@@ -39,6 +39,7 @@ interface GameState {
   currentPlayerIndex: number;
   secretWord: string;
   usedWords: string[];
+  discussionTimeEnabled: boolean;
   discussionTime: number;
   winner: 'imposters' | 'players' | null;
 }
@@ -54,6 +55,7 @@ interface GameContextType extends GameState {
   setImposterCount: (count: number) => void;
   setCategory: (category: Category) => void;
   setCustomWords: (words: string[]) => void;
+  setDiscussionTimeEnabled: (enabled: boolean) => void;
   setDiscussionTime: (time: number) => void;
   setPlayerNames: (names: string[]) => void;
   goToPlayerNames: () => void;
@@ -77,6 +79,7 @@ const initialState: GameState = {
   currentPlayerIndex: 0,
   secretWord: '',
   usedWords: [],
+  discussionTimeEnabled: true,
   discussionTime: 90,
   winner: null,
 };
@@ -109,6 +112,10 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const setCustomWords = (words: string[]) => {
     setState(prev => ({ ...prev, customWords: words }));
+  };
+
+  const setDiscussionTimeEnabled = (enabled: boolean) => {
+    setState(prev => ({ ...prev, discussionTimeEnabled: enabled }));
   };
 
   const setDiscussionTime = (time: number) => {
@@ -232,6 +239,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setImposterCount,
         setCategory,
         setCustomWords,
+        setDiscussionTimeEnabled,
         setDiscussionTime,
         setPlayerNames,
         goToPlayerNames,
