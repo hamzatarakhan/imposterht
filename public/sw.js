@@ -1,5 +1,4 @@
-// Bump cache version when changing caching logic to ensure old caches are cleared.
-const CACHE_NAME = 'imposter-v2';
+const CACHE_NAME = 'imposter-v1';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -37,12 +36,6 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-  // Never cache dev-server / Vite dependency chunks; they change frequently.
-  const url = new URL(event.request.url);
-  if (url.pathname.includes('/node_modules/.vite/') || url.pathname.includes('/@vite/') || url.pathname.endsWith('.map')) {
-    return;
-  }
-
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
