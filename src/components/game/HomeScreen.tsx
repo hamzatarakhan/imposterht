@@ -205,14 +205,14 @@ const { setScreen } = useGame();
               <button
                 onClick={() => handleAddPlayer(false)}
                 disabled={!newPlayerName.trim()}
-                className="w-full btn-primary-game disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 px-4 rounded-xl bg-primary text-primary-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
               >
                 ✅ حفظ وإغلاق
               </button>
               <button
                 onClick={() => handleAddPlayer(true)}
                 disabled={!newPlayerName.trim()}
-                className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors text-sm"
+                className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors"
               >
                 ➕ حفظ وإضافة آخر
               </button>
