@@ -200,11 +200,11 @@ const HomeScreen: React.FC = () => {
               هذا الإجراء لا يمكن التراجع عنه.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row-reverse gap-2">
-            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+          <AlertDialogFooter className="flex-row gap-3 sm:gap-2 justify-center sm:justify-end">
+            <AlertDialogCancel className="flex-1 sm:flex-none m-0">إلغاء</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleClearAll}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="flex-1 sm:flex-none bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               نعم، امسح الكل
             </AlertDialogAction>
