@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
-import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode } from 'lucide-react';
+import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import QRCodeModal from './QRCodeModal';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,12 +28,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 
 const HomeScreen: React.FC = () => {
 const { setScreen } = useGame();
@@ -36,8 +36,55 @@ const { setScreen } = useGame();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [showAddPlayerDialog, setShowAddPlayerDialog] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
+  const [showInstallSteps, setShowInstallSteps] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newPlayerAvatar, setNewPlayerAvatar] = useState('👤');
+
+  type DeviceType = 'ios' | 'android' | 'desktop';
+  const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
+
+  React.useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(userAgent)) {
+      setDeviceType('ios');
+    } else if (/android/.test(userAgent)) {
+      setDeviceType('android');
+    } else {
+      setDeviceType('desktop');
+    }
+  }, []);
+
+  const iosSteps = [
+    { step: 1, icon: '🧭', text: 'افتح الرابط في Safari' },
+    { step: 2, icon: '📤', text: 'اضغط على زر المشاركة (أسفل الشاشة)' },
+    { step: 3, icon: '➕', text: 'اختر "إضافة إلى الشاشة الرئيسية"' },
+    { step: 4, icon: '✅', text: 'اضغط "إضافة" للتأكيد' },
+  ];
+
+  const androidSteps = [
+    { step: 1, icon: '🌐', text: 'افتح الرابط في Chrome' },
+    { step: 2, icon: '⋮', text: 'اضغط على القائمة (ثلاث نقاط)' },
+    { step: 3, icon: '📲', text: 'اختر "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية"' },
+    { step: 4, icon: '✅', text: 'اضغط "تثبيت" للتأكيد' },
+  ];
+
+  const desktopSteps = [
+    { step: 1, icon: '🌐', text: 'افتح الرابط في Chrome أو Edge' },
+    { step: 2, icon: '📥', text: 'ابحث عن أيقونة التثبيت في شريط العنوان' },
+    { step: 3, icon: '✅', text: 'اضغط "تثبيت" للتأكيد' },
+  ];
+
+  const getSteps = () => {
+    if (deviceType === 'ios') return iosSteps;
+    if (deviceType === 'android') return androidSteps;
+    return desktopSteps;
+  };
+
+  const getDeviceLabel = () => {
+    if (deviceType === 'ios') return 'التثبيت على iPhone';
+    if (deviceType === 'android') return 'التثبيت على Android';
+    return 'التثبيت على الكمبيوتر';
+  };
 
   const appUrl = 'https://imposter-hide-and-seek.lovable.app';
 
@@ -243,6 +290,47 @@ const { setScreen } = useGame();
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Install Steps Dialog */}
+      <Dialog open={showInstallSteps} onOpenChange={setShowInstallSteps}>
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-sm rounded-2xl p-5">
+          <DialogHeader className="text-center">
+            <div className="flex justify-center mb-2">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Smartphone size={28} className="text-primary-foreground" />
+              </div>
+            </div>
+            <DialogTitle className="text-lg">{getDeviceLabel()}</DialogTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              اتبع الخطوات التالية
+            </p>
+          </DialogHeader>
+          
+          <div className="space-y-3 my-4">
+            {getSteps().map((item) => (
+              <div 
+                key={item.step}
+                className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl"
+              >
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <span className="text-lg">{item.icon}</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-muted-foreground mb-0.5">الخطوة {item.step}</p>
+                  <p className="text-sm font-medium text-foreground">{item.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => setShowInstallSteps(false)}
+            className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold hover:bg-secondary/80 transition-colors"
+          >
+            فهمت! 👍
+          </button>
+        </DialogContent>
+      </Dialog>
       
       {/* Main Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
@@ -271,6 +359,14 @@ const { setScreen } = useGame();
           >
             <HelpCircle size={24} />
             طريقة اللعب
+          </button>
+
+          <button
+            onClick={() => setShowInstallSteps(true)}
+            className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-accent to-primary/80 text-accent-foreground font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <Download size={20} />
+            كيف أضيف التطبيق للشاشة الرئيسية؟
           </button>
           
           {isInstallable && (
