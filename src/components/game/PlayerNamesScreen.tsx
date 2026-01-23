@@ -85,7 +85,7 @@ const PlayerNamesScreen: React.FC = () => {
   const progress = ((currentIndex + 1) / playerCount) * 100;
 
   return (
-    <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
       <div className="absolute top-1/4 left-10 w-32 h-32 bg-accent/10 rounded-full blur-3xl" />
