@@ -6,11 +6,16 @@ const HomeScreen: React.FC = () => {
   const { setScreen } = useGame();
 
   return (
-    <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col p-6 relative">
       {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
       <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
       <div className="absolute bottom-40 right-10 w-40 h-40 bg-imposter/10 rounded-full blur-3xl" />
+      
+      {/* Floating Imposter Icon - positioned absolutely */}
+      <div className="absolute top-[12%] left-1/2 -translate-x-1/2 z-20 animate-float">
+        <span className="text-7xl block drop-shadow-2xl">😈</span>
+      </div>
       
       {/* Settings Icon */}
       <div className="relative z-10 flex justify-start">
@@ -22,8 +27,7 @@ const HomeScreen: React.FC = () => {
       {/* Main Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
         {/* Logo */}
-        <div className="text-center mb-12">
-          <span className="text-7xl mb-4 block animate-float">😈</span>
+        <div className="text-center mb-12 mt-16">
           <h1 className="text-5xl font-black text-gradient mb-2">IMPOSTER</h1>
           <p className="text-muted-foreground">لعبة الإمبوستر الجماعية</p>
         </div>
