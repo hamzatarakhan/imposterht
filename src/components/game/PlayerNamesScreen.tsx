@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
-import { ArrowRight, ArrowLeft, Check, Users, X, Trash2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, Users, X, Trash2, Pencil } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import {
   DropdownMenu,
@@ -299,14 +299,72 @@ const PlayerNamesScreen: React.FC = () => {
           {currentIndex > 0 && (
             <div className="mt-8 flex flex-wrap justify-center gap-2">
               {playerData.slice(0, currentIndex).map((data, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 rounded-full bg-secondary text-sm flex items-center gap-2"
-                >
-                  <span>{data.avatar}</span>
-                  <Check size={14} className="text-accent" />
-                  {data.name}
-                </span>
+                <DropdownMenu key={i}>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className="px-3 py-1.5 rounded-full bg-secondary hover:bg-secondary/80 text-sm flex items-center gap-2 transition-colors"
+                    >
+                      <span>{data.avatar}</span>
+                      <span>{data.name}</span>
+                      <Pencil size={12} className="text-muted-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="center" 
+                    className="min-w-[200px] bg-card/95 backdrop-blur-md border-border/50 rounded-xl"
+                  >
+                    <DropdownMenuLabel className="text-muted-foreground text-center">
+                      ✏️ تعديل اللاعب #{i + 1}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="cursor-pointer flex items-center gap-2 justify-center"
+                      onSelect={() => {
+                        // Go to this player's index to edit
+                        const newPlayerData = [...playerData];
+                        const trimmedName = inputValue.trim();
+                        newPlayerData[currentIndex] = {
+                          name: trimmedName || `لاعب ${currentIndex + 1}`,
+                          avatar: selectedAvatar
+                        };
+                        setPlayerData(newPlayerData);
+                        setCurrentIndex(i);
+                        setInputValue(newPlayerData[i].name);
+                        setSelectedAvatar(newPlayerData[i].avatar);
+                      }}
+                    >
+                      <Pencil size={14} />
+                      تعديل الاسم
+                    </DropdownMenuItem>
+                    {savedPlayers.length > 0 && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel className="text-muted-foreground text-xs">
+                          🔖 اختر من المحفوظين
+                        </DropdownMenuLabel>
+                        <div className="max-h-[150px] overflow-y-auto">
+                          {savedPlayers.map((player) => (
+                            <DropdownMenuItem
+                              key={player.name}
+                              className="cursor-pointer flex items-center gap-2"
+                              onSelect={() => {
+                                const newPlayerData = [...playerData];
+                                newPlayerData[i] = {
+                                  name: player.name,
+                                  avatar: player.avatar
+                                };
+                                setPlayerData(newPlayerData);
+                              }}
+                            >
+                              <span>{player.avatar}</span>
+                              <span>{player.name}</span>
+                            </DropdownMenuItem>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ))}
             </div>
           )}
