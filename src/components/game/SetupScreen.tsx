@@ -77,23 +77,31 @@ const SetupScreen: React.FC = () => {
             </div>
             <div>
               <h3 className="font-bold">عدد الإمبوستر</h3>
-              <p className="text-sm text-muted-foreground">للمتقدمين: جرب 2</p>
+              <p className="text-sm text-muted-foreground">
+                {playerCount < 4 ? 'يتطلب 4+ لاعبين لإمبوسترين' : 'للمتقدمين: جرب 2'}
+              </p>
             </div>
           </div>
           <div className="flex gap-3">
-            {[1, 2].map((count) => (
-              <button
-                key={count}
-                onClick={() => setImposterCount(count)}
-                className={`flex-1 py-4 rounded-2xl text-xl font-bold transition-all ${
-                  imposterCount === count
-                    ? 'bg-imposter text-white glow-imposter'
-                    : 'bg-secondary text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {count} 😈
-              </button>
-            ))}
+            {[1, 2].map((count) => {
+              const isDisabled = count === 2 && playerCount < 4;
+              return (
+                <button
+                  key={count}
+                  onClick={() => !isDisabled && setImposterCount(count)}
+                  disabled={isDisabled}
+                  className={`flex-1 py-4 rounded-2xl text-xl font-bold transition-all ${
+                    imposterCount === count
+                      ? 'bg-imposter text-white glow-imposter'
+                      : isDisabled
+                        ? 'bg-secondary/50 text-muted-foreground/50 cursor-not-allowed'
+                        : 'bg-secondary text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {count} 😈
+                </button>
+              );
+            })}
           </div>
         </div>
         

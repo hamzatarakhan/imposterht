@@ -91,7 +91,12 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const setPlayerCount = (count: number) => {
-    setState(prev => ({ ...prev, playerCount: count }));
+    setState(prev => ({
+      ...prev,
+      playerCount: count,
+      // Auto-reset imposter count to 1 if less than 4 players
+      imposterCount: count < 4 ? 1 : prev.imposterCount,
+    }));
   };
 
   const setImposterCount = (count: number) => {
