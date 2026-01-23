@@ -91,26 +91,28 @@ const PlayerNamesScreen: React.FC = () => {
       <div className="absolute top-1/4 left-10 w-32 h-32 bg-accent/10 rounded-full blur-3xl" />
       
       <div className="relative z-10 flex-1 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => setScreen('setup')}
-            className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
-          >
-            <ArrowRight size={24} />
-          </button>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold">أسماء اللاعبين</h1>
-            <p className="text-sm text-muted-foreground">
-              {currentIndex + 1} / {playerCount}
-            </p>
+        {/* Header - Sticky */}
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-2">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setScreen('setup')}
+              className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
+            >
+              <ArrowRight size={24} />
+            </button>
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold">أسماء اللاعبين</h1>
+              <p className="text-sm text-muted-foreground">
+                {currentIndex + 1} / {playerCount}
+              </p>
+            </div>
+            <button
+              onClick={handleSkipAll}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              تخطي الكل
+            </button>
           </div>
-          <button
-            onClick={handleSkipAll}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            تخطي الكل
-          </button>
         </div>
 
         {/* Progress Bar */}
