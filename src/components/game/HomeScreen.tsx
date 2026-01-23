@@ -434,12 +434,22 @@ const HomeScreen: React.FC = () => {
         <p className="text-xs text-muted-foreground">
           Powered by <span className="text-primary font-bold">Hamza Tarkhan</span>
         </p>
-        <a
-          href="mailto:Hamzatarakhan2000@gmail.com"
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors"
-        >
-          ✉️ Hamzatarakhan2000@gmail.com
-        </a>
+        <div className="flex flex-col items-center gap-1">
+          <a
+            href="mailto:Hamzatarakhan2000@gmail.com"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors"
+          >
+            ✉️ Hamzatarakhan2000@gmail.com
+          </a>
+          <a
+            href="https://instagram.com/hamza_tarakhan_"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors"
+          >
+            📸 @hamza_tarakhan_
+          </a>
+        </div>
       </div>
     </div>
   );
