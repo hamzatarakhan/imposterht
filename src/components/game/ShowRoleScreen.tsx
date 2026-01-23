@@ -44,7 +44,7 @@ const ShowRoleScreen: React.FC = () => {
               <span className="text-6xl">🎭</span>
             </div>
             
-            <h2 className="text-2xl font-bold mb-2">لاعب {currentPlayerIndex + 1}</h2>
+            <h2 className="text-2xl font-bold mb-2">{currentPlayer?.name}</h2>
             <p className="text-muted-foreground mb-8">اضغط لكشف دورك</p>
             
             <button

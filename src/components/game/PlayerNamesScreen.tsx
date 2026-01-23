@@ -11,15 +11,16 @@ const PlayerNamesScreen: React.FC = () => {
   const [inputValue, setInputValue] = useState(names[0]);
 
   const handleNameChange = (value: string) => {
-    // Limit name length and sanitize
-    const sanitized = value.slice(0, 20).trim();
-    setInputValue(sanitized);
+    // Limit name length only (trim will happen when saving)
+    const limited = value.slice(0, 20);
+    setInputValue(limited);
   };
 
   const handleNext = () => {
-    // Save current name
+    // Save current name (trim here when saving)
     const newNames = [...names];
-    newNames[currentIndex] = inputValue || `لاعب ${currentIndex + 1}`;
+    const trimmedName = inputValue.trim();
+    newNames[currentIndex] = trimmedName || `لاعب ${currentIndex + 1}`;
     setNames(newNames);
 
     if (currentIndex < playerCount - 1) {
