@@ -140,7 +140,7 @@ const HomeScreen: React.FC = () => {
 
       {/* Add Player Dialog */}
       <Dialog open={showAddPlayerDialog} onOpenChange={setShowAddPlayerDialog}>
-        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm mx-4">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-sm rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-center">➕ إضافة لاعب جديد</DialogTitle>
           </DialogHeader>
