@@ -16,10 +16,16 @@ export type GameScreen =
 export interface Player {
   id: number;
   name: string;
+  avatar: string;
   isImposter: boolean;
   hasSeenRole: boolean;
   votes: number;
 }
+
+export const AVATAR_OPTIONS = [
+  '👤', '😎', '🦊', '🐱', '🐶', '🦁', '🐼', '🐨', 
+  '🦄', '🐸', '🐵', '🐰', '🐻', '🐯', '🦋', '🌟'
+];
 
 interface GameState {
   screen: GameScreen;
@@ -36,6 +42,11 @@ interface GameState {
   winner: 'imposters' | 'players' | null;
 }
 
+interface PlayerData {
+  name: string;
+  avatar: string;
+}
+
 interface GameContextType extends GameState {
   setScreen: (screen: GameScreen) => void;
   setPlayerCount: (count: number) => void;
@@ -45,7 +56,7 @@ interface GameContextType extends GameState {
   setDiscussionTime: (time: number) => void;
   setPlayerNames: (names: string[]) => void;
   goToPlayerNames: () => void;
-  startGame: (names?: string[]) => void;
+  startGame: (playerData?: PlayerData[]) => void;
   nextPlayer: () => void;
   markPlayerAsSeen: () => void;
   voteForPlayer: (playerId: number) => void;
@@ -106,19 +117,18 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setState(prev => ({ ...prev, screen: 'playerNames' }));
   };
 
-  const startGame = (customNames?: string[]) => {
-    // Use passed names or fallback to state
-    const namesToUse = customNames || state.playerNames;
-    
+  const startGame = (playerData?: PlayerData[]) => {
     // Generate random word
     const word = getRandomWord(state.category, state.usedWords);
     
-    // Create players array with custom names if available
+    // Create players array with custom names and avatars
     const players: Player[] = [];
     for (let i = 0; i < state.playerCount; i++) {
+      const data = playerData?.[i];
       players.push({
         id: i + 1,
-        name: namesToUse[i] || `لاعب ${i + 1}`,
+        name: data?.name || `لاعب ${i + 1}`,
+        avatar: data?.avatar || '👤',
         isImposter: false,
         hasSeenRole: false,
         votes: 0,
@@ -138,7 +148,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setState(prev => ({
       ...prev,
       players,
-      playerNames: namesToUse,
+      playerNames: playerData?.map(p => p.name) || state.playerNames,
       secretWord: word,
       usedWords: [...prev.usedWords, word],
       currentPlayerIndex: 0,

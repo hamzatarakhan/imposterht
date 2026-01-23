@@ -72,6 +72,10 @@ const VotingScreen: React.FC = () => {
               مرّر الهاتف إلى
             </h1>
             
+            <div className="w-16 h-16 mx-auto rounded-full bg-primary/20 flex items-center justify-center mb-4">
+              <span className="text-3xl">{nextVoter?.avatar || '👤'}</span>
+            </div>
+            
             <div className="card-game mb-6 inline-block">
               <span className="text-3xl font-black text-gradient">
                 {nextVoter?.name}
@@ -121,6 +125,9 @@ const VotingScreen: React.FC = () => {
         
         {/* Current Voter */}
         <div className="card-game bg-primary/10 border-primary/30 mb-6 text-center">
+          <div className="w-16 h-16 mx-auto rounded-full bg-primary/20 flex items-center justify-center mb-2">
+            <span className="text-3xl">{currentVoter?.avatar || '👤'}</span>
+          </div>
           <p className="text-muted-foreground mb-1">دور</p>
           <span className="text-2xl font-black text-gradient">
             {currentVoter?.name}
@@ -150,8 +157,7 @@ const VotingScreen: React.FC = () => {
                   selectedPlayer === player.id ? 'bg-imposter' : 'bg-card'
                 }`}>
                   <span className="text-2xl">
-                    {player.id === currentVoter?.id ? '🙋' : 
-                     selectedPlayer === player.id ? '😈' : '👤'}
+                    {selectedPlayer === player.id ? '😈' : player.avatar || '👤'}
                   </span>
                 </div>
                 <span className="font-bold text-lg">{player.name}</span>

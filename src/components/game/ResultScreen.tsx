@@ -56,14 +56,15 @@ const ResultScreen: React.FC = () => {
         {/* Imposter Reveal */}
         <div className="card-game w-full max-w-sm mb-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
           <p className="text-muted-foreground mb-2">الإمبوستر كان:</p>
-          <div className="flex flex-wrap justify-center gap-2">
+          <div className="flex flex-wrap justify-center gap-3">
             {imposters.map((imposter) => (
-              <span 
+              <div 
                 key={imposter.id}
-                className="px-4 py-2 rounded-xl bg-imposter/20 text-imposter font-bold text-xl"
+                className="flex flex-col items-center gap-2 px-4 py-3 rounded-xl bg-imposter/20"
               >
-                {imposter.name} 😈
-              </span>
+                <span className="text-4xl">{imposter.avatar || '😈'}</span>
+                <span className="text-imposter font-bold text-lg">{imposter.name}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -87,6 +88,7 @@ const ResultScreen: React.FC = () => {
               >
                 <div className="flex items-center gap-2">
                   <span>{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>
+                  <span className="text-xl">{player.avatar || '👤'}</span>
                   <span className={player.isImposter ? 'text-imposter' : ''}>
                     {player.name}
                     {player.isImposter && ' 😈'}

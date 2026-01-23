@@ -40,12 +40,12 @@ const ShowRoleScreen: React.FC = () => {
         {!revealed ? (
           // Hidden state
           <div className="animate-slide-up">
-            <div className="w-32 h-32 mx-auto rounded-full bg-secondary flex items-center justify-center mb-8">
-              <span className="text-6xl">🎭</span>
+            <div className="w-32 h-32 mx-auto rounded-full bg-secondary flex items-center justify-center mb-6">
+              <span className="text-6xl">{currentPlayer?.avatar || '🎭'}</span>
             </div>
             
             <h2 className="text-2xl font-bold mb-2">{currentPlayer?.name}</h2>
-            <p className="text-muted-foreground mb-8">اضغط لكشف دورك</p>
+            <p className="text-muted-foreground mb-6">اضغط لكشف دورك</p>
             
             <button
               onClick={handleReveal}
