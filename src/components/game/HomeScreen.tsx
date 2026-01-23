@@ -286,13 +286,19 @@ const { setScreen } = useGame();
       </div>
       
       {/* Footer */}
-      <div className="relative z-10 text-center py-4 space-y-1">
+      <div className="relative z-10 text-center py-4 space-y-2">
         <p className="text-sm text-muted-foreground">
           العبوا مع بعض في نفس المكان 🎮
         </p>
         <p className="text-xs text-muted-foreground">
           Powered by <span className="text-primary font-bold">Hamza Tarkhan</span>
         </p>
+        <a 
+          href="mailto:Hamzatarakhan2000@gmail.com" 
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors"
+        >
+          ✉️ Hamzatarakhan2000@gmail.com
+        </a>
       </div>
     </div>
   );
