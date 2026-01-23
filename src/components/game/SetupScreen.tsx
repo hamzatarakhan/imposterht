@@ -12,6 +12,8 @@ const SetupScreen: React.FC = () => {
     setImposterCount,
     category,
     setCategory,
+    discussionTimeEnabled,
+    setDiscussionTimeEnabled,
     discussionTime,
     setDiscussionTime,
     goToPlayerNames
@@ -135,30 +137,48 @@ const SetupScreen: React.FC = () => {
         
         {/* Discussion Time */}
         <div className="card-game">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
-              <Clock className="text-accent" size={20} />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
+                <Clock className="text-accent" size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold">وقت النقاش</h3>
+                <p className="text-sm text-muted-foreground">
+                  {discussionTimeEnabled ? 'مؤقت تنازلي' : 'بدون مؤقت'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold">وقت النقاش</h3>
-              <p className="text-sm text-muted-foreground">بالثواني</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            {[60, 90, 120].map((time) => (
-              <button
-                key={time}
-                onClick={() => setDiscussionTime(time)}
-                className={`flex-1 py-3 rounded-2xl font-bold transition-all ${
-                  discussionTime === time
-                    ? 'bg-accent text-accent-foreground glow-accent'
-                    : 'bg-secondary text-muted-foreground hover:text-foreground'
+            <button
+              onClick={() => setDiscussionTimeEnabled(!discussionTimeEnabled)}
+              className={`w-14 h-8 rounded-full transition-colors relative ${
+                discussionTimeEnabled ? 'bg-accent' : 'bg-secondary'
+              }`}
+            >
+              <div 
+                className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${
+                  discussionTimeEnabled ? 'left-1' : 'right-1'
                 }`}
-              >
-                {time}s
-              </button>
-            ))}
+              />
+            </button>
           </div>
+          {discussionTimeEnabled && (
+            <div className="flex gap-3">
+              {[60, 90, 120].map((time) => (
+                <button
+                  key={time}
+                  onClick={() => setDiscussionTime(time)}
+                  className={`flex-1 py-3 rounded-2xl font-bold transition-all ${
+                    discussionTime === time
+                      ? 'bg-accent text-accent-foreground glow-accent'
+                      : 'bg-secondary text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {time}s
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       
