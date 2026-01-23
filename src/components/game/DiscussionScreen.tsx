@@ -6,7 +6,6 @@ const DiscussionScreen: React.FC = () => {
   const { discussionTime, setScreen } = useGame();
   const [timeLeft, setTimeLeft] = useState(discussionTime);
   const [isRunning, setIsRunning] = useState(false);
-  const [round, setRound] = useState(1);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -37,8 +36,7 @@ const DiscussionScreen: React.FC = () => {
     return 'bg-imposter';
   };
 
-  const handleNewRound = () => {
-    setRound((prev) => prev + 1);
+  const handleResetTimer = () => {
     setTimeLeft(discussionTime);
     setIsRunning(false);
   };
@@ -58,10 +56,7 @@ const DiscussionScreen: React.FC = () => {
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
         <div className="text-center mb-8">
-          <span className="px-4 py-2 rounded-full bg-secondary text-sm font-bold">
-            الجولة {round}
-          </span>
-          <h1 className="text-3xl font-black mt-4">وقت النقاش 💬</h1>
+          <h1 className="text-3xl font-black">وقت النقاش 💬</h1>
         </div>
         
         {/* Timer */}
@@ -116,7 +111,7 @@ const DiscussionScreen: React.FC = () => {
             </button>
             
             <button
-              onClick={handleNewRound}
+              onClick={handleResetTimer}
               className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors"
             >
               <RotateCcw size={28} />
@@ -136,13 +131,6 @@ const DiscussionScreen: React.FC = () => {
         
         {/* Actions */}
         <div className="space-y-3">
-          <button
-            onClick={handleNewRound}
-            className="w-full btn-secondary-game"
-          >
-            🔄 جولة أخرى
-          </button>
-          
           <button
             onClick={() => setScreen('voting')}
             className="w-full btn-primary-game flex items-center justify-center gap-3"
