@@ -20,7 +20,7 @@ const SetupScreen: React.FC = () => {
   const categories: Category[] = ['random', 'things', 'places', 'food', 'jobs'];
 
   return (
-    <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
       

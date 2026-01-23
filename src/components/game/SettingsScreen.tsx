@@ -39,7 +39,7 @@ const SettingsScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 relative">
+    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
       {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
       <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
