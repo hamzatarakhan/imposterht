@@ -1,12 +1,20 @@
 import React from 'react';
 import { useGame } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 import { Smartphone } from 'lucide-react';
 import RestartButton from './RestartButton';
 
 const PassPhoneScreen: React.FC = () => {
   const { currentPlayerIndex, players, setScreen } = useGame();
+  const { playSound, vibrate } = useSettings();
   
   const currentPlayer = players[currentPlayerIndex];
+
+  const handleShowRole = () => {
+    playSound('click');
+    vibrate(50);
+    setScreen('showRole');
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
@@ -40,7 +48,7 @@ const PassPhoneScreen: React.FC = () => {
         {/* Button */}
         <div className="space-y-3">
           <button
-            onClick={() => setScreen('showRole')}
+            onClick={handleShowRole}
             className="w-full btn-primary-game text-xl"
           >
             👁️ عرض دوري

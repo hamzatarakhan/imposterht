@@ -10,7 +10,7 @@ interface SettingsContextType extends SettingsState {
   setSoundEnabled: (enabled: boolean) => void;
   setVibrationEnabled: (enabled: boolean) => void;
   setDarkMode: (enabled: boolean) => void;
-  playSound: (type: 'click' | 'reveal' | 'win' | 'lose') => void;
+  playSound: (type: 'click' | 'reveal' | 'win' | 'lose' | 'tick' | 'alarm') => void;
   vibrate: (pattern?: number | number[]) => void;
 }
 
@@ -30,6 +30,8 @@ const soundFrequencies = {
   reveal: { frequency: 800, duration: 150 },
   win: { frequency: 523, duration: 200 }, // C5
   lose: { frequency: 220, duration: 300 }, // A3
+  tick: { frequency: 440, duration: 30 }, // Short tick
+  alarm: { frequency: 880, duration: 400 }, // Alarm sound
 };
 
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -76,7 +78,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   // Play sound using Web Audio API
-  const playSound = (type: 'click' | 'reveal' | 'win' | 'lose') => {
+  const playSound = (type: 'click' | 'reveal' | 'win' | 'lose' | 'tick' | 'alarm') => {
     if (!settings.soundEnabled) return;
 
     try {

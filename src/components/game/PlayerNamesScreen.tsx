@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, ArrowLeft, Check, Users, X, Trash2, Pencil } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import RestartButton from './RestartButton';
@@ -29,6 +30,7 @@ interface PlayerData {
 
 const PlayerNamesScreen: React.FC = () => {
   const { playerCount, setScreen, startGame } = useGame();
+  const { playSound, vibrate } = useSettings();
   const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
   const [playerData, setPlayerData] = useState<PlayerData[]>(
     Array.from({ length: playerCount }, (_, i) => ({
@@ -41,17 +43,22 @@ const PlayerNamesScreen: React.FC = () => {
   const [selectedAvatar, setSelectedAvatar] = useState(playerData[0].avatar);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+
   const handleNameChange = (value: string) => {
     const limited = value.slice(0, 20);
     setInputValue(limited);
   };
 
   const handleAvatarSelect = (avatar: string) => {
+    playSound('click');
     setSelectedAvatar(avatar);
     setShowAvatarPicker(false);
   };
 
   const handleNext = () => {
+    playSound('click');
+    vibrate(30);
+    
     // Save current player data
     const newPlayerData = [...playerData];
     const trimmedName = inputValue.trim();
@@ -76,11 +83,16 @@ const PlayerNamesScreen: React.FC = () => {
       setShowAvatarPicker(false);
     } else {
       // All data entered, start game
+      playSound('reveal');
+      vibrate(100);
       startGame(newPlayerData);
     }
   };
 
   const handlePrevious = () => {
+    playSound('click');
+    vibrate(30);
+    
     if (currentIndex > 0) {
       // Save current player data first
       const newPlayerData = [...playerData];
@@ -101,6 +113,8 @@ const PlayerNamesScreen: React.FC = () => {
   };
 
   const handleSkipAll = () => {
+    playSound('click');
+    vibrate(50);
     const defaultData = Array.from({ length: playerCount }, (_, i) => ({
       name: `لاعب ${i + 1}`,
       avatar: '👤'
@@ -109,6 +123,7 @@ const PlayerNamesScreen: React.FC = () => {
   };
 
   const handleSelectSavedPlayer = (player: { name: string; avatar: string }) => {
+    playSound('click');
     setInputValue(player.name);
     setSelectedAvatar(player.avatar);
   };
@@ -116,12 +131,26 @@ const PlayerNamesScreen: React.FC = () => {
   const handleRemovePlayer = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
     e.stopPropagation();
+    playSound('click');
     removePlayer(name);
   };
 
   const handleClearAll = () => {
+    playSound('click');
+    vibrate(50);
     clearAllPlayers();
     setShowDeleteAllDialog(false);
+  };
+
+  const handleBack = () => {
+    playSound('click');
+    vibrate(30);
+    setScreen('setup');
+  };
+
+  const handleAvatarPickerToggle = () => {
+    playSound('click');
+    setShowAvatarPicker(!showAvatarPicker);
   };
 
   const isLastPlayer = currentIndex === playerCount - 1;
@@ -138,7 +167,7 @@ const PlayerNamesScreen: React.FC = () => {
         <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-2">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setScreen('setup')}
+              onClick={handleBack}
               className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
             >
               <ArrowRight size={24} />
@@ -170,7 +199,7 @@ const PlayerNamesScreen: React.FC = () => {
         <div className="flex-1 flex flex-col items-center justify-center">
           {/* Avatar Picker */}
           <button
-            onClick={() => setShowAvatarPicker(!showAvatarPicker)}
+            onClick={handleAvatarPickerToggle}
             className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center mb-4 glow-primary animate-float hover:scale-110 transition-transform relative"
           >
             <span className="text-5xl">{selectedAvatar}</span>
@@ -228,7 +257,10 @@ const PlayerNamesScreen: React.FC = () => {
                 {savedPlayers.length > 0 && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="shrink-0 p-3 sm:p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors">
+                      <button 
+                        onClick={() => playSound('click')}
+                        className="shrink-0 p-3 sm:p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors"
+                      >
                         <Users size={22} />
                       </button>
                     </DropdownMenuTrigger>
@@ -308,6 +340,7 @@ const PlayerNamesScreen: React.FC = () => {
                 <DropdownMenu key={i}>
                   <DropdownMenuTrigger asChild>
                     <button
+                      onClick={() => playSound('click')}
                       className="px-3 py-1.5 rounded-full bg-secondary hover:bg-secondary/80 text-sm flex items-center gap-2 transition-colors"
                     >
                       <span>{data.avatar}</span>
@@ -326,6 +359,7 @@ const PlayerNamesScreen: React.FC = () => {
                     <DropdownMenuItem
                       className="cursor-pointer flex items-center gap-2 justify-center"
                       onSelect={() => {
+                        playSound('click');
                         // Go to this player's index to edit
                         const newPlayerData = [...playerData];
                         const trimmedName = inputValue.trim();
@@ -354,6 +388,7 @@ const PlayerNamesScreen: React.FC = () => {
                               key={player.name}
                               className="cursor-pointer flex items-center gap-2"
                               onSelect={() => {
+                                playSound('click');
                                 const newPlayerData = [...playerData];
                                 newPlayerData[i] = {
                                   name: player.name,

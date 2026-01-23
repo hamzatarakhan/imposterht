@@ -1,14 +1,43 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useGame } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 import { RotateCcw, Home } from 'lucide-react';
 
 const ResultScreen: React.FC = () => {
   const { players, winner, secretWord, playAgain, resetGame } = useGame();
+  const { playSound, vibrate } = useSettings();
+  const hasPlayedSoundRef = useRef(false);
   
   const imposters = players.filter(p => p.isImposter);
   const sortedByVotes = [...players].sort((a, b) => b.votes - a.votes);
   const mostVoted = sortedByVotes[0];
   const playersWon = winner === 'players';
+
+  // Play result sound on mount
+  useEffect(() => {
+    if (!hasPlayedSoundRef.current) {
+      if (playersWon) {
+        playSound('win');
+        vibrate([100, 50, 100, 50, 200]);
+      } else {
+        playSound('lose');
+        vibrate([200, 100, 200]);
+      }
+      hasPlayedSoundRef.current = true;
+    }
+  }, [playersWon, playSound, vibrate]);
+
+  const handlePlayAgain = () => {
+    playSound('click');
+    vibrate(50);
+    playAgain();
+  };
+
+  const handleGoHome = () => {
+    playSound('click');
+    vibrate(30);
+    resetGame();
+  };
 
   return (
     <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
@@ -104,7 +133,7 @@ const ResultScreen: React.FC = () => {
       {/* Actions */}
       <div className="relative z-10 space-y-3 mt-6">
         <button
-          onClick={playAgain}
+          onClick={handlePlayAgain}
           className="w-full btn-primary-game flex items-center justify-center gap-3"
         >
           <RotateCcw size={24} />
@@ -112,7 +141,7 @@ const ResultScreen: React.FC = () => {
         </button>
         
         <button
-          onClick={resetGame}
+          onClick={handleGoHome}
           className="w-full btn-secondary-game flex items-center justify-center gap-3"
         >
           <Home size={24} />

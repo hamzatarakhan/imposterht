@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Check, Smartphone } from 'lucide-react';
 import RestartButton from './RestartButton';
 
 const VotingScreen: React.FC = () => {
   const { players, voteForPlayer, calculateResult, setScreen } = useGame();
+  const { playSound, vibrate } = useSettings();
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
   const [votingPlayerIndex, setVotingPlayerIndex] = useState(0);
   const [votes, setVotes] = useState<Record<number, number>>({});
@@ -14,8 +16,18 @@ const VotingScreen: React.FC = () => {
   const nextVoter = players[votingPlayerIndex + 1];
   const isLastVoter = votingPlayerIndex === players.length - 1;
 
+  const handleSelectPlayer = (playerId: number) => {
+    if (playerId === currentVoter?.id) return;
+    playSound('click');
+    vibrate(30);
+    setSelectedPlayer(playerId);
+  };
+
   const handleVote = () => {
     if (selectedPlayer === null) return;
+    
+    playSound('click');
+    vibrate(50);
     
     // Record the vote
     voteForPlayer(selectedPlayer);
@@ -36,9 +48,17 @@ const VotingScreen: React.FC = () => {
   };
 
   const handleNextVoter = () => {
+    playSound('click');
+    vibrate(30);
     setVotingPlayerIndex(prev => prev + 1);
     setSelectedPlayer(null);
     setShowPassPhone(false);
+  };
+
+  const handleBack = () => {
+    playSound('click');
+    vibrate(30);
+    setScreen('discussion');
   };
 
   // Pass phone screen between voters
@@ -112,7 +132,7 @@ const VotingScreen: React.FC = () => {
         <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-2">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setScreen('discussion')}
+              onClick={handleBack}
               className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
             >
               <ArrowRight size={24} />
@@ -145,7 +165,7 @@ const VotingScreen: React.FC = () => {
           {players.map((player) => (
             <button
               key={player.id}
-              onClick={() => setSelectedPlayer(player.id)}
+              onClick={() => handleSelectPlayer(player.id)}
               disabled={player.id === currentVoter?.id}
               className={`w-full p-4 rounded-2xl flex items-center justify-between transition-all ${
                 player.id === currentVoter?.id

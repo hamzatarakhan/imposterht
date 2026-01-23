@@ -1,21 +1,27 @@
 import React, { useState } from 'react';
 import { useGame } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 import { EyeOff } from 'lucide-react';
 import RestartButton from './RestartButton';
 
 const ShowRoleScreen: React.FC = () => {
   const { players, currentPlayerIndex, secretWord, markPlayerAsSeen, nextPlayer } = useGame();
+  const { playSound, vibrate } = useSettings();
   const [revealed, setRevealed] = useState(false);
   
   const currentPlayer = players[currentPlayerIndex];
   const isImposter = currentPlayer?.isImposter;
 
   const handleReveal = () => {
+    playSound('reveal');
+    vibrate(isImposter ? [100, 50, 100, 50, 100] : 100);
     setRevealed(true);
     markPlayerAsSeen();
   };
 
   const handleNext = () => {
+    playSound('click');
+    vibrate(50);
     setRevealed(false);
     nextPlayer();
   };
