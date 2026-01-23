@@ -219,13 +219,12 @@ const PlayerNamesScreen: React.FC = () => {
                     }
                   }}
                 />
-                {savedPlayers.length > 0 && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="shrink-0 p-3 sm:p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors">
-                        <Users size={22} />
-                      </button>
-                    </DropdownMenuTrigger>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="shrink-0 p-3 sm:p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors">
+                      <Users size={22} />
+                    </button>
+                  </DropdownMenuTrigger>
                   <DropdownMenuContent 
                     align="end" 
                     className="min-w-[220px] bg-card/95 backdrop-blur-md border-border/50 rounded-xl"
@@ -264,7 +263,6 @@ const PlayerNamesScreen: React.FC = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              )}
               </div>
               <p className="text-center text-sm text-muted-foreground">
                 {inputValue.length}/20 حرف
