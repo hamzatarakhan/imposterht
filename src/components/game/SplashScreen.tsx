@@ -18,12 +18,12 @@ const SplashScreen: React.FC = () => {
       <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-imposter/20 rounded-full blur-3xl animate-pulse" />
       
-      {/* Floating Imposter Icon - positioned absolutely */}
-      <div className="absolute top-[15%] left-1/2 -translate-x-1/2 z-20 animate-float">
-        <span className="text-8xl block drop-shadow-2xl">😈</span>
-      </div>
-      
-      <div className="relative z-10 text-center mt-24">
+      <div className="relative z-10 text-center">
+        {/* Icon above title */}
+        <div className="flex justify-center mb-4 animate-float">
+          <span className="text-8xl drop-shadow-2xl">😈</span>
+        </div>
+        
         <h1 className="text-6xl font-black mb-4 text-gradient tracking-tight animate-reveal">
           IMPOSTER
         </h1>
