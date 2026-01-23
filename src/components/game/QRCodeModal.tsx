@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { X, Share2, Copy, Check, Smartphone, Download } from 'lucide-react';
+import { X, Share2, Copy, Check, Smartphone, Download, Zap } from 'lucide-react';
 import { toast } from 'sonner';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { useSettings } from '@/context/SettingsContext';
 
 interface QRCodeModalProps {
   isOpen: boolean;
@@ -15,6 +17,8 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
   const [copied, setCopied] = useState(false);
   const [showInstallSteps, setShowInstallSteps] = useState(false);
   const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
+  const { isInstallable, isInstalled, installApp } = usePWAInstall();
+  const { playSound, vibrate } = useSettings();
 
   useEffect(() => {
     // Detect device type
@@ -201,31 +205,70 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
                 {getDeviceLabel()}
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                اتبع الخطوات التالية
+                {isInstalled ? 'التطبيق مثبت بالفعل! 🎉' : isInstallable ? 'اضغط الزر للتثبيت مباشرة' : 'اتبع الخطوات التالية'}
               </p>
             </div>
 
-            {/* Steps */}
-            <div className="space-y-3 mb-5">
-              {steps.map((item) => (
-                <div 
-                  key={item.step}
-                  className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl"
-                >
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-lg">{item.icon}</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-muted-foreground mb-0.5">الخطوة {item.step}</p>
-                    <p className="text-sm font-medium text-foreground">{item.text}</p>
-                  </div>
+            {/* Quick Install Button - Only show when installable */}
+            {isInstallable && !isInstalled && (
+              <button
+                onClick={async () => {
+                  playSound('click');
+                  vibrate();
+                  const success = await installApp();
+                  if (success) {
+                    playSound('win');
+                    vibrate([100, 50, 100]);
+                    toast.success('تم تثبيت التطبيق بنجاح! 🎉');
+                  }
+                }}
+                className="w-full py-4 px-4 rounded-xl bg-gradient-to-r from-safe to-primary text-primary-foreground font-bold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity mb-4 animate-pulse"
+              >
+                <Zap size={22} />
+                ثبّت الآن بضغطة واحدة!
+              </button>
+            )}
+
+            {/* Already Installed Message */}
+            {isInstalled && (
+              <div className="w-full py-4 px-4 rounded-xl bg-safe/20 border border-safe/30 text-safe font-bold flex items-center justify-center gap-3 mb-4">
+                <Check size={22} />
+                التطبيق مثبت بالفعل!
+              </div>
+            )}
+
+            {/* Manual Steps - Show when not installable or as fallback */}
+            {!isInstalled && (
+              <>
+                {isInstallable && (
+                  <p className="text-center text-xs text-muted-foreground mb-3">أو اتبع الخطوات اليدوية:</p>
+                )}
+                <div className="space-y-3 mb-5">
+                  {steps.map((item) => (
+                    <div 
+                      key={item.step}
+                      className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                        <span className="text-lg">{item.icon}</span>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-muted-foreground mb-0.5">الخطوة {item.step}</p>
+                        <p className="text-sm font-medium text-foreground">{item.text}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
 
             {/* Back button */}
             <button
-              onClick={() => setShowInstallSteps(false)}
+              onClick={() => {
+                playSound('click');
+                vibrate();
+                setShowInstallSteps(false);
+              }}
               className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold hover:bg-secondary/80 transition-colors"
             >
               رجوع للمشاركة
