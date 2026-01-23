@@ -6,6 +6,7 @@ export type GameScreen =
   | 'home'
   | 'howToPlay'
   | 'setup'
+  | 'playerNames'
   | 'passPhone'
   | 'showRole'
   | 'discussion'
@@ -27,6 +28,7 @@ interface GameState {
   category: Category;
   customWords: string[];
   players: Player[];
+  playerNames: string[];
   currentPlayerIndex: number;
   secretWord: string;
   usedWords: string[];
@@ -41,6 +43,8 @@ interface GameContextType extends GameState {
   setCategory: (category: Category) => void;
   setCustomWords: (words: string[]) => void;
   setDiscussionTime: (time: number) => void;
+  setPlayerNames: (names: string[]) => void;
+  goToPlayerNames: () => void;
   startGame: () => void;
   nextPlayer: () => void;
   markPlayerAsSeen: () => void;
@@ -57,6 +61,7 @@ const initialState: GameState = {
   category: 'random',
   customWords: [],
   players: [],
+  playerNames: [],
   currentPlayerIndex: 0,
   secretWord: '',
   usedWords: [],
@@ -93,16 +98,24 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setState(prev => ({ ...prev, discussionTime: time }));
   };
 
+  const setPlayerNames = (names: string[]) => {
+    setState(prev => ({ ...prev, playerNames: names }));
+  };
+
+  const goToPlayerNames = () => {
+    setState(prev => ({ ...prev, screen: 'playerNames' }));
+  };
+
   const startGame = () => {
     // Generate random word
     const word = getRandomWord(state.category, state.usedWords);
     
-    // Create players array
+    // Create players array with custom names if available
     const players: Player[] = [];
     for (let i = 0; i < state.playerCount; i++) {
       players.push({
         id: i + 1,
-        name: `لاعب ${i + 1}`,
+        name: state.playerNames[i] || `لاعب ${i + 1}`,
         isImposter: false,
         hasSeenRole: false,
         votes: 0,
@@ -176,7 +189,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const resetGame = () => {
     setState(prev => ({
       ...initialState,
-      usedWords: prev.usedWords, // Keep track of used words
+      usedWords: prev.usedWords,
     }));
   };
 
@@ -200,6 +213,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setCategory,
         setCustomWords,
         setDiscussionTime,
+        setPlayerNames,
+        goToPlayerNames,
         startGame,
         nextPlayer,
         markPlayerAsSeen,

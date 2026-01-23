@@ -4,6 +4,7 @@ import SplashScreen from './SplashScreen';
 import HomeScreen from './HomeScreen';
 import HowToPlayScreen from './HowToPlayScreen';
 import SetupScreen from './SetupScreen';
+import PlayerNamesScreen from './PlayerNamesScreen';
 import PassPhoneScreen from './PassPhoneScreen';
 import ShowRoleScreen from './ShowRoleScreen';
 import DiscussionScreen from './DiscussionScreen';
@@ -18,6 +19,7 @@ const Game: React.FC = () => {
     home: HomeScreen,
     howToPlay: HowToPlayScreen,
     setup: SetupScreen,
+    playerNames: PlayerNamesScreen,
     passPhone: PassPhoneScreen,
     showRole: ShowRoleScreen,
     discussion: DiscussionScreen,

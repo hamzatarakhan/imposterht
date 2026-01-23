@@ -14,7 +14,7 @@ const SetupScreen: React.FC = () => {
     setCategory,
     discussionTime,
     setDiscussionTime,
-    startGame
+    goToPlayerNames
   } = useGame();
 
   const categories: Category[] = ['random', 'things', 'places', 'food', 'jobs'];
@@ -155,10 +155,10 @@ const SetupScreen: React.FC = () => {
       {/* Start Button */}
       <div className="relative z-10 mt-6">
         <button
-          onClick={startGame}
+          onClick={goToPlayerNames}
           className="w-full btn-primary-game text-xl"
         >
-          ابدأ اللعبة 🚀
+          التالي: أسماء اللاعبين ✏️
         </button>
       </div>
     </div>
