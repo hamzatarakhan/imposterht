@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
 import { ArrowRight, Check, Smartphone } from 'lucide-react';
+import RestartButton from './RestartButton';
 
 const VotingScreen: React.FC = () => {
   const { players, voteForPlayer, calculateResult, setScreen } = useGame();
@@ -179,7 +180,7 @@ const VotingScreen: React.FC = () => {
         </div>
         
         {/* Vote Button */}
-        <div className="mt-6">
+        <div className="mt-6 space-y-3">
           <button
             onClick={handleVote}
             disabled={selectedPlayer === null}
@@ -189,6 +190,9 @@ const VotingScreen: React.FC = () => {
           >
             {isLastVoter ? '🎭 إظهار النتيجة' : '✅ تأكيد التصويت'}
           </button>
+          <div className="flex justify-center">
+            <RestartButton />
+          </div>
         </div>
       </div>
     </div>

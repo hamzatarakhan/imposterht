@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '@/context/GameContext';
 import { EyeOff } from 'lucide-react';
+import RestartButton from './RestartButton';
 
 const ShowRoleScreen: React.FC = () => {
   const { players, currentPlayerIndex, secretWord, markPlayerAsSeen, nextPlayer } = useGame();
@@ -98,15 +99,20 @@ const ShowRoleScreen: React.FC = () => {
               </>
             )}
             
-            <button
-              onClick={handleNext}
-              className={`w-full text-xl flex items-center justify-center gap-3 ${
-                isImposter ? 'btn-imposter' : 'btn-accent-game'
-              }`}
-            >
-              <EyeOff size={24} />
-              إخفاء وتمرير للي بعدي
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={handleNext}
+                className={`w-full text-xl flex items-center justify-center gap-3 ${
+                  isImposter ? 'btn-imposter' : 'btn-accent-game'
+                }`}
+              >
+                <EyeOff size={24} />
+                إخفاء وتمرير للي بعدي
+              </button>
+              <div className="flex justify-center">
+                <RestartButton />
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useGame } from '@/context/GameContext';
-import { RotateCcw, X } from 'lucide-react';
 import SplashScreen from './SplashScreen';
 import HomeScreen from './HomeScreen';
 import SettingsScreen from './SettingsScreen';
@@ -14,8 +13,7 @@ import VotingScreen from './VotingScreen';
 import ResultScreen from './ResultScreen';
 
 const Game: React.FC = () => {
-  const { screen, resetGame } = useGame();
-  const [showConfirm, setShowConfirm] = useState(false);
+  const { screen } = useGame();
 
   const screens = {
     splash: SplashScreen,
@@ -32,66 +30,10 @@ const Game: React.FC = () => {
   };
 
   const CurrentScreen = screens[screen];
-  
-  // Screens where restart button should NOT appear
-  const hideRestartOn = ['splash', 'home', 'settings', 'howToPlay'];
-  const showRestartButton = !hideRestartOn.includes(screen);
-
-  const handleRestart = () => {
-    setShowConfirm(false);
-    resetGame();
-  };
 
   return (
     <div className="max-w-md mx-auto min-h-screen bg-background relative">
       <CurrentScreen />
-      
-      {/* Restart Button - Fixed at bottom center below main buttons */}
-      {showRestartButton && !showConfirm && (
-        <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-3 z-40">
-          <button
-            onClick={() => setShowConfirm(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/60 backdrop-blur-sm border border-white/5 text-xs text-muted-foreground hover:bg-secondary/80 transition-all"
-            title="إعادة اللعبة"
-          >
-            <RotateCcw size={14} />
-            إعادة اللعبة
-          </button>
-        </div>
-      )}
-      
-      {/* Confirmation Dialog */}
-      {showConfirm && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-6 animate-fade-in">
-          <div className="card-game max-w-sm w-full text-center animate-reveal">
-            <div className="w-16 h-16 mx-auto rounded-full bg-destructive/20 flex items-center justify-center mb-4">
-              <RotateCcw size={32} className="text-destructive" />
-            </div>
-            
-            <h2 className="text-2xl font-bold mb-2">إعادة اللعبة؟</h2>
-            <p className="text-muted-foreground mb-6">
-              سيتم إنهاء اللعبة الحالية والعودة للبداية
-            </p>
-            
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="flex-1 btn-secondary-game flex items-center justify-center gap-2"
-              >
-                <X size={20} />
-                إلغاء
-              </button>
-              <button
-                onClick={handleRestart}
-                className="flex-1 btn-imposter flex items-center justify-center gap-2"
-              >
-                <RotateCcw size={20} />
-                إعادة
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

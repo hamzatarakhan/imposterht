@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
 import { ArrowRight, ArrowLeft, Check, Users, X, Trash2, Pencil } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
+import RestartButton from './RestartButton';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -376,21 +377,26 @@ const PlayerNamesScreen: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-6 flex gap-3">
-          {currentIndex > 0 && (
+        <div className="mt-6 space-y-3">
+          <div className="flex gap-3">
+            {currentIndex > 0 && (
+              <button
+                onClick={handlePrevious}
+                className="p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors"
+              >
+                <ArrowLeft size={24} />
+              </button>
+            )}
             <button
-              onClick={handlePrevious}
-              className="p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors"
+              onClick={handleNext}
+              className="flex-1 btn-primary-game text-xl"
             >
-              <ArrowLeft size={24} />
+              {isLastPlayer ? '🚀 ابدأ اللعبة' : '➡️ التالي'}
             </button>
-          )}
-          <button
-            onClick={handleNext}
-            className="flex-1 btn-primary-game text-xl"
-          >
-            {isLastPlayer ? '🚀 ابدأ اللعبة' : '➡️ التالي'}
-          </button>
+          </div>
+          <div className="flex justify-center">
+            <RestartButton />
+          </div>
         </div>
       </div>
     </div>
