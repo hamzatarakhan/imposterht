@@ -14,10 +14,10 @@ const PassPhoneScreen: React.FC = () => {
       <div className="absolute top-1/3 left-1/4 w-48 h-48 bg-primary/10 rounded-full blur-3xl" />
       
       <div className="relative z-10 text-center max-w-sm">
-        {/* Icon */}
+        {/* Player Avatar */}
         <div className="mb-8 animate-float">
-          <div className="w-24 h-24 mx-auto rounded-3xl bg-secondary flex items-center justify-center">
-            <Smartphone className="text-primary" size={48} />
+          <div className="w-24 h-24 mx-auto rounded-full bg-primary/20 flex items-center justify-center glow-primary">
+            <span className="text-5xl">{currentPlayer?.avatar || '👤'}</span>
           </div>
         </div>
         
