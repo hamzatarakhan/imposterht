@@ -3,6 +3,7 @@ import { useGame } from '@/context/GameContext';
 import { RotateCcw, X } from 'lucide-react';
 import SplashScreen from './SplashScreen';
 import HomeScreen from './HomeScreen';
+import SettingsScreen from './SettingsScreen';
 import HowToPlayScreen from './HowToPlayScreen';
 import SetupScreen from './SetupScreen';
 import PlayerNamesScreen from './PlayerNamesScreen';
@@ -19,6 +20,7 @@ const Game: React.FC = () => {
   const screens = {
     splash: SplashScreen,
     home: HomeScreen,
+    settings: SettingsScreen,
     howToPlay: HowToPlayScreen,
     setup: SetupScreen,
     playerNames: PlayerNamesScreen,
@@ -32,7 +34,7 @@ const Game: React.FC = () => {
   const CurrentScreen = screens[screen];
   
   // Screens where restart button should NOT appear
-  const hideRestartOn = ['splash', 'home', 'howToPlay'];
+  const hideRestartOn = ['splash', 'home', 'settings', 'howToPlay'];
   const showRestartButton = !hideRestartOn.includes(screen);
 
   const handleRestart = () => {

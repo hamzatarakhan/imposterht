@@ -15,7 +15,10 @@ const HomeScreen: React.FC = () => {
       
       {/* Settings Icon */}
       <div className="relative z-10 flex justify-start">
-        <button className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+        <button 
+          onClick={() => setScreen('settings')}
+          className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
+        >
           <Settings size={24} />
         </button>
       </div>
