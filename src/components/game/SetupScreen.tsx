@@ -53,18 +53,18 @@ const SetupScreen: React.FC = () => {
               <p className="text-sm text-muted-foreground">من 3 إلى 10</p>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-3">
             <button
               onClick={() => setPlayerCount(Math.max(3, playerCount - 1))}
-              className="w-14 h-14 rounded-2xl bg-secondary text-2xl font-bold hover:bg-secondary/80 transition-colors"
+              className="w-11 h-11 rounded-xl bg-secondary text-xl font-bold hover:bg-secondary/80 transition-colors"
               disabled={playerCount <= 3}
             >
               -
             </button>
-            <span className="text-4xl font-black text-primary">{playerCount}</span>
+            <span className="text-3xl font-black text-primary">{playerCount}</span>
             <button
               onClick={() => setPlayerCount(Math.min(10, playerCount + 1))}
-              className="w-14 h-14 rounded-2xl bg-secondary text-2xl font-bold hover:bg-secondary/80 transition-colors"
+              className="w-11 h-11 rounded-xl bg-secondary text-xl font-bold hover:bg-secondary/80 transition-colors"
               disabled={playerCount >= 10}
             >
               +
