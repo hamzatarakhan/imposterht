@@ -1,8 +1,31 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useGame } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 
 const SplashScreen: React.FC = () => {
   const { setScreen } = useGame();
+  const { playSound, unlockAudio } = useSettings();
+  const hasPlayedSound = useRef(false);
+
+  // Play intro sound on first user interaction
+  useEffect(() => {
+    const handleInteraction = () => {
+      unlockAudio();
+      if (!hasPlayedSound.current) {
+        hasPlayedSound.current = true;
+        // Small delay to ensure audio context is ready
+        setTimeout(() => playSound('intro'), 100);
+      }
+    };
+
+    document.addEventListener('touchstart', handleInteraction, { once: true, passive: true });
+    document.addEventListener('click', handleInteraction, { once: true, passive: true });
+
+    return () => {
+      document.removeEventListener('touchstart', handleInteraction);
+      document.removeEventListener('click', handleInteraction);
+    };
+  }, [playSound, unlockAudio]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

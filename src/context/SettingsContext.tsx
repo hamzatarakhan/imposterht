@@ -10,7 +10,7 @@ interface SettingsContextType extends SettingsState {
   setSoundEnabled: (enabled: boolean) => void;
   setVibrationEnabled: (enabled: boolean) => void;
   setDarkMode: (enabled: boolean) => void;
-  playSound: (type: 'click' | 'reveal' | 'win' | 'lose' | 'tick' | 'alarm') => void;
+  playSound: (type: 'click' | 'reveal' | 'win' | 'lose' | 'tick' | 'alarm' | 'intro') => void;
   vibrate: (pattern?: number | number[]) => void;
   unlockAudio: () => void;
 }
@@ -33,6 +33,7 @@ const soundFrequencies = {
   lose: { frequency: 220, duration: 300 }, // A3
   tick: { frequency: 440, duration: 30 }, // Short tick
   alarm: { frequency: 880, duration: 400 }, // Alarm sound
+  intro: { frequency: 330, duration: 600 }, // E4 - mysterious intro
 };
 
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -132,7 +133,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   // Play sound using Web Audio API
-  const playSound = (type: 'click' | 'reveal' | 'win' | 'lose' | 'tick' | 'alarm') => {
+  const playSound = (type: 'click' | 'reveal' | 'win' | 'lose' | 'tick' | 'alarm' | 'intro') => {
     if (!settings.soundEnabled) return;
 
     try {
@@ -198,6 +199,45 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
         osc2.start(audioContext.currentTime + 0.15);
         osc2.stop(audioContext.currentTime + 0.4);
+      }
+
+      // For intro sound, create a mysterious ascending melody
+      if (type === 'intro') {
+        // Note 2 - E4 higher
+        const osc2 = audioContext.createOscillator();
+        const gain2 = audioContext.createGain();
+        osc2.connect(gain2);
+        gain2.connect(audioContext.destination);
+        osc2.frequency.value = 392; // G4
+        osc2.type = 'sine';
+        gain2.gain.setValueAtTime(0.25, audioContext.currentTime + 0.15);
+        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        osc2.start(audioContext.currentTime + 0.15);
+        osc2.stop(audioContext.currentTime + 0.5);
+
+        // Note 3 - B4
+        const osc3 = audioContext.createOscillator();
+        const gain3 = audioContext.createGain();
+        osc3.connect(gain3);
+        gain3.connect(audioContext.destination);
+        osc3.frequency.value = 494; // B4
+        osc3.type = 'sine';
+        gain3.gain.setValueAtTime(0.25, audioContext.currentTime + 0.3);
+        gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.7);
+        osc3.start(audioContext.currentTime + 0.3);
+        osc3.stop(audioContext.currentTime + 0.7);
+
+        // Note 4 - E5 (mysterious end)
+        const osc4 = audioContext.createOscillator();
+        const gain4 = audioContext.createGain();
+        osc4.connect(gain4);
+        gain4.connect(audioContext.destination);
+        osc4.frequency.value = 659; // E5
+        osc4.type = 'sine';
+        gain4.gain.setValueAtTime(0.2, audioContext.currentTime + 0.5);
+        gain4.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);
+        osc4.start(audioContext.currentTime + 0.5);
+        osc4.stop(audioContext.currentTime + 1.0);
       }
     } catch (e) {
       console.error('Error playing sound:', e);
