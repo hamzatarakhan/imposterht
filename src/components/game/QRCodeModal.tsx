@@ -183,14 +183,44 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
               </button>
             </div>
 
-            {/* Install to Home Screen button - always visible */}
-            <button
-              onClick={() => setShowInstallSteps(true)}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-accent to-primary/80 text-accent-foreground font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
-            >
-              <Download size={18} />
-              كيف أضيف التطبيق للشاشة الرئيسية؟
-            </button>
+            {/* Quick Install Button - Show directly when browser supports it */}
+            {isInstallable && !isInstalled && (
+              <button
+                onClick={async () => {
+                  playSound('click');
+                  vibrate();
+                  const success = await installApp();
+                  if (success) {
+                    playSound('win');
+                    vibrate([100, 50, 100]);
+                    toast.success('تم تثبيت التطبيق بنجاح! 🎉');
+                  }
+                }}
+                className="w-full py-4 px-4 rounded-xl bg-gradient-to-r from-safe to-primary text-primary-foreground font-bold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity mb-3 animate-pulse"
+              >
+                <Zap size={20} />
+                ثبّت التطبيق الآن!
+              </button>
+            )}
+
+            {/* Already Installed Message */}
+            {isInstalled && (
+              <div className="w-full py-3 px-4 rounded-xl bg-safe/20 border border-safe/30 text-safe font-bold flex items-center justify-center gap-2 mb-3">
+                <Check size={18} />
+                التطبيق مثبت بالفعل!
+              </div>
+            )}
+
+            {/* Install to Home Screen button - for manual steps */}
+            {!isInstalled && (
+              <button
+                onClick={() => setShowInstallSteps(true)}
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-accent to-primary/80 text-accent-foreground font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+              >
+                <Download size={18} />
+                {isInstallable ? 'أو شاهد خطوات التثبيت اليدوي' : 'كيف أضيف التطبيق للشاشة الرئيسية؟'}
+              </button>
+            )}
           </>
         ) : (
           <>
