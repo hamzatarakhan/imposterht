@@ -1,12 +1,42 @@
 import React from 'react';
 import { useGame } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Volume2, VolumeX, Moon, Sun, Vibrate } from 'lucide-react';
 
 const SettingsScreen: React.FC = () => {
   const { setScreen } = useGame();
-  const [soundEnabled, setSoundEnabled] = React.useState(true);
-  const [vibrationEnabled, setVibrationEnabled] = React.useState(true);
-  const [darkMode, setDarkMode] = React.useState(true);
+  const { 
+    soundEnabled, 
+    vibrationEnabled, 
+    darkMode, 
+    setSoundEnabled, 
+    setVibrationEnabled, 
+    setDarkMode,
+    playSound,
+    vibrate 
+  } = useSettings();
+
+  const handleSoundToggle = () => {
+    setSoundEnabled(!soundEnabled);
+    if (!soundEnabled) {
+      // Play a test sound when enabling
+      setTimeout(() => playSound('click'), 100);
+    }
+  };
+
+  const handleVibrationToggle = () => {
+    setVibrationEnabled(!vibrationEnabled);
+    if (!vibrationEnabled) {
+      // Test vibration when enabling
+      setTimeout(() => vibrate(100), 100);
+    }
+  };
+
+  const handleDarkModeToggle = () => {
+    setDarkMode(!darkMode);
+    playSound('click');
+    vibrate(50);
+  };
 
   return (
     <div className="min-h-screen flex flex-col p-6 relative">
@@ -18,7 +48,11 @@ const SettingsScreen: React.FC = () => {
       {/* Header */}
       <div className="relative z-10 flex items-center gap-4 mb-8">
         <button 
-          onClick={() => setScreen('home')}
+          onClick={() => {
+            playSound('click');
+            vibrate(30);
+            setScreen('home');
+          }}
           className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowRight size={24} />
@@ -38,7 +72,7 @@ const SettingsScreen: React.FC = () => {
             </div>
           </div>
           <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
+            onClick={handleSoundToggle}
             className={`w-14 h-8 rounded-full transition-colors relative ${
               soundEnabled ? 'bg-primary' : 'bg-secondary'
             }`}
@@ -61,7 +95,7 @@ const SettingsScreen: React.FC = () => {
             </div>
           </div>
           <button
-            onClick={() => setVibrationEnabled(!vibrationEnabled)}
+            onClick={handleVibrationToggle}
             className={`w-14 h-8 rounded-full transition-colors relative ${
               vibrationEnabled ? 'bg-primary' : 'bg-secondary'
             }`}
@@ -84,7 +118,7 @@ const SettingsScreen: React.FC = () => {
             </div>
           </div>
           <button
-            onClick={() => setDarkMode(!darkMode)}
+            onClick={handleDarkModeToggle}
             className={`w-14 h-8 rounded-full transition-colors relative ${
               darkMode ? 'bg-primary' : 'bg-secondary'
             }`}
