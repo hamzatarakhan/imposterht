@@ -256,9 +256,12 @@ const { setScreen } = useGame();
       </div>
       
       {/* Footer */}
-      <div className="relative z-10 text-center py-4">
+      <div className="relative z-10 text-center py-4 space-y-1">
         <p className="text-sm text-muted-foreground">
           العبوا مع بعض في نفس المكان 🎮
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Powered by <span className="text-primary font-bold">Hamza Tarkhan</span>
         </p>
       </div>
     </div>
