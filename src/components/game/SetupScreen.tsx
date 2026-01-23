@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Users, UserX, Layers, Clock } from 'lucide-react';
@@ -21,6 +21,18 @@ const SetupScreen: React.FC = () => {
     goToPlayerNames
   } = useGame();
   const { playSound, vibrate } = useSettings();
+  const hasPlayedReady = useRef(false);
+
+  // Play ready sound when entering setup screen
+  useEffect(() => {
+    if (!hasPlayedReady.current) {
+      hasPlayedReady.current = true;
+      setTimeout(() => {
+        playSound('ready');
+        vibrate(20);
+      }, 200);
+    }
+  }, [playSound, vibrate]);
 
   const categories: Category[] = ['random', 'things', 'places', 'food', 'jobs'];
 
