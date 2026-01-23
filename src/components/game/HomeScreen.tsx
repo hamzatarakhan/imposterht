@@ -140,11 +140,11 @@ const HomeScreen: React.FC = () => {
 
       {/* Add Player Dialog */}
       <Dialog open={showAddPlayerDialog} onOpenChange={setShowAddPlayerDialog}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm mx-4">
           <DialogHeader>
             <DialogTitle className="text-center">➕ إضافة لاعب جديد</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
+          <div className="flex flex-col items-center gap-3 sm:gap-4 py-3 sm:py-4">
             {/* Avatar Picker */}
             <button
               onClick={() => {
@@ -152,7 +152,7 @@ const HomeScreen: React.FC = () => {
                 const nextIndex = (currentIndex + 1) % AVATAR_OPTIONS.length;
                 setNewPlayerAvatar(AVATAR_OPTIONS[nextIndex]);
               }}
-              className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-3xl hover:scale-110 transition-transform"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/20 flex items-center justify-center text-2xl sm:text-3xl hover:scale-110 transition-transform"
             >
               {newPlayerAvatar}
             </button>
@@ -165,7 +165,7 @@ const HomeScreen: React.FC = () => {
               onChange={(e) => setNewPlayerName(e.target.value.slice(0, 20))}
               placeholder="اسم اللاعب"
               maxLength={20}
-              className="w-full text-center text-xl font-bold py-3 px-4 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:text-muted-foreground/50"
+              className="w-full text-center text-lg sm:text-xl font-bold py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:text-muted-foreground/50"
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
