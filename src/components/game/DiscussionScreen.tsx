@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
-import { Play, Pause, RotateCcw, Vote } from 'lucide-react';
+import { Play, Pause, RotateCcw, Vote, MessageCircle } from 'lucide-react';
 
 const DiscussionScreen: React.FC = () => {
-  const { discussionTime, setScreen } = useGame();
+  const { discussionTime, discussionTimeEnabled, setScreen } = useGame();
   const [timeLeft, setTimeLeft] = useState(discussionTime);
   const [isRunning, setIsRunning] = useState(false);
 
@@ -29,13 +29,6 @@ const DiscussionScreen: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getProgressColor = () => {
-    const percentage = timeLeft / discussionTime;
-    if (percentage > 0.5) return 'bg-accent';
-    if (percentage > 0.25) return 'bg-primary';
-    return 'bg-imposter';
-  };
-
   const handleResetTimer = () => {
     setTimeLeft(discussionTime);
     setIsRunning(false);
@@ -43,6 +36,60 @@ const DiscussionScreen: React.FC = () => {
 
   const progress = (timeLeft / discussionTime) * 100;
 
+  // UI without timer
+  if (!discussionTimeEnabled) {
+    return (
+      <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
+        
+        <div className="relative z-10 flex-1 flex flex-col">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-black">وقت النقاش 💬</h1>
+          </div>
+          
+          {/* Free Discussion Mode */}
+          <div className="flex-1 flex flex-col items-center justify-center">
+            {/* Large Icon */}
+            <div className="w-48 h-48 rounded-full bg-primary/20 flex items-center justify-center mb-8 animate-pulse">
+              <MessageCircle size={80} className="text-primary" />
+            </div>
+            
+            <h2 className="text-2xl font-bold mb-4">نقاش حر 🗣️</h2>
+            
+            {/* Hints */}
+            <div className="text-center space-y-3 max-w-sm">
+              <p className="text-muted-foreground">
+                كل لاعب يعطي تلميح عن الكلمة 🎯
+              </p>
+              <p className="text-sm text-muted-foreground/70">
+                الإمبوستر يحاول يندمج!
+              </p>
+              <div className="mt-6 p-4 rounded-2xl bg-secondary/50">
+                <p className="text-sm text-muted-foreground">
+                  💡 ناقشوا واكتشفوا من هو الإمبوستر
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Actions */}
+          <div className="space-y-3">
+            <button
+              onClick={() => setScreen('voting')}
+              className="w-full btn-primary-game flex items-center justify-center gap-3"
+            >
+              <Vote size={24} />
+              الانتقال للتصويت
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // UI with timer
   return (
     <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
       {/* Background */}
