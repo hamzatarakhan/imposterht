@@ -163,12 +163,12 @@ const SetupScreen: React.FC = () => {
             </button>
           </div>
           {discussionTimeEnabled && (
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               {[60, 90, 120].map((time) => (
                 <button
                   key={time}
                   onClick={() => setDiscussionTime(time)}
-                  className={`flex-1 py-3 rounded-2xl font-bold transition-all ${
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
                     discussionTime === time
                       ? 'bg-accent text-accent-foreground glow-accent'
                       : 'bg-secondary text-muted-foreground hover:text-foreground'
