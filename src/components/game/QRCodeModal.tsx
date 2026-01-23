@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { X, Share2, Copy, Check, Smartphone, Download } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface QRCodeModalProps {
   isOpen: boolean;
@@ -14,7 +15,6 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
   const [copied, setCopied] = useState(false);
   const [showInstallSteps, setShowInstallSteps] = useState(false);
   const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
-  const [canShare, setCanShare] = useState(false);
 
   useEffect(() => {
     // Detect device type
@@ -26,22 +26,22 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
     } else {
       setDeviceType('desktop');
     }
-
-    // Check if native share is available
-    setCanShare(typeof navigator !== 'undefined' && !!navigator.share);
   }, []);
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      toast.success('تم نسخ الرابط!');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
+      toast.error('فشل النسخ');
     }
   };
 
   const handleShare = async () => {
+    // Try native share first
     if (navigator.share) {
       try {
         await navigator.share({
@@ -49,16 +49,18 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
           text: 'العب معنا لعبة الإمبوستر! 😈',
           url: url,
         });
+        return;
       } catch (err) {
-        // User cancelled or share failed - this is normal
-        if ((err as Error).name !== 'AbortError') {
-          console.error('Failed to share:', err);
+        // User cancelled - that's fine, don't fallback
+        if ((err as Error).name === 'AbortError') {
+          return;
         }
+        console.error('Share failed, falling back to copy:', err);
       }
-    } else {
-      // Fallback: copy to clipboard
-      handleCopy();
     }
+    
+    // Fallback: copy to clipboard
+    await handleCopy();
   };
 
   if (!isOpen) return null;
@@ -77,7 +79,25 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
     { step: 4, icon: '✅', text: 'اضغط "تثبيت" للتأكيد' },
   ];
 
-  const steps = deviceType === 'ios' ? iosSteps : androidSteps;
+  const desktopSteps = [
+    { step: 1, icon: '🌐', text: 'افتح الرابط في Chrome أو Edge' },
+    { step: 2, icon: '📥', text: 'ابحث عن أيقونة التثبيت في شريط العنوان' },
+    { step: 3, icon: '✅', text: 'اضغط "تثبيت" للتأكيد' },
+  ];
+
+  const getSteps = () => {
+    if (deviceType === 'ios') return iosSteps;
+    if (deviceType === 'android') return androidSteps;
+    return desktopSteps;
+  };
+
+  const getDeviceLabel = () => {
+    if (deviceType === 'ios') return 'التثبيت على iPhone';
+    if (deviceType === 'android') return 'التثبيت على Android';
+    return 'التثبيت على الكمبيوتر';
+  };
+
+  const steps = getSteps();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -159,16 +179,14 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
               </button>
             </div>
 
-            {/* Install to Home Screen button */}
-            {deviceType !== 'desktop' && (
-              <button
-                onClick={() => setShowInstallSteps(true)}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-accent to-primary/80 text-accent-foreground font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
-              >
-                <Download size={18} />
-                كيف أضيف التطبيق للشاشة الرئيسية؟
-              </button>
-            )}
+            {/* Install to Home Screen button - always visible */}
+            <button
+              onClick={() => setShowInstallSteps(true)}
+              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-accent to-primary/80 text-accent-foreground font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+            >
+              <Download size={18} />
+              كيف أضيف التطبيق للشاشة الرئيسية؟
+            </button>
           </>
         ) : (
           <>
@@ -180,7 +198,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
                 </div>
               </div>
               <h2 className="text-lg font-bold text-foreground">
-                {deviceType === 'ios' ? 'التثبيت على iPhone' : 'التثبيت على Android'}
+                {getDeviceLabel()}
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
                 اتبع الخطوات التالية
