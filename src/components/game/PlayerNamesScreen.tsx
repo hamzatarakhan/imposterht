@@ -1,6 +1,25 @@
 import React, { useState } from 'react';
 import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
-import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, Users, X, Trash2 } from 'lucide-react';
+import { useSavedPlayers } from '@/hooks/useSavedPlayers';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface PlayerData {
   name: string;
@@ -9,6 +28,7 @@ interface PlayerData {
 
 const PlayerNamesScreen: React.FC = () => {
   const { playerCount, setScreen, startGame } = useGame();
+  const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
   const [playerData, setPlayerData] = useState<PlayerData[]>(
     Array.from({ length: playerCount }, (_, i) => ({
       name: `لاعب ${i + 1}`,
@@ -19,7 +39,7 @@ const PlayerNamesScreen: React.FC = () => {
   const [inputValue, setInputValue] = useState(playerData[0].name);
   const [selectedAvatar, setSelectedAvatar] = useState(playerData[0].avatar);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
-
+  const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const handleNameChange = (value: string) => {
     const limited = value.slice(0, 20);
     setInputValue(limited);
@@ -48,7 +68,8 @@ const PlayerNamesScreen: React.FC = () => {
       setSelectedAvatar(newPlayerData[nextIndex].avatar);
       setShowAvatarPicker(false);
     } else {
-      // All data entered, start game
+      // All data entered, save players and start game
+      addPlayers(newPlayerData);
       startGame(newPlayerData);
     }
   };
@@ -79,6 +100,22 @@ const PlayerNamesScreen: React.FC = () => {
       avatar: '👤'
     }));
     startGame(defaultData);
+  };
+
+  const handleSelectSavedPlayer = (player: { name: string; avatar: string }) => {
+    setInputValue(player.name);
+    setSelectedAvatar(player.avatar);
+  };
+
+  const handleRemovePlayer = (e: React.MouseEvent, name: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removePlayer(name);
+  };
+
+  const handleClearAll = () => {
+    clearAllPlayers();
+    setShowDeleteAllDialog(false);
   };
 
   const isLastPlayer = currentIndex === playerCount - 1;
@@ -166,24 +203,95 @@ const PlayerNamesScreen: React.FC = () => {
 
           {/* Name Input */}
           <div className="w-full max-w-sm">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => handleNameChange(e.target.value)}
-              placeholder={`لاعب ${currentIndex + 1}`}
-              maxLength={20}
-              className="w-full text-center text-2xl font-bold py-4 px-6 rounded-2xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:text-muted-foreground/50"
-              autoFocus
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleNext();
-                }
-              }}
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => handleNameChange(e.target.value)}
+                placeholder={`لاعب ${currentIndex + 1}`}
+                maxLength={20}
+                className="flex-1 text-center text-2xl font-bold py-4 px-6 rounded-2xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:text-muted-foreground/50"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleNext();
+                  }
+                }}
+              />
+              {savedPlayers.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors">
+                      <Users size={24} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="min-w-[220px] bg-card/95 backdrop-blur-md border-border/50 rounded-xl"
+                  >
+                    <DropdownMenuLabel className="text-muted-foreground flex items-center gap-2">
+                      🔖 الأسماء المحفوظة
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <div className="max-h-[200px] overflow-y-auto">
+                      {savedPlayers.map((player) => (
+                        <DropdownMenuItem
+                          key={player.name}
+                          className="flex items-center justify-between cursor-pointer"
+                          onSelect={() => handleSelectSavedPlayer(player)}
+                        >
+                          <span className="flex items-center gap-2">
+                            <span>{player.avatar}</span>
+                            <span>{player.name}</span>
+                          </span>
+                          <button
+                            onClick={(e) => handleRemovePlayer(e, player.name)}
+                            className="p-1 rounded-full hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </DropdownMenuItem>
+                      ))}
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-destructive cursor-pointer flex items-center gap-2"
+                      onSelect={() => setShowDeleteAllDialog(true)}
+                    >
+                      <Trash2 size={16} />
+                      مسح الكل
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
             <p className="text-center text-sm text-muted-foreground mt-2">
               {inputValue.length}/20 حرف
             </p>
           </div>
+
+          {/* Delete All Confirmation Dialog */}
+          <AlertDialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-center">🗑️ مسح كل الأسماء؟</AlertDialogTitle>
+                <AlertDialogDescription className="text-center">
+                  هل أنت متأكد من مسح كل الأسماء المحفوظة؟
+                  <br />
+                  هذا الإجراء لا يمكن التراجع عنه.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="flex-row-reverse gap-2">
+                <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleClearAll}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  نعم، امسح الكل
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           {/* Names Preview */}
           {currentIndex > 0 && (
