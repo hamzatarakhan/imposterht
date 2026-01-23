@@ -2,6 +2,7 @@ import React from 'react';
 import { useGame } from '@/context/GameContext';
 import { ArrowRight, Users, UserX, Layers, Clock } from 'lucide-react';
 import { Category, categoryNames } from '@/data/words';
+import RestartButton from './RestartButton';
 
 const SetupScreen: React.FC = () => {
   const { 
@@ -183,13 +184,16 @@ const SetupScreen: React.FC = () => {
       </div>
       
       {/* Start Button */}
-      <div className="relative z-10 mt-6">
+      <div className="relative z-10 mt-6 space-y-3">
         <button
           onClick={goToPlayerNames}
           className="w-full btn-primary-game text-xl"
         >
           التالي: أسماء اللاعبين ✏️
         </button>
+        <div className="flex justify-center">
+          <RestartButton />
+        </div>
       </div>
     </div>
   );

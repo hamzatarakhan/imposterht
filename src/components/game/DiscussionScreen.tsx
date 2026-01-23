@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
 import { Play, Pause, RotateCcw, Vote, MessageCircle } from 'lucide-react';
+import RestartButton from './RestartButton';
 
 const DiscussionScreen: React.FC = () => {
   const { discussionTime, discussionTimeEnabled, setScreen } = useGame();
@@ -83,6 +84,9 @@ const DiscussionScreen: React.FC = () => {
               <Vote size={24} />
               الانتقال للتصويت
             </button>
+            <div className="flex justify-center">
+              <RestartButton />
+            </div>
           </div>
         </div>
       </div>
@@ -185,6 +189,9 @@ const DiscussionScreen: React.FC = () => {
             <Vote size={24} />
             الانتقال للتصويت
           </button>
+          <div className="flex justify-center">
+            <RestartButton />
+          </div>
         </div>
       </div>
     </div>

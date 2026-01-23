@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGame } from '@/context/GameContext';
 import { Smartphone } from 'lucide-react';
+import RestartButton from './RestartButton';
 
 const PassPhoneScreen: React.FC = () => {
   const { currentPlayerIndex, players, setScreen } = useGame();
@@ -37,12 +38,17 @@ const PassPhoneScreen: React.FC = () => {
         </p>
         
         {/* Button */}
-        <button
-          onClick={() => setScreen('showRole')}
-          className="w-full btn-primary-game text-xl"
-        >
-          👁️ عرض دوري
-        </button>
+        <div className="space-y-3">
+          <button
+            onClick={() => setScreen('showRole')}
+            className="w-full btn-primary-game text-xl"
+          >
+            👁️ عرض دوري
+          </button>
+          <div className="flex justify-center">
+            <RestartButton />
+          </div>
+        </div>
       </div>
     </div>
   );
