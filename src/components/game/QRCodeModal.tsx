@@ -1,7 +1,5 @@
-import React from 'react';
-import { QRCodeSVG } from 'qrcode.react';
-import { X, Share2, Copy, Check } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { X, Copy, Check, Share2 } from 'lucide-react';
 
 interface QRCodeModalProps {
   isOpen: boolean;
@@ -38,6 +36,9 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
 
   if (!isOpen) return null;
 
+  // Use QR Server API for generating QR code
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}&bgcolor=ffffff&color=000000&margin=0`;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
@@ -70,13 +71,12 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({ isOpen, onClose, url }) => {
         {/* QR Code */}
         <div className="flex justify-center mb-6">
           <div className="bg-white p-4 rounded-2xl shadow-inner">
-            <QRCodeSVG
-              value={url}
-              size={180}
-              level="H"
-              includeMargin={false}
-              bgColor="#ffffff"
-              fgColor="#000000"
+            <img 
+              src={qrCodeUrl} 
+              alt="QR Code" 
+              width={180} 
+              height={180}
+              className="rounded-lg"
             />
           </div>
         </div>
