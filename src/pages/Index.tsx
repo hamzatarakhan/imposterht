@@ -1,11 +1,14 @@
 import { GameProvider } from '@/context/GameContext';
+import { SettingsProvider } from '@/context/SettingsContext';
 import Game from '@/components/game/Game';
 
 const Index = () => {
   return (
-    <GameProvider>
-      <Game />
-    </GameProvider>
+    <SettingsProvider>
+      <GameProvider>
+        <Game />
+      </GameProvider>
+    </SettingsProvider>
   );
 };
 
