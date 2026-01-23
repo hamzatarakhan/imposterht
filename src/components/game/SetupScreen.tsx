@@ -84,7 +84,7 @@ const SetupScreen: React.FC = () => {
               </p>
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             {[1, 2].map((count) => {
               const isDisabled = count === 2 && playerCount < 4;
               return (
@@ -92,7 +92,7 @@ const SetupScreen: React.FC = () => {
                   key={count}
                   onClick={() => !isDisabled && setImposterCount(count)}
                   disabled={isDisabled}
-                  className={`flex-1 py-4 rounded-2xl text-xl font-bold transition-all ${
+                  className={`flex-1 py-2.5 rounded-xl text-base font-bold transition-all ${
                     imposterCount === count
                       ? 'bg-imposter text-white glow-imposter'
                       : isDisabled
