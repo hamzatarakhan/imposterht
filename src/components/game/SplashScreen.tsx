@@ -4,28 +4,8 @@ import { useSettings } from '@/context/SettingsContext';
 
 const SplashScreen: React.FC = () => {
   const { setScreen } = useGame();
-  const { playSound, unlockAudio } = useSettings();
+  const { playSound, unlockAudio, vibrate } = useSettings();
   const hasPlayedSound = useRef(false);
-
-  // Play intro sound on first user interaction
-  useEffect(() => {
-    const handleInteraction = () => {
-      unlockAudio();
-      if (!hasPlayedSound.current) {
-        hasPlayedSound.current = true;
-        // Small delay to ensure audio context is ready
-        setTimeout(() => playSound('intro'), 100);
-      }
-    };
-
-    document.addEventListener('touchstart', handleInteraction, { once: true, passive: true });
-    document.addEventListener('click', handleInteraction, { once: true, passive: true });
-
-    return () => {
-      document.removeEventListener('touchstart', handleInteraction);
-      document.removeEventListener('click', handleInteraction);
-    };
-  }, [playSound, unlockAudio]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -34,8 +14,24 @@ const SplashScreen: React.FC = () => {
     return () => clearTimeout(timer);
   }, [setScreen]);
 
+  // Handle tap to skip and play sound
+  const handleTap = () => {
+    unlockAudio();
+    if (!hasPlayedSound.current) {
+      hasPlayedSound.current = true;
+      playSound('intro');
+      vibrate([50, 30, 50]);
+    }
+    // Skip to home after tap
+    setTimeout(() => setScreen('home'), 500);
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative">
+    <div 
+      className="min-h-screen flex flex-col items-center justify-center p-6 relative cursor-pointer"
+      onClick={handleTap}
+      onTouchStart={handleTap}
+    >
       {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-card" />
       <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-pulse" />
@@ -60,9 +56,16 @@ const SplashScreen: React.FC = () => {
             هل تستطيع كشف الإمبوستر قبل فوات الأوان؟ 🔍
           </p>
         </div>
+
+        {/* Tap to continue hint */}
+        <div className="mt-8 animate-pulse">
+          <p className="text-sm text-muted-foreground">
+            اضغط للمتابعة
+          </p>
+        </div>
         
         {/* Loading indicator */}
-        <div className="mt-12 flex justify-center gap-2">
+        <div className="mt-6 flex justify-center gap-2">
           {[0, 1, 2].map((i) => (
             <div
               key={i}

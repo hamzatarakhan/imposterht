@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useGame, AVATAR_OPTIONS } from "@/context/GameContext";
 import { useSettings } from "@/context/SettingsContext";
 import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone } from "lucide-react";
@@ -36,9 +36,21 @@ const HomeScreen: React.FC = () => {
   const [showInstallSteps, setShowInstallSteps] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [newPlayerAvatar, setNewPlayerAvatar] = useState("👤");
+  const hasPlayedWelcome = useRef(false);
 
   type DeviceType = "ios" | "android" | "desktop";
   const [deviceType, setDeviceType] = useState<DeviceType>("desktop");
+
+  // Play welcome sound when entering home screen
+  useEffect(() => {
+    if (!hasPlayedWelcome.current) {
+      hasPlayedWelcome.current = true;
+      setTimeout(() => {
+        playSound('welcome');
+        vibrate(30);
+      }, 300);
+    }
+  }, [playSound, vibrate]);
 
   React.useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
