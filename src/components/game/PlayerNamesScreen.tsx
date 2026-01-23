@@ -54,11 +54,17 @@ const PlayerNamesScreen: React.FC = () => {
     // Save current player data
     const newPlayerData = [...playerData];
     const trimmedName = inputValue.trim();
-    newPlayerData[currentIndex] = {
+    const currentPlayer = {
       name: trimmedName || `لاعب ${currentIndex + 1}`,
       avatar: selectedAvatar
     };
+    newPlayerData[currentIndex] = currentPlayer;
     setPlayerData(newPlayerData);
+
+    // Save new player immediately (non-default names only)
+    if (trimmedName && !/^لاعب \d+$/.test(trimmedName)) {
+      addPlayers([currentPlayer]);
+    }
 
     if (currentIndex < playerCount - 1) {
       // Move to next player
@@ -68,8 +74,7 @@ const PlayerNamesScreen: React.FC = () => {
       setSelectedAvatar(newPlayerData[nextIndex].avatar);
       setShowAvatarPicker(false);
     } else {
-      // All data entered, save players and start game
-      addPlayers(newPlayerData);
+      // All data entered, start game
       startGame(newPlayerData);
     }
   };
