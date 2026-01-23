@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useGame, AVATAR_OPTIONS } from "@/context/GameContext";
 import { useSettings } from "@/context/SettingsContext";
-import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone } from "lucide-react";
+import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone, Video } from "lucide-react";
 import { useSavedPlayers } from "@/hooks/useSavedPlayers";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import QRCodeModal from "./QRCodeModal";
+import VideoTutorialModal from "./VideoTutorialModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -33,6 +34,7 @@ const HomeScreen: React.FC = () => {
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [showAddPlayerDialog, setShowAddPlayerDialog] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
   const [showInstallSteps, setShowInstallSteps] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [newPlayerAvatar, setNewPlayerAvatar] = useState("👤");
@@ -220,6 +222,9 @@ const HomeScreen: React.FC = () => {
       {/* QR Code Modal */}
       <QRCodeModal isOpen={showQRModal} onClose={() => setShowQRModal(false)} url={appUrl} />
 
+      {/* Video Tutorial Modal */}
+      <VideoTutorialModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
+
       {/* Add Player Dialog */}
       <Dialog open={showAddPlayerDialog} onOpenChange={setShowAddPlayerDialog}>
         <DialogContent className="w-[calc(100vw-2rem)] max-w-sm rounded-2xl">
@@ -381,6 +386,18 @@ const HomeScreen: React.FC = () => {
           >
             <HelpCircle size={24} />
             طريقة اللعب
+          </button>
+
+          <button
+            onClick={() => {
+              playSound('click');
+              vibrate(30);
+              setShowVideoModal(true);
+            }}
+            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-imposter/80 to-primary/60 text-foreground font-bold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity shadow-lg border border-primary/20"
+          >
+            <Video size={24} />
+            شاهد فيديو الشرح 🎬
           </button>
 
           <button
