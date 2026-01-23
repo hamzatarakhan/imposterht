@@ -4,6 +4,7 @@ import { Category, getRandomWord } from '@/data/words';
 export type GameScreen = 
   | 'splash'
   | 'home'
+  | 'settings'
   | 'howToPlay'
   | 'setup'
   | 'playerNames'
