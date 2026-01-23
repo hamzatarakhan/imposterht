@@ -26,5 +26,15 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     // Ensure deps are re-optimized after dependency changes
     force: true,
+    include: [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-toast",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-popover",
+    ],
   },
 }));
