@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
 
 interface PlayerData {
   name: string;
@@ -50,6 +50,26 @@ const PlayerNamesScreen: React.FC = () => {
     } else {
       // All data entered, start game
       startGame(newPlayerData);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      // Save current player data first
+      const newPlayerData = [...playerData];
+      const trimmedName = inputValue.trim();
+      newPlayerData[currentIndex] = {
+        name: trimmedName || `لاعب ${currentIndex + 1}`,
+        avatar: selectedAvatar
+      };
+      setPlayerData(newPlayerData);
+
+      // Go back to previous player
+      const prevIndex = currentIndex - 1;
+      setCurrentIndex(prevIndex);
+      setInputValue(newPlayerData[prevIndex].name);
+      setSelectedAvatar(newPlayerData[prevIndex].avatar);
+      setShowAvatarPicker(false);
     }
   };
 
@@ -180,11 +200,19 @@ const PlayerNamesScreen: React.FC = () => {
           )}
         </div>
 
-        {/* Action Button */}
-        <div className="mt-6">
+        {/* Action Buttons */}
+        <div className="mt-6 flex gap-3">
+          {currentIndex > 0 && (
+            <button
+              onClick={handlePrevious}
+              className="p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors"
+            >
+              <ArrowLeft size={24} />
+            </button>
+          )}
           <button
             onClick={handleNext}
-            className="w-full btn-primary-game text-xl"
+            className="flex-1 btn-primary-game text-xl"
           >
             {isLastPlayer ? '🚀 ابدأ اللعبة' : '➡️ التالي'}
           </button>
