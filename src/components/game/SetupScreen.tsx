@@ -1,9 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { ArrowRight, Users, UserX, Layers, Clock } from 'lucide-react';
+import { useSavedGroups } from '@/hooks/useSavedGroups';
+import { ArrowRight, Users, UserX, Layers, Clock, FolderOpen } from 'lucide-react';
 import { Category, categoryNames } from '@/data/words';
 import RestartButton from './RestartButton';
+import GroupManagementModal from './GroupManagementModal';
+import { SavedPlayer } from '@/hooks/useSavedPlayers';
 
 const SetupScreen: React.FC = () => {
   const { 
@@ -18,10 +21,14 @@ const SetupScreen: React.FC = () => {
     setDiscussionTimeEnabled,
     discussionTime,
     setDiscussionTime,
-    goToPlayerNames
+    goToPlayerNames,
+    startGame
   } = useGame();
   const { playSound, vibrate } = useSettings();
+  const { groups } = useSavedGroups();
   const hasPlayedReady = useRef(false);
+  const [showGroupsModal, setShowGroupsModal] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<{ name: string; members: SavedPlayer[] } | null>(null);
 
   // Play ready sound when entering setup screen
   useEffect(() => {
@@ -41,6 +48,10 @@ const SetupScreen: React.FC = () => {
     vibrate(30);
     const newCount = Math.max(3, Math.min(10, playerCount + delta));
     setPlayerCount(newCount);
+    // Clear selected group if count doesn't match
+    if (selectedGroup && newCount !== selectedGroup.members.length) {
+      setSelectedGroup(null);
+    }
   };
 
   const handleImposterCountChange = (count: number, isDisabled: boolean) => {
@@ -68,10 +79,29 @@ const SetupScreen: React.FC = () => {
     setDiscussionTime(time);
   };
 
+  const handleSelectGroup = (members: SavedPlayer[]) => {
+    setSelectedGroup({ name: '', members });
+    setPlayerCount(members.length);
+    playSound('click');
+    vibrate(50);
+  };
+
+  const handleClearGroup = () => {
+    playSound('click');
+    vibrate(30);
+    setSelectedGroup(null);
+  };
+
   const handleStart = () => {
     playSound('click');
     vibrate(50);
-    goToPlayerNames();
+    // If a group is selected, skip to game directly
+    if (selectedGroup) {
+      const playerData = selectedGroup.members.map(m => ({ name: m.name, avatar: m.avatar }));
+      startGame(playerData);
+    } else {
+      goToPlayerNames();
+    }
   };
 
   const handleBack = () => {
@@ -128,6 +158,54 @@ const SetupScreen: React.FC = () => {
               +
             </button>
           </div>
+        </div>
+
+        {/* Group Selection */}
+        <div className="card-game">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <FolderOpen className="text-primary" size={20} />
+            </div>
+            <div>
+              <h3 className="font-bold">مجموعة سريعة</h3>
+              <p className="text-sm text-muted-foreground">
+                {selectedGroup ? `${selectedGroup.members.length} لاعبين جاهزين` : 'اختر مجموعة محفوظة'}
+              </p>
+            </div>
+          </div>
+          
+          {selectedGroup ? (
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-1.5">
+                {selectedGroup.members.map((member, idx) => (
+                  <span
+                    key={idx}
+                    className="px-2 py-1 bg-primary/20 rounded-lg text-xs flex items-center gap-1"
+                  >
+                    {member.avatar} {member.name}
+                  </span>
+                ))}
+              </div>
+              <button
+                onClick={handleClearGroup}
+                className="w-full py-2 bg-secondary rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                إلغاء المجموعة ✕
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                playSound('click');
+                vibrate(30);
+                setShowGroupsModal(true);
+              }}
+              className="w-full py-3 border-2 border-dashed border-muted-foreground/30 rounded-xl text-muted-foreground hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
+            >
+              <FolderOpen size={18} />
+              {groups.length > 0 ? `اختر من ${groups.length} مجموعات` : 'إنشاء مجموعة جديدة'}
+            </button>
+          )}
         </div>
         
         {/* Imposter Count */}
@@ -247,12 +325,19 @@ const SetupScreen: React.FC = () => {
           onClick={handleStart}
           className="w-full btn-primary-game text-xl"
         >
-          التالي: أسماء اللاعبين ✏️
+          {selectedGroup ? 'ابدأ اللعبة! 🎮' : 'التالي: أسماء اللاعبين ✏️'}
         </button>
         <div className="flex justify-center">
           <RestartButton />
         </div>
       </div>
+
+      {/* Groups Modal */}
+      <GroupManagementModal
+        isOpen={showGroupsModal}
+        onClose={() => setShowGroupsModal(false)}
+        onSelectGroup={handleSelectGroup}
+      />
     </div>
   );
 };

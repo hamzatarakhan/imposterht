@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useGame, AVATAR_OPTIONS } from "@/context/GameContext";
 import { useSettings } from "@/context/SettingsContext";
-import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone, Video } from "lucide-react";
+import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone, Video, FolderOpen } from "lucide-react";
 import { useSavedPlayers } from "@/hooks/useSavedPlayers";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { useSavedGroups } from "@/hooks/useSavedGroups";
 import QRCodeModal from "./QRCodeModal";
 import VideoTutorialModal from "./VideoTutorialModal";
+import GroupManagementModal from "./GroupManagementModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -31,11 +33,13 @@ const HomeScreen: React.FC = () => {
   const { playSound, vibrate } = useSettings();
   const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
   const { isInstallable, installApp } = usePWAInstall();
+  const { groups } = useSavedGroups();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [showAddPlayerDialog, setShowAddPlayerDialog] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showInstallSteps, setShowInstallSteps] = useState(false);
+  const [showGroupsModal, setShowGroupsModal] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [newPlayerAvatar, setNewPlayerAvatar] = useState("👤");
   const hasPlayedWelcome = useRef(false);
@@ -152,6 +156,21 @@ const HomeScreen: React.FC = () => {
           >
             <QrCode size={24} />
           </button>
+          <button
+            onClick={() => {
+              playSound('click');
+              vibrate(30);
+              setShowGroupsModal(true);
+            }}
+            className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors relative"
+          >
+            <FolderOpen size={24} />
+            {groups.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-xs rounded-full flex items-center justify-center font-bold">
+                {groups.length}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Saved Players Dropdown */}
@@ -224,6 +243,12 @@ const HomeScreen: React.FC = () => {
 
       {/* Video Tutorial Modal */}
       <VideoTutorialModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
+
+      {/* Groups Management Modal */}
+      <GroupManagementModal 
+        isOpen={showGroupsModal} 
+        onClose={() => setShowGroupsModal(false)} 
+      />
 
       {/* Add Player Dialog */}
       <Dialog open={showAddPlayerDialog} onOpenChange={setShowAddPlayerDialog}>
