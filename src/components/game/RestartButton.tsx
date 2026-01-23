@@ -1,12 +1,27 @@
 import React, { useState } from 'react';
 import { useGame } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 import { RotateCcw, X } from 'lucide-react';
 
 const RestartButton: React.FC = () => {
   const { resetGame } = useGame();
+  const { playSound, vibrate } = useSettings();
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const handleShowConfirm = () => {
+    playSound('click');
+    vibrate(30);
+    setShowConfirm(true);
+  };
+
+  const handleCancel = () => {
+    playSound('click');
+    setShowConfirm(false);
+  };
+
   const handleRestart = () => {
+    playSound('click');
+    vibrate(100);
     setShowConfirm(false);
     resetGame();
   };
@@ -14,7 +29,7 @@ const RestartButton: React.FC = () => {
   return (
     <>
       <button
-        onClick={() => setShowConfirm(true)}
+        onClick={handleShowConfirm}
         className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-secondary/60 text-sm text-muted-foreground hover:bg-secondary/80 transition-all"
       >
         <RotateCcw size={16} />
@@ -36,7 +51,7 @@ const RestartButton: React.FC = () => {
             
             <div className="flex gap-3">
               <button
-                onClick={() => setShowConfirm(false)}
+                onClick={handleCancel}
                 className="flex-1 btn-secondary-game flex items-center justify-center gap-2"
               >
                 <X size={20} />

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useGame } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Users, Eye, MessageCircle, Vote, Trophy } from 'lucide-react';
 
 const steps = [
@@ -32,6 +33,19 @@ const steps = [
 
 const HowToPlayScreen: React.FC = () => {
   const { setScreen } = useGame();
+  const { playSound, vibrate } = useSettings();
+
+  const handleBack = () => {
+    playSound('click');
+    vibrate(30);
+    setScreen('home');
+  };
+
+  const handleStartGame = () => {
+    playSound('click');
+    vibrate(50);
+    setScreen('setup');
+  };
 
   return (
     <div className="min-h-screen flex flex-col p-6 pt-0 relative">
@@ -42,7 +56,7 @@ const HowToPlayScreen: React.FC = () => {
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-4">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setScreen('home')}
+            onClick={handleBack}
             className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
           >
             <ArrowRight size={24} />
@@ -91,7 +105,7 @@ const HowToPlayScreen: React.FC = () => {
       {/* Start Button */}
       <div className="relative z-10 mt-6">
         <button
-          onClick={() => setScreen('setup')}
+          onClick={handleStartGame}
           className="w-full btn-primary-game"
         >
           يلا نلعب! 🎮

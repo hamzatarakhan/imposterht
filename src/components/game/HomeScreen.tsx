@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useGame, AVATAR_OPTIONS } from "@/context/GameContext";
+import { useSettings } from "@/context/SettingsContext";
 import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone } from "lucide-react";
 import { useSavedPlayers } from "@/hooks/useSavedPlayers";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
@@ -26,6 +27,7 @@ import {
 
 const HomeScreen: React.FC = () => {
   const { setScreen } = useGame();
+  const { playSound, vibrate } = useSettings();
   const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
   const { isInstallable, installApp } = usePWAInstall();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
@@ -117,13 +119,21 @@ const HomeScreen: React.FC = () => {
       <div className="relative z-10 flex justify-between">
         <div className="flex gap-2">
           <button
-            onClick={() => setScreen("settings")}
+            onClick={() => {
+              playSound('click');
+              vibrate(30);
+              setScreen("settings");
+            }}
             className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
           >
             <Settings size={24} />
           </button>
           <button
-            onClick={() => setShowQRModal(true)}
+            onClick={() => {
+              playSound('click');
+              vibrate(30);
+              setShowQRModal(true);
+            }}
             className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
           >
             <QrCode size={24} />
@@ -208,6 +218,7 @@ const HomeScreen: React.FC = () => {
             {/* Avatar Picker */}
             <button
               onClick={() => {
+                playSound('click');
                 const currentIndex = AVATAR_OPTIONS.indexOf(newPlayerAvatar);
                 const nextIndex = (currentIndex + 1) % AVATAR_OPTIONS.length;
                 setNewPlayerAvatar(AVATAR_OPTIONS[nextIndex]);
@@ -238,14 +249,22 @@ const HomeScreen: React.FC = () => {
             {/* Action Buttons */}
             <div className="w-full flex flex-col gap-2">
               <button
-                onClick={() => handleAddPlayer(false)}
+                onClick={() => {
+                  playSound('click');
+                  vibrate(30);
+                  handleAddPlayer(false);
+                }}
                 disabled={!newPlayerName.trim()}
                 className="w-full py-3 px-4 rounded-xl bg-primary text-primary-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
               >
                 ✅ حفظ وإغلاق
               </button>
               <button
-                onClick={() => handleAddPlayer(true)}
+                onClick={() => {
+                  playSound('click');
+                  vibrate(30);
+                  handleAddPlayer(true);
+                }}
                 disabled={!newPlayerName.trim()}
                 className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors"
               >
@@ -329,7 +348,11 @@ const HomeScreen: React.FC = () => {
         {/* Buttons */}
         <div className="w-full max-w-sm space-y-4">
           <button
-            onClick={() => setScreen("setup")}
+            onClick={() => {
+              playSound('click');
+              vibrate(50);
+              setScreen("setup");
+            }}
             className="w-full btn-primary-game flex items-center justify-center gap-3 text-xl"
           >
             <Play size={28} fill="currentColor" />
@@ -337,7 +360,11 @@ const HomeScreen: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setScreen("howToPlay")}
+            onClick={() => {
+              playSound('click');
+              vibrate(30);
+              setScreen("howToPlay");
+            }}
             className="w-full btn-secondary-game flex items-center justify-center gap-3"
           >
             <HelpCircle size={24} />
@@ -345,7 +372,11 @@ const HomeScreen: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setShowInstallSteps(true)}
+            onClick={() => {
+              playSound('click');
+              vibrate(30);
+              setShowInstallSteps(true);
+            }}
             className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-accent to-primary/80 text-accent-foreground font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
           >
             <Download size={20} />
@@ -354,7 +385,11 @@ const HomeScreen: React.FC = () => {
 
           {isInstallable && (
             <button
-              onClick={installApp}
+              onClick={() => {
+                playSound('click');
+                vibrate(50);
+                installApp();
+              }}
               className="w-full py-3 px-6 rounded-2xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity shadow-lg"
             >
               <Download size={24} />

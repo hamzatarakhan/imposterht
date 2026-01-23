@@ -1,28 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 import { Play, Pause, RotateCcw, Vote, MessageCircle } from 'lucide-react';
 import RestartButton from './RestartButton';
 
 const DiscussionScreen: React.FC = () => {
   const { discussionTime, discussionTimeEnabled, setScreen } = useGame();
+  const { playSound, vibrate } = useSettings();
   const [timeLeft, setTimeLeft] = useState(discussionTime);
   const [isRunning, setIsRunning] = useState(false);
+  const lastTimeRef = useRef(timeLeft);
+  const hasPlayedAlarmRef = useRef(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     
     if (isRunning && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
+        setTimeLeft((prev) => {
+          const newTime = prev - 1;
+          
+          // Play tick sound every second
+          if (newTime > 0 && newTime !== lastTimeRef.current) {
+            playSound('tick');
+            // Extra vibration for last 10 seconds
+            if (newTime <= 10) {
+              vibrate(100);
+            }
+          }
+          
+          lastTimeRef.current = newTime;
+          return newTime;
+        });
       }, 1000);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && !hasPlayedAlarmRef.current) {
       setIsRunning(false);
+      playSound('alarm');
+      vibrate([200, 100, 200, 100, 200]);
+      hasPlayedAlarmRef.current = true;
     }
     
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRunning, timeLeft]);
+  }, [isRunning, timeLeft, playSound, vibrate]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -31,8 +52,23 @@ const DiscussionScreen: React.FC = () => {
   };
 
   const handleResetTimer = () => {
+    playSound('click');
+    vibrate(50);
     setTimeLeft(discussionTime);
     setIsRunning(false);
+    hasPlayedAlarmRef.current = false;
+  };
+
+  const handlePlayPause = () => {
+    playSound('click');
+    vibrate(30);
+    setIsRunning(!isRunning);
+  };
+
+  const handleGoToVoting = () => {
+    playSound('click');
+    vibrate(50);
+    setScreen('voting');
   };
 
   const progress = (timeLeft / discussionTime) * 100;
@@ -78,7 +114,7 @@ const DiscussionScreen: React.FC = () => {
           {/* Actions */}
           <div className="space-y-3">
             <button
-              onClick={() => setScreen('voting')}
+              onClick={handleGoToVoting}
               className="w-full btn-primary-game flex items-center justify-center gap-3"
             >
               <Vote size={24} />
@@ -150,7 +186,7 @@ const DiscussionScreen: React.FC = () => {
           {/* Controls */}
           <div className="flex gap-4">
             <button
-              onClick={() => setIsRunning(!isRunning)}
+              onClick={handlePlayPause}
               className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all ${
                 isRunning 
                   ? 'bg-secondary text-foreground' 
@@ -183,7 +219,7 @@ const DiscussionScreen: React.FC = () => {
         {/* Actions */}
         <div className="space-y-3">
           <button
-            onClick={() => setScreen('voting')}
+            onClick={handleGoToVoting}
             className="w-full btn-primary-game flex items-center justify-center gap-3"
           >
             <Vote size={24} />

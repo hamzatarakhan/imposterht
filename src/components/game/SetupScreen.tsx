@@ -1,5 +1,6 @@
 import React from 'react';
 import { useGame } from '@/context/GameContext';
+import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Users, UserX, Layers, Clock } from 'lucide-react';
 import { Category, categoryNames } from '@/data/words';
 import RestartButton from './RestartButton';
@@ -19,8 +20,53 @@ const SetupScreen: React.FC = () => {
     setDiscussionTime,
     goToPlayerNames
   } = useGame();
+  const { playSound, vibrate } = useSettings();
 
   const categories: Category[] = ['random', 'things', 'places', 'food', 'jobs'];
+
+  const handlePlayerCountChange = (delta: number) => {
+    playSound('click');
+    vibrate(30);
+    const newCount = Math.max(3, Math.min(10, playerCount + delta));
+    setPlayerCount(newCount);
+  };
+
+  const handleImposterCountChange = (count: number, isDisabled: boolean) => {
+    if (isDisabled) return;
+    playSound('click');
+    vibrate(30);
+    setImposterCount(count);
+  };
+
+  const handleCategoryChange = (cat: Category) => {
+    playSound('click');
+    vibrate(30);
+    setCategory(cat);
+  };
+
+  const handleDiscussionTimeToggle = () => {
+    playSound('click');
+    vibrate(30);
+    setDiscussionTimeEnabled(!discussionTimeEnabled);
+  };
+
+  const handleDiscussionTimeChange = (time: number) => {
+    playSound('click');
+    vibrate(30);
+    setDiscussionTime(time);
+  };
+
+  const handleStart = () => {
+    playSound('click');
+    vibrate(50);
+    goToPlayerNames();
+  };
+
+  const handleBack = () => {
+    playSound('click');
+    vibrate(30);
+    setScreen('home');
+  };
 
   return (
     <div className="min-h-screen flex flex-col p-6 pt-0 relative">
@@ -31,7 +77,7 @@ const SetupScreen: React.FC = () => {
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-4">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => setScreen('home')}
+            onClick={handleBack}
             className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
           >
             <ArrowRight size={24} />
@@ -55,7 +101,7 @@ const SetupScreen: React.FC = () => {
           </div>
           <div className="flex items-center justify-between gap-3">
             <button
-              onClick={() => setPlayerCount(Math.max(3, playerCount - 1))}
+              onClick={() => handlePlayerCountChange(-1)}
               className="w-11 h-11 rounded-xl bg-secondary text-xl font-bold hover:bg-secondary/80 transition-colors"
               disabled={playerCount <= 3}
             >
@@ -63,7 +109,7 @@ const SetupScreen: React.FC = () => {
             </button>
             <span className="text-3xl font-black text-primary">{playerCount}</span>
             <button
-              onClick={() => setPlayerCount(Math.min(10, playerCount + 1))}
+              onClick={() => handlePlayerCountChange(1)}
               className="w-11 h-11 rounded-xl bg-secondary text-xl font-bold hover:bg-secondary/80 transition-colors"
               disabled={playerCount >= 10}
             >
@@ -91,7 +137,7 @@ const SetupScreen: React.FC = () => {
               return (
                 <button
                   key={count}
-                  onClick={() => !isDisabled && setImposterCount(count)}
+                  onClick={() => handleImposterCountChange(count, isDisabled)}
                   disabled={isDisabled}
                   className={`flex-1 py-2.5 rounded-xl text-base font-bold transition-all ${
                     imposterCount === count
@@ -123,7 +169,7 @@ const SetupScreen: React.FC = () => {
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setCategory(cat)}
+                onClick={() => handleCategoryChange(cat)}
                 className={`py-3 px-4 rounded-2xl text-sm font-bold transition-all ${
                   category === cat
                     ? 'bg-primary text-primary-foreground glow-primary'
@@ -151,7 +197,7 @@ const SetupScreen: React.FC = () => {
               </div>
             </div>
             <button
-              onClick={() => setDiscussionTimeEnabled(!discussionTimeEnabled)}
+              onClick={handleDiscussionTimeToggle}
               className={`w-14 h-8 rounded-full transition-colors relative ${
                 discussionTimeEnabled ? 'bg-accent' : 'bg-secondary'
               }`}
@@ -168,7 +214,7 @@ const SetupScreen: React.FC = () => {
               {[60, 90, 120].map((time) => (
                 <button
                   key={time}
-                  onClick={() => setDiscussionTime(time)}
+                  onClick={() => handleDiscussionTimeChange(time)}
                   className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
                     discussionTime === time
                       ? 'bg-accent text-accent-foreground glow-accent'
@@ -186,7 +232,7 @@ const SetupScreen: React.FC = () => {
       {/* Start Button */}
       <div className="relative z-10 mt-6 space-y-3">
         <button
-          onClick={goToPlayerNames}
+          onClick={handleStart}
           className="w-full btn-primary-game text-xl"
         >
           التالي: أسماء اللاعبين ✏️
