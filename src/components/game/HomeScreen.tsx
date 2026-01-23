@@ -201,20 +201,20 @@ const { setScreen } = useGame();
             </p>
 
             {/* Action Buttons */}
-            <div className="w-full flex gap-2">
-              <button
-                onClick={() => handleAddPlayer(true)}
-                disabled={!newPlayerName.trim()}
-                className="flex-1 py-3 px-4 rounded-xl bg-secondary text-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors"
-              >
-                ➕ حفظ وإضافة آخر
-              </button>
+            <div className="w-full flex flex-col gap-2">
               <button
                 onClick={() => handleAddPlayer(false)}
                 disabled={!newPlayerName.trim()}
-                className="flex-1 btn-primary-game disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full btn-primary-game disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 ✅ حفظ وإغلاق
+              </button>
+              <button
+                onClick={() => handleAddPlayer(true)}
+                disabled={!newPlayerName.trim()}
+                className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors text-sm"
+              >
+                ➕ حفظ وإضافة آخر
               </button>
             </div>
           </div>
