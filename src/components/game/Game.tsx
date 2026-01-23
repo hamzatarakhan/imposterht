@@ -46,14 +46,14 @@ const Game: React.FC = () => {
     <div className="max-w-md mx-auto min-h-screen bg-background relative">
       <CurrentScreen />
       
-      {/* Floating Restart Button */}
+      {/* Floating Restart Button - Top Right */}
       {showRestartButton && !showConfirm && (
         <button
           onClick={() => setShowConfirm(true)}
-          className="fixed bottom-6 left-6 w-14 h-14 rounded-full bg-secondary/90 backdrop-blur-sm border border-white/10 flex items-center justify-center shadow-lg hover:bg-secondary transition-all z-50 animate-slide-up"
+          className="fixed top-4 right-4 w-11 h-11 rounded-xl bg-secondary/80 backdrop-blur-sm border border-white/10 flex items-center justify-center shadow-lg hover:bg-secondary transition-all z-50"
           title="إعادة اللعبة"
         >
-          <RotateCcw size={24} className="text-muted-foreground" />
+          <RotateCcw size={20} className="text-muted-foreground" />
         </button>
       )}
       
