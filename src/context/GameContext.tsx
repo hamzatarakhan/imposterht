@@ -217,6 +217,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setState(prev => ({
       ...initialState,
       usedWords: prev.usedWords,
+      screen: 'home', // Go to home screen instead of splash
     }));
   };
 
