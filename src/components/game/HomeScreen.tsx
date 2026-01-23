@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
-import { Play, HelpCircle, Settings, Users, X, Trash2, Plus } from 'lucide-react';
+import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,8 +29,9 @@ import {
 } from '@/components/ui/dialog';
 
 const HomeScreen: React.FC = () => {
-  const { setScreen } = useGame();
+const { setScreen } = useGame();
   const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
+  const { isInstallable, installApp } = usePWAInstall();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [showAddPlayerDialog, setShowAddPlayerDialog] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState('');
@@ -240,6 +242,16 @@ const HomeScreen: React.FC = () => {
             <HelpCircle size={24} />
             طريقة اللعب
           </button>
+          
+          {isInstallable && (
+            <button
+              onClick={installApp}
+              className="w-full py-3 px-6 rounded-2xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity shadow-lg"
+            >
+              <Download size={24} />
+              تثبيت التطبيق
+            </button>
+          )}
         </div>
       </div>
       
