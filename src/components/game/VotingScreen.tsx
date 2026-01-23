@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Smartphone } from 'lucide-react';
 
 const VotingScreen: React.FC = () => {
   const { players, voteForPlayer, calculateResult, setScreen } = useGame();
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
   const [votingPlayerIndex, setVotingPlayerIndex] = useState(0);
   const [votes, setVotes] = useState<Record<number, number>>({});
+  const [showPassPhone, setShowPassPhone] = useState(false);
 
   const currentVoter = players[votingPlayerIndex];
+  const nextVoter = players[votingPlayerIndex + 1];
   const isLastVoter = votingPlayerIndex === players.length - 1;
 
   const handleVote = () => {
@@ -27,11 +29,72 @@ const VotingScreen: React.FC = () => {
         calculateResult();
       }, 500);
     } else {
-      // Next voter
-      setVotingPlayerIndex(prev => prev + 1);
-      setSelectedPlayer(null);
+      // Show pass phone screen
+      setShowPassPhone(true);
     }
   };
+
+  const handleNextVoter = () => {
+    setVotingPlayerIndex(prev => prev + 1);
+    setSelectedPlayer(null);
+    setShowPassPhone(false);
+  };
+
+  // Pass phone screen between voters
+  if (showPassPhone) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
+        <div className="absolute top-1/3 left-1/4 w-48 h-48 bg-accent/10 rounded-full blur-3xl" />
+        
+        <div className="relative z-10 text-center max-w-sm">
+          {/* Success Icon */}
+          <div className="mb-6 animate-reveal">
+            <div className="w-20 h-20 mx-auto rounded-full bg-accent/20 flex items-center justify-center glow-accent">
+              <Check className="text-accent" size={40} />
+            </div>
+          </div>
+          
+          <h2 className="text-2xl font-bold text-accent mb-6 animate-slide-up">
+            تم تسجيل صوتك! ✅
+          </h2>
+          
+          {/* Pass phone instruction */}
+          <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <div className="mb-6 animate-float">
+              <div className="w-20 h-20 mx-auto rounded-2xl bg-secondary flex items-center justify-center">
+                <Smartphone className="text-primary" size={40} />
+              </div>
+            </div>
+            
+            <h1 className="text-2xl font-black mb-4">
+              مرّر الهاتف إلى
+            </h1>
+            
+            <div className="card-game mb-6 inline-block">
+              <span className="text-3xl font-black text-gradient">
+                {nextVoter?.name}
+              </span>
+            </div>
+            
+            <p className="text-muted-foreground mb-8">
+              ليصوّت على من يعتقد أنه الإمبوستر 🗳️
+            </p>
+          </div>
+          
+          {/* Button */}
+          <button
+            onClick={handleNextVoter}
+            className="w-full btn-primary-game text-xl animate-slide-up"
+            style={{ animationDelay: '0.2s' }}
+          >
+            🗳️ بدء التصويت
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
