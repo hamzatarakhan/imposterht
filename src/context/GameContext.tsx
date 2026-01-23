@@ -45,7 +45,7 @@ interface GameContextType extends GameState {
   setDiscussionTime: (time: number) => void;
   setPlayerNames: (names: string[]) => void;
   goToPlayerNames: () => void;
-  startGame: () => void;
+  startGame: (names?: string[]) => void;
   nextPlayer: () => void;
   markPlayerAsSeen: () => void;
   voteForPlayer: (playerId: number) => void;
@@ -106,7 +106,10 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setState(prev => ({ ...prev, screen: 'playerNames' }));
   };
 
-  const startGame = () => {
+  const startGame = (customNames?: string[]) => {
+    // Use passed names or fallback to state
+    const namesToUse = customNames || state.playerNames;
+    
     // Generate random word
     const word = getRandomWord(state.category, state.usedWords);
     
@@ -115,7 +118,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     for (let i = 0; i < state.playerCount; i++) {
       players.push({
         id: i + 1,
-        name: state.playerNames[i] || `لاعب ${i + 1}`,
+        name: namesToUse[i] || `لاعب ${i + 1}`,
         isImposter: false,
         hasSeenRole: false,
         votes: 0,
@@ -135,6 +138,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setState(prev => ({
       ...prev,
       players,
+      playerNames: namesToUse,
       secretWord: word,
       usedWords: [...prev.usedWords, word],
       currentPlayerIndex: 0,
