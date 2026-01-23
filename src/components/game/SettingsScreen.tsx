@@ -110,7 +110,7 @@ const SettingsScreen: React.FC = () => {
           </button>
         </div>
 
-        {/* Dark Mode Toggle */}
+        {/* Dark Mode Toggle - Hidden for now, can be re-enabled later
         <div className="card-game p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {darkMode ? <Moon size={24} className="text-primary" /> : <Sun size={24} className="text-muted-foreground" />}
@@ -132,6 +132,7 @@ const SettingsScreen: React.FC = () => {
             />
           </button>
         </div>
+        */}
 
         {/* App Info */}
         <div className="card-game p-4 mt-8">
