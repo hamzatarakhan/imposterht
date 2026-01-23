@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useGame } from '@/context/GameContext';
-import { Play, HelpCircle, Settings, Users, X, Trash2 } from 'lucide-react';
+import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
+import { Play, HelpCircle, Settings, Users, X, Trash2, Plus } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import {
   DropdownMenu,
@@ -20,11 +20,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const HomeScreen: React.FC = () => {
   const { setScreen } = useGame();
-  const { savedPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
+  const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+  const [showAddPlayerDialog, setShowAddPlayerDialog] = useState(false);
+  const [newPlayerName, setNewPlayerName] = useState('');
+  const [newPlayerAvatar, setNewPlayerAvatar] = useState('👤');
 
   const handleRemovePlayer = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
@@ -35,6 +44,16 @@ const HomeScreen: React.FC = () => {
   const handleClearAll = () => {
     clearAllPlayers();
     setShowDeleteAllDialog(false);
+  };
+
+  const handleAddPlayer = () => {
+    const trimmedName = newPlayerName.trim();
+    if (trimmedName) {
+      addPlayers([{ name: trimmedName, avatar: newPlayerAvatar }]);
+      setNewPlayerName('');
+      setNewPlayerAvatar('👤');
+      setShowAddPlayerDialog(false);
+    }
   };
 
   return (
@@ -74,15 +93,18 @@ const HomeScreen: React.FC = () => {
               👥 اللاعبين المحفوظين
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {savedPlayers.length === 0 ? (
-              <div className="px-3 py-4 text-center text-muted-foreground text-sm">
-                لا يوجد لاعبين محفوظين
-                <br />
-                <span className="text-xs">ابدأ لعبة وأضف أسماء!</span>
-              </div>
-            ) : (
+            {/* Add New Player Button */}
+            <DropdownMenuItem
+              className="cursor-pointer flex items-center gap-2 text-primary"
+              onSelect={() => setShowAddPlayerDialog(true)}
+            >
+              <Plus size={16} />
+              إضافة لاعب جديد
+            </DropdownMenuItem>
+            {savedPlayers.length > 0 && (
               <>
-                <div className="max-h-[250px] overflow-y-auto">
+                <DropdownMenuSeparator />
+                <div className="max-h-[200px] overflow-y-auto">
                   {savedPlayers.map((player) => (
                     <DropdownMenuItem
                       key={player.name}
@@ -115,6 +137,57 @@ const HomeScreen: React.FC = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Add Player Dialog */}
+      <Dialog open={showAddPlayerDialog} onOpenChange={setShowAddPlayerDialog}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-center">➕ إضافة لاعب جديد</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
+            {/* Avatar Picker */}
+            <button
+              onClick={() => {
+                const currentIndex = AVATAR_OPTIONS.indexOf(newPlayerAvatar);
+                const nextIndex = (currentIndex + 1) % AVATAR_OPTIONS.length;
+                setNewPlayerAvatar(AVATAR_OPTIONS[nextIndex]);
+              }}
+              className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-3xl hover:scale-110 transition-transform"
+            >
+              {newPlayerAvatar}
+            </button>
+            <p className="text-xs text-muted-foreground">اضغط لتغيير الأفاتار</p>
+
+            {/* Name Input */}
+            <input
+              type="text"
+              value={newPlayerName}
+              onChange={(e) => setNewPlayerName(e.target.value.slice(0, 20))}
+              placeholder="اسم اللاعب"
+              maxLength={20}
+              className="w-full text-center text-xl font-bold py-3 px-4 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:text-muted-foreground/50"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleAddPlayer();
+                }
+              }}
+            />
+            <p className="text-xs text-muted-foreground">
+              {newPlayerName.length}/20 حرف
+            </p>
+
+            {/* Add Button */}
+            <button
+              onClick={handleAddPlayer}
+              disabled={!newPlayerName.trim()}
+              className="w-full btn-primary-game disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              ✅ إضافة
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete All Confirmation Dialog */}
       <AlertDialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
