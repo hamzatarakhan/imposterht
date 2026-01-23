@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
-import { Play, HelpCircle, Settings, Users, X, Trash2, Plus } from 'lucide-react';
+import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
+import QRCodeModal from './QRCodeModal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,12 +30,16 @@ import {
 } from '@/components/ui/dialog';
 
 const HomeScreen: React.FC = () => {
-  const { setScreen } = useGame();
+const { setScreen } = useGame();
   const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
+  const { isInstallable, installApp } = usePWAInstall();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [showAddPlayerDialog, setShowAddPlayerDialog] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newPlayerAvatar, setNewPlayerAvatar] = useState('👤');
+
+  const appUrl = 'https://imposter-hide-and-seek.lovable.app';
 
   const handleRemovePlayer = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
@@ -66,12 +72,20 @@ const HomeScreen: React.FC = () => {
       
       {/* Header Icons */}
       <div className="relative z-10 flex justify-between">
-        <button 
-          onClick={() => setScreen('settings')}
-          className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <Settings size={24} />
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setScreen('settings')}
+            className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Settings size={24} />
+          </button>
+          <button 
+            onClick={() => setShowQRModal(true)}
+            className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <QrCode size={24} />
+          </button>
+        </div>
 
         {/* Saved Players Dropdown */}
         <DropdownMenu>
@@ -137,6 +151,13 @@ const HomeScreen: React.FC = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* QR Code Modal */}
+      <QRCodeModal
+        isOpen={showQRModal}
+        onClose={() => setShowQRModal(false)}
+        url={appUrl}
+      />
 
       {/* Add Player Dialog */}
       <Dialog open={showAddPlayerDialog} onOpenChange={setShowAddPlayerDialog}>
@@ -240,13 +261,26 @@ const HomeScreen: React.FC = () => {
             <HelpCircle size={24} />
             طريقة اللعب
           </button>
+          
+          {isInstallable && (
+            <button
+              onClick={installApp}
+              className="w-full py-3 px-6 rounded-2xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity shadow-lg"
+            >
+              <Download size={24} />
+              تثبيت التطبيق
+            </button>
+          )}
         </div>
       </div>
       
       {/* Footer */}
-      <div className="relative z-10 text-center py-4">
+      <div className="relative z-10 text-center py-4 space-y-1">
         <p className="text-sm text-muted-foreground">
           العبوا مع بعض في نفس المكان 🎮
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Powered by <span className="text-primary font-bold">Hamza Tarkhan</span>
         </p>
       </div>
     </div>

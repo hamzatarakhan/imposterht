@@ -49,6 +49,13 @@ const SplashScreen: React.FC = () => {
           ))}
         </div>
       </div>
+      
+      {/* Footer */}
+      <div className="absolute bottom-6 left-0 right-0 text-center">
+        <p className="text-sm text-muted-foreground">
+          Powered by <span className="text-primary font-bold">Hamza Tarkhan</span>
+        </p>
+      </div>
     </div>
   );
 };
