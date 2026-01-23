@@ -45,19 +45,21 @@ const SettingsScreen: React.FC = () => {
       <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
       <div className="absolute bottom-40 right-10 w-40 h-40 bg-imposter/10 rounded-full blur-3xl" />
       
-      {/* Header */}
-      <div className="relative z-10 flex items-center gap-4 mb-8">
-        <button 
-          onClick={() => {
-            playSound('click');
-            vibrate(30);
-            setScreen('home');
-          }}
-          className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowRight size={24} />
-        </button>
-        <h1 className="text-2xl font-bold">الإعدادات</h1>
+      {/* Header - Sticky */}
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-4">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => {
+              playSound('click');
+              vibrate(30);
+              setScreen('home');
+            }}
+            className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowRight size={24} />
+          </button>
+          <h1 className="text-2xl font-bold">الإعدادات</h1>
+        </div>
       </div>
       
       {/* Settings Options */}

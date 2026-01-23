@@ -38,15 +38,17 @@ const HowToPlayScreen: React.FC = () => {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
       
-      {/* Header */}
-      <div className="relative z-10 flex items-center gap-4 mb-8">
-        <button
-          onClick={() => setScreen('home')}
-          className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
-        >
-          <ArrowRight size={24} />
-        </button>
-        <h1 className="text-2xl font-bold">طريقة اللعب</h1>
+      {/* Header - Sticky */}
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-4">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setScreen('home')}
+            className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
+          >
+            <ArrowRight size={24} />
+          </button>
+          <h1 className="text-2xl font-bold">طريقة اللعب</h1>
+        </div>
       </div>
       
       {/* Content */}
