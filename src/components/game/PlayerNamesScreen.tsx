@@ -27,17 +27,15 @@ const PlayerNamesScreen: React.FC = () => {
       setCurrentIndex(currentIndex + 1);
       setInputValue(newNames[currentIndex + 1]);
     } else {
-      // All names entered, start game
-      setPlayerNames(newNames);
-      startGame();
+      // All names entered, start game with the names directly
+      startGame(newNames);
     }
   };
 
   const handleSkipAll = () => {
     // Use default names
     const defaultNames = Array.from({ length: playerCount }, (_, i) => `لاعب ${i + 1}`);
-    setPlayerNames(defaultNames);
-    startGame();
+    startGame(defaultNames);
   };
 
   const isLastPlayer = currentIndex === playerCount - 1;
