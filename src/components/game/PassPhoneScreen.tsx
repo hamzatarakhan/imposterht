@@ -3,7 +3,9 @@ import { useGame } from '@/context/GameContext';
 import { Smartphone } from 'lucide-react';
 
 const PassPhoneScreen: React.FC = () => {
-  const { currentPlayerIndex, setScreen } = useGame();
+  const { currentPlayerIndex, players, setScreen } = useGame();
+  
+  const currentPlayer = players[currentPlayerIndex];
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
@@ -26,7 +28,7 @@ const PassPhoneScreen: React.FC = () => {
         
         <div className="card-game mb-8 inline-block">
           <span className="text-4xl font-black text-gradient">
-            لاعب {currentPlayerIndex + 1}
+            {currentPlayer?.name || `لاعب ${currentPlayerIndex + 1}`}
           </span>
         </div>
         
