@@ -52,13 +52,15 @@ const { setScreen } = useGame();
     setShowDeleteAllDialog(false);
   };
 
-  const handleAddPlayer = () => {
+  const handleAddPlayer = (keepOpen: boolean = false) => {
     const trimmedName = newPlayerName.trim();
     if (trimmedName) {
       addPlayers([{ name: trimmedName, avatar: newPlayerAvatar }]);
       setNewPlayerName('');
       setNewPlayerAvatar('👤');
-      setShowAddPlayerDialog(false);
+      if (!keepOpen) {
+        setShowAddPlayerDialog(false);
+      }
     }
   };
 
@@ -190,7 +192,7 @@ const { setScreen } = useGame();
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  handleAddPlayer();
+                  handleAddPlayer(false);
                 }
               }}
             />
@@ -198,14 +200,23 @@ const { setScreen } = useGame();
               {newPlayerName.length}/20 حرف
             </p>
 
-            {/* Add Button */}
-            <button
-              onClick={handleAddPlayer}
-              disabled={!newPlayerName.trim()}
-              className="w-full btn-primary-game disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              ✅ إضافة
-            </button>
+            {/* Action Buttons */}
+            <div className="w-full flex gap-2">
+              <button
+                onClick={() => handleAddPlayer(true)}
+                disabled={!newPlayerName.trim()}
+                className="flex-1 py-3 px-4 rounded-xl bg-secondary text-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors"
+              >
+                ➕ حفظ وإضافة آخر
+              </button>
+              <button
+                onClick={() => handleAddPlayer(false)}
+                disabled={!newPlayerName.trim()}
+                className="flex-1 btn-primary-game disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ✅ حفظ وإغلاق
+              </button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
