@@ -203,28 +203,29 @@ const PlayerNamesScreen: React.FC = () => {
 
           {/* Name Input */}
           <div className="w-full max-w-sm">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => handleNameChange(e.target.value)}
-                placeholder={`لاعب ${currentIndex + 1}`}
-                maxLength={20}
-                className="flex-1 text-center text-2xl font-bold py-4 px-6 rounded-2xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:text-muted-foreground/50"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleNext();
-                  }
-                }}
-              />
-              {savedPlayers.length > 0 && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors">
-                      <Users size={24} />
-                    </button>
-                  </DropdownMenuTrigger>
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  placeholder={`لاعب ${currentIndex + 1}`}
+                  maxLength={20}
+                  className="flex-1 min-w-0 text-center text-xl sm:text-2xl font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-2xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:text-muted-foreground/50"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleNext();
+                    }
+                  }}
+                />
+                {savedPlayers.length > 0 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="shrink-0 p-3 sm:p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors">
+                        <Users size={22} />
+                      </button>
+                    </DropdownMenuTrigger>
                   <DropdownMenuContent 
                     align="end" 
                     className="min-w-[220px] bg-card/95 backdrop-blur-md border-border/50 rounded-xl"
@@ -264,10 +265,11 @@ const PlayerNamesScreen: React.FC = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
+              </div>
+              <p className="text-center text-sm text-muted-foreground">
+                {inputValue.length}/20 حرف
+              </p>
             </div>
-            <p className="text-center text-sm text-muted-foreground mt-2">
-              {inputValue.length}/20 حرف
-            </p>
           </div>
 
           {/* Delete All Confirmation Dialog */}
