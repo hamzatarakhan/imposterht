@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 
 interface SettingsState {
   soundEnabled: boolean;
@@ -12,6 +12,7 @@ interface SettingsContextType extends SettingsState {
   setDarkMode: (enabled: boolean) => void;
   playSound: (type: 'click' | 'reveal' | 'win' | 'lose' | 'tick' | 'alarm') => void;
   vibrate: (pattern?: number | number[]) => void;
+  unlockAudio: () => void;
 }
 
 const STORAGE_KEY = 'imposter-settings';
@@ -46,6 +47,59 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
     return defaultSettings;
   });
+
+  // Singleton AudioContext for mobile compatibility
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const isAudioUnlockedRef = useRef(false);
+
+  // Get or create AudioContext
+  const getAudioContext = (): AudioContext | null => {
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      return audioContextRef.current;
+    } catch (e) {
+      console.error('Error creating AudioContext:', e);
+      return null;
+    }
+  };
+
+  // Unlock audio for mobile browsers (must be called from user gesture)
+  const unlockAudio = () => {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().then(() => {
+        isAudioUnlockedRef.current = true;
+        console.log('Audio unlocked successfully');
+      }).catch(e => {
+        console.error('Failed to unlock audio:', e);
+      });
+    } else if (ctx) {
+      isAudioUnlockedRef.current = true;
+    }
+  };
+
+  // Auto-unlock audio on first user interaction
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      unlockAudio();
+      // Remove listeners after first interaction
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+
+    document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('touchend', handleUserInteraction, { passive: true });
+    document.addEventListener('click', handleUserInteraction, { passive: true });
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('touchend', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+  }, []);
 
   // Apply dark mode to document
   useEffect(() => {
@@ -82,7 +136,14 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     if (!settings.soundEnabled) return;
 
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioContext = getAudioContext();
+      if (!audioContext) return;
+
+      // Resume context if suspended (mobile browsers)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
@@ -124,6 +185,20 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         osc3.start(audioContext.currentTime + 0.2);
         osc3.stop(audioContext.currentTime + 0.4);
       }
+
+      // For alarm sound, make it more noticeable
+      if (type === 'alarm') {
+        const osc2 = audioContext.createOscillator();
+        const gain2 = audioContext.createGain();
+        osc2.connect(gain2);
+        gain2.connect(audioContext.destination);
+        osc2.frequency.value = 1200;
+        osc2.type = 'sine';
+        gain2.gain.setValueAtTime(0.2, audioContext.currentTime + 0.15);
+        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+        osc2.start(audioContext.currentTime + 0.15);
+        osc2.stop(audioContext.currentTime + 0.4);
+      }
     } catch (e) {
       console.error('Error playing sound:', e);
     }
@@ -151,6 +226,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         setDarkMode,
         playSound,
         vibrate,
+        unlockAudio,
       }}
     >
       {children}
