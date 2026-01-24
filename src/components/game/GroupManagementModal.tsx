@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AVATAR_OPTIONS } from "@/context/GameContext";
 import { useSavedGroups, PlayerGroup } from "@/hooks/useSavedGroups";
 import { useSavedPlayers, SavedPlayer } from "@/hooks/useSavedPlayers";
@@ -138,17 +137,38 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
     setSelectedMembers(current => current.filter(m => m.name !== name));
   };
 
+  if (!isOpen) return null;
+
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-hidden flex flex-col bg-card border-border">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-center">
-              {mode === "list" && "المجموعات 👥"}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+          onClick={handleClose}
+        />
+        
+        {/* Modal */}
+        <div className="relative z-10 w-full max-w-sm bg-card border border-border rounded-3xl p-5 shadow-2xl animate-slide-up max-h-[85vh] overflow-hidden flex flex-col">
+          {/* Close button */}
+          <button
+            onClick={handleClose}
+            className="absolute top-3 right-3 p-2 rounded-full bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors z-10"
+          >
+            <X size={20} />
+          </button>
+
+          {/* Header */}
+          <div className="text-center mb-4">
+            <div className="flex justify-center mb-2">
+              <span className="text-4xl">👥</span>
+            </div>
+            <h2 className="text-xl font-bold text-foreground">
+              {mode === "list" && "المجموعات"}
               {mode === "create" && "إنشاء مجموعة جديدة"}
               {mode === "edit" && "تعديل المجموعة"}
-            </DialogTitle>
-          </DialogHeader>
+            </h2>
+          </div>
 
           <div className="flex-1 overflow-y-auto">
             {/* List Mode */}
@@ -392,8 +412,8 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
               </div>
             )}
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
