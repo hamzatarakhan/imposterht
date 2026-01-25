@@ -1,100 +1,98 @@
 
+# خطة توسيع الكلمات لتشمل الأماكن العربية والكلمات المعروفة 🇯🇴🌍
 
-## Setting Up PWA (Progressive Web App)
-
-This plan will make your Imposter game installable on phones and tablets. Users will be able to add it to their home screen and use it like a regular app - even when offline!
-
----
-
-### What You'll Get
-
-- **Install Button**: Users can "Add to Home Screen" on iOS and Android
-- **App-like Experience**: Full screen mode, no browser bars
-- **Works Offline**: Game will work even without internet
-- **App Icon**: Custom icon on the home screen
+## الهدف
+توسيع ملف `src/data/words.ts` بإضافة:
+1. أماكن عربية معروفة (دول ومدن ومعالم)
+2. كلمات كثيرة معروفة ومشتركة بين العرب والأردنيين
+3. الحفاظ على الطابع المحلي مع إضافة البعد العربي
 
 ---
 
-### Implementation Steps
+## التغييرات المطلوبة
 
-#### Step 1: Create Web App Manifest
-Create a `manifest.json` file in the `public` folder with app information:
-- App name: "Imposter"
-- Arabic description
-- Theme colors matching the dark purple theme (#0f0a1a)
-- Icons for different screen sizes
-- Display mode: standalone (full screen, no browser UI)
-- RTL text direction
+### 1. فئة الأماكن (places) - إضافة أماكن عربية
 
-#### Step 2: Create Service Worker
-Create a `sw.js` file in the `public` folder to:
-- Cache all app files for offline use
-- Handle network requests when offline
-- Update cache when new version is available
+**دول عربية:**
+- مصر، لبنان، سوريا، فلسطين، العراق، السعودية، الإمارات، الكويت، قطر، البحرين، عمان، اليمن، ليبيا، تونس، الجزائر، المغرب، السودان
 
-#### Step 3: Update HTML
-Add to `index.html`:
-- Link to manifest file
-- Apple-specific meta tags for iOS support
-- Mobile web app capable meta tags
+**مدن عربية مشهورة:**
+- **مصر:** الإسكندرية، الأقصر، أسوان، شرم الشيخ، الغردقة، بورسعيد، السويس، المنصورة، المحلة
+- **لبنان:** جونيه، صيدا، طرابلس، بعلبك، زحلة، جبيل، تير
+- **سوريا:** حلب، حمص، اللاذقية، طرطوس، دير الزور، الرقة، إدلب
+- **فلسطين:** القدس، نابلس، رام الله، الخليل، بيت لحم، جنين، طولكرم، غزة، يافا، حيفا، عكا
+- **العراق:** الموصل، البصرة، أربيل، كربلاء، النجف، السليمانية
+- **الخليج:** الرياض، جدة، مكة، المدينة، الدمام، الخبر، أبوظبي، دبي، الشارقة، الكويت، الدوحة، المنامة، مسقط
 
-#### Step 4: Register Service Worker
-Update `src/main.tsx` to register the service worker when the app loads
+**معالم عربية مشهورة:**
+- الأهرامات، أبو الهول، برج خليفة، الحرم المكي، المسجد النبوي، المسجد الأقصى، قلعة صلاح الدين، معبد الكرنك، أبو سمبل
+- برج العرب، نخلة جميرا، متحف اللوفر أبوظبي، برج المملكة، ساحة الفنا، مدينة البتراء، سوق خان الخليلي
 
----
+### 2. فئة الأشياء (things) - كلمات عربية مشتركة
 
-### Technical Details
+**أشياء من التراث:**
+- سبحة، مصحف، سجادة صلاة، فانوس رمضان، مدفع رمضان، تمرية، إبريق وضوء، كشكول، طربوش، فيشة
 
-**Files to Create:**
-1. `public/manifest.json` - PWA configuration
-2. `public/sw.js` - Service worker for offline support
+**أشياء يومية معروفة عربياً:**
+- كشري، طاسة، جردل، كنكة، إبريق شاي، بابور، برايمز، طشت، كومودينو، سرير دورين
+- لعبة طاولة، شيشة، نرجيلة، معسل، فحم جوز الهند، ملقط فحم
 
-**Files to Modify:**
-1. `index.html` - Add manifest link and iOS meta tags
-2. `src/main.tsx` - Register service worker
+### 3. فئة الأكل (food) - أكلات عربية مشهورة
 
-**Manifest Configuration:**
-```text
-+---------------------------+
-|  manifest.json            |
-+---------------------------+
-| name: "Imposter"          |
-| short_name: "Imposter"    |
-| start_url: "/"            |
-| display: "standalone"     |
-| background: "#0f0a1a"     |
-| theme_color: "#0f0a1a"    |
-| dir: "rtl"                |
-| lang: "ar"                |
-| icons: [192x192, 512x512] |
-+---------------------------+
-```
+**أكلات مصرية:**
+- كشري، فول مدمس، طعمية، ممبار، حواوشي، فتة مصرية، رز معمر، ملوخية مصرية، مسقعة، كوارع
+- أم علي، بسبوسة مصرية، قتايف، زلابية، كنافة مصرية، جلاش
 
-**Service Worker Strategy:**
-- Cache-first for static assets (JS, CSS, images)
-- Network-first for dynamic content
-- Fallback to cached version when offline
+**أكلات خليجية:**
+- كبسة، مندي، مضبي، هريس، ثريد، مجبوس، مطبق، سليق، جريش، قرصان
+- لقيمات، رقاق، بلاليط، ساقو، محلبية خليجية
+
+**أكلات شامية إضافية:**
+- كبة حلبية، شيش برك، فتوش، تبولة شامية، مقلوبة فلسطينية، مسخن فلسطيني، مقدوس
+
+**أكلات مغاربية:**
+- كسكس مغربي، طاجين، بسطيلة، شوربة حريرة، مسمن، بغرير، رفيسة، سفة
+
+**مشروبات عربية:**
+- سحلب مصري، كركديه، دوم، عناب، خروب، قمر الدين، تمر هندي، سوبيا، شاي كرك، قهوة سعودي
+
+### 4. فئة الوظائف (jobs) - وظائف معروفة عربياً
+
+**وظائف تراثية:**
+- سقّا، قهوجي، طحان، حمّال، صراف عملات، صائغ، عطار، بقال، زيات، حطاب
+
+**وظائف معروفة في المنطقة:**
+- شيخ قبيلة، مختار، عمدة، وزير، سفير، قنصل، ملحق ثقافي، موظف سفارة
+- لاعب منتخب، معلق رياضي، محلل رياضي، مدرب منتخب
 
 ---
 
-### How Users Will Install
+## ملخص الإضافات المتوقعة
 
-**On Android (Chrome):**
-1. Visit the app URL
-2. Tap the 3-dot menu
-3. Select "Add to Home screen"
-4. Or use the automatic install prompt
-
-**On iOS (Safari):**
-1. Visit the app URL
-2. Tap the Share button
-3. Select "Add to Home Screen"
+| الفئة | الكلمات الجديدة |
+|-------|-----------------|
+| أماكن | +150 مكان عربي |
+| أشياء | +50 شيء عربي مشترك |
+| أكل | +100 أكلة عربية |
+| وظائف | +30 وظيفة |
+| **المجموع** | **+330 كلمة جديدة** |
 
 ---
 
-### Notes
+## الملفات المتأثرة
 
-- The app will use the existing `favicon.png` as the app icon
-- For best results, you may want to create larger icon sizes (192x192 and 512x512) later
-- The offline functionality will cache the game so it works without internet
+| الملف | التغيير |
+|-------|---------|
+| `src/data/words.ts` | إضافة كلمات جديدة لجميع الفئات |
 
+---
+
+## التفاصيل التقنية
+
+سيتم إضافة الكلمات الجديدة إلى المصفوفات الموجودة في ملف `words.ts` مع:
+- إضافة تعليقات تصنيفية جديدة (مثل `// أماكن عربية`)
+- الحفاظ على نفس البنية والتنسيق الحالي
+- عدم حذف أي كلمات موجودة
+- إضافة الكلمات في نهاية كل فئة
+
+المجموع النهائي المتوقع: **أكثر من 1800 كلمة** بدلاً من 1500 كلمة حالياً
