@@ -393,7 +393,7 @@ const HomeScreen: React.FC = () => {
             onClick={() => {
               playSound('click');
               vibrate(50);
-              setScreen("setup");
+              setScreen("modeSelect");
             }}
             className="w-full btn-primary-game flex items-center justify-center gap-3 text-xl"
           >

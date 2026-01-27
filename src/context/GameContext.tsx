@@ -6,6 +6,7 @@ export type GameScreen =
   | 'home'
   | 'settings'
   | 'howToPlay'
+  | 'modeSelect'
   | 'setup'
   | 'playerNames'
   | 'passPhone'

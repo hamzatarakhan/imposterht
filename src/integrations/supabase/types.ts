@@ -14,13 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      room_players: {
+        Row: {
+          avatar: string
+          has_seen_role: boolean
+          id: string
+          is_host: boolean
+          is_imposter: boolean
+          joined_at: string
+          name: string
+          player_id: string
+          player_order: number
+          room_id: string
+          voted_for: string | null
+          votes: number
+        }
+        Insert: {
+          avatar?: string
+          has_seen_role?: boolean
+          id?: string
+          is_host?: boolean
+          is_imposter?: boolean
+          joined_at?: string
+          name: string
+          player_id: string
+          player_order?: number
+          room_id: string
+          voted_for?: string | null
+          votes?: number
+        }
+        Update: {
+          avatar?: string
+          has_seen_role?: boolean
+          id?: string
+          is_host?: boolean
+          is_imposter?: boolean
+          joined_at?: string
+          name?: string
+          player_id?: string
+          player_order?: number
+          room_id?: string
+          voted_for?: string | null
+          votes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          category: string
+          code: string
+          created_at: string
+          current_player_index: number
+          discussion_time: number
+          discussion_time_enabled: boolean
+          host_id: string
+          id: string
+          imposter_count: number
+          player_count: number
+          secret_word: string | null
+          status: string
+          updated_at: string
+          winner: string | null
+        }
+        Insert: {
+          category?: string
+          code: string
+          created_at?: string
+          current_player_index?: number
+          discussion_time?: number
+          discussion_time_enabled?: boolean
+          host_id: string
+          id?: string
+          imposter_count?: number
+          player_count?: number
+          secret_word?: string | null
+          status?: string
+          updated_at?: string
+          winner?: string | null
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string
+          current_player_index?: number
+          discussion_time?: number
+          discussion_time_enabled?: boolean
+          host_id?: string
+          id?: string
+          imposter_count?: number
+          player_count?: number
+          secret_word?: string | null
+          status?: string
+          updated_at?: string
+          winner?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_room_code: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never

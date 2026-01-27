@@ -1,5 +1,6 @@
 import React from 'react';
 import { useGame } from '@/context/GameContext';
+import { OnlineGameProvider, useOnlineGame } from '@/context/OnlineGameContext';
 import SplashScreen from './SplashScreen';
 import HomeScreen from './HomeScreen';
 import SettingsScreen from './SettingsScreen';
@@ -11,15 +12,36 @@ import ShowRoleScreen from './ShowRoleScreen';
 import DiscussionScreen from './DiscussionScreen';
 import VotingScreen from './VotingScreen';
 import ResultScreen from './ResultScreen';
+import OnlineGame from './online/OnlineGame';
+import ModeSelectScreen from './online/ModeSelectScreen';
 
-const Game: React.FC = () => {
+const GameContent: React.FC = () => {
   const { screen } = useGame();
+  const { screen: onlineScreen } = useOnlineGame();
+
+  // If we're in mode select, show mode select screen
+  if (screen === 'modeSelect') {
+    // If online game has progressed, show online screens
+    if (onlineScreen !== 'modeSelect') {
+      return (
+        <div className="max-w-md mx-auto min-h-screen bg-background relative">
+          <OnlineGame />
+        </div>
+      );
+    }
+    return (
+      <div className="max-w-md mx-auto min-h-screen bg-background relative">
+        <ModeSelectScreen />
+      </div>
+    );
+  }
 
   const screens = {
     splash: SplashScreen,
     home: HomeScreen,
     settings: SettingsScreen,
     howToPlay: HowToPlayScreen,
+    modeSelect: ModeSelectScreen,
     setup: SetupScreen,
     playerNames: PlayerNamesScreen,
     passPhone: PassPhoneScreen,
@@ -35,6 +57,14 @@ const Game: React.FC = () => {
     <div className="max-w-md mx-auto min-h-screen bg-background relative">
       <CurrentScreen />
     </div>
+  );
+};
+
+const Game: React.FC = () => {
+  return (
+    <OnlineGameProvider>
+      <GameContent />
+    </OnlineGameProvider>
   );
 };
 
