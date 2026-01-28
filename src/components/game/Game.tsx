@@ -1,6 +1,7 @@
 import React from 'react';
-import { useGame } from '@/context/GameContext';
+import { GameProvider, useGame } from '@/context/GameContext';
 import { OnlineGameProvider, useOnlineGame } from '@/context/OnlineGameContext';
+import { SettingsProvider } from '@/context/SettingsContext';
 import SplashScreen from './SplashScreen';
 import HomeScreen from './HomeScreen';
 import SettingsScreen from './SettingsScreen';
@@ -62,9 +63,13 @@ const GameContent: React.FC = () => {
 
 const Game: React.FC = () => {
   return (
-    <OnlineGameProvider>
-      <GameContent />
-    </OnlineGameProvider>
+    <SettingsProvider>
+      <GameProvider>
+        <OnlineGameProvider>
+          <GameContent />
+        </OnlineGameProvider>
+      </GameProvider>
+    </SettingsProvider>
   );
 };
 
