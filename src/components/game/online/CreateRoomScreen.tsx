@@ -56,22 +56,24 @@ const CreateRoomScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
       
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={handleBack}
-            className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
-          >
-            <ArrowRight size={24} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold">إنشاء غرفة 🎮</h1>
-            <p className="text-sm text-muted-foreground">اعمل غرفة وشارك الكود</p>
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-2">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleBack}
+              className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
+            >
+              <ArrowRight size={24} />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold">إنشاء غرفة 🎮</h1>
+              <p className="text-sm text-muted-foreground">اعمل غرفة وشارك الكود</p>
+            </div>
           </div>
         </div>
 

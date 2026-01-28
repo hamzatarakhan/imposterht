@@ -51,23 +51,25 @@ const JoinRoomScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
       <div className="absolute top-1/3 left-1/4 w-48 h-48 bg-accent/10 rounded-full blur-3xl" />
       
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={handleBack}
-            className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
-          >
-            <ArrowRight size={24} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold">انضم لغرفة 🎯</h1>
-            <p className="text-sm text-muted-foreground">أدخل كود الغرفة للانضمام</p>
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleBack}
+              className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
+            >
+              <ArrowRight size={24} />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold">انضم لغرفة 🎯</h1>
+              <p className="text-sm text-muted-foreground">أدخل كود الغرفة للانضمام</p>
+            </div>
           </div>
         </div>
 
