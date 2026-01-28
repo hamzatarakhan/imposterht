@@ -47,21 +47,23 @@ const OnlineDiscussionScreen: React.FC = () => {
   const impostorCount = players.filter(p => p.is_imposter).length;
 
   return (
-    <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
       <div className="absolute top-1/4 right-10 w-48 h-48 bg-accent/10 rounded-full blur-3xl" />
       
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <div className="text-center mb-6">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <MessageSquare size={24} className="text-accent" />
-            <h1 className="text-2xl font-bold">وقت النقاش! 🗣️</h1>
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-2">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <MessageSquare size={24} className="text-accent" />
+              <h1 className="text-2xl font-bold">وقت النقاش! 🗣️</h1>
+            </div>
+            <p className="text-muted-foreground">
+              ناقشوا واكتشفوا الإمبوستر
+            </p>
           </div>
-          <p className="text-muted-foreground">
-            ناقشوا واكتشفوا الإمبوستر
-          </p>
         </div>
 
         {/* Timer */}
