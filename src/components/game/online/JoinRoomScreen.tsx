@@ -51,14 +51,14 @@ const JoinRoomScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
+    <div className="min-h-screen flex flex-col relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
       <div className="absolute top-1/3 left-1/4 w-48 h-48 bg-accent/10 rounded-full blur-3xl" />
       
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-4">
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md px-6 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={handleBack}
@@ -74,7 +74,7 @@ const JoinRoomScreen: React.FC = () => {
         </div>
 
         {/* Form */}
-        <div className="flex-1 flex flex-col justify-center space-y-6">
+        <div className="flex-1 flex flex-col justify-center space-y-6 px-6 pb-48">
           {/* Room Code Input */}
           <div className="card-game">
             <label className="block text-sm font-medium mb-3 text-center">كود الغرفة</label>
@@ -128,8 +128,8 @@ const JoinRoomScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Buttons */}
-        <div className="space-y-3 mt-6">
+        {/* Sticky Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 space-y-3 max-w-md mx-auto">
           <button
             onClick={handleJoin}
             disabled={!name.trim() || code.length !== 6 || isJoining}
