@@ -56,13 +56,13 @@ const CreateRoomScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
+    <div className="min-h-screen flex flex-col relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
       
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-2">
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md px-6 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={handleBack}
@@ -78,7 +78,7 @@ const CreateRoomScreen: React.FC = () => {
         </div>
 
         {/* Form */}
-        <div className="flex-1 overflow-auto space-y-4 pb-4">
+        <div className="flex-1 overflow-auto space-y-4 px-6 pb-48">
           {/* Name Input */}
           <div className="card-game">
             <label className="block text-sm font-medium mb-2">اسمك</label>
@@ -233,8 +233,8 @@ const CreateRoomScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Buttons */}
-        <div className="space-y-3 mt-4">
+        {/* Sticky Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 space-y-3 max-w-md mx-auto">
           <button
             onClick={handleCreate}
             disabled={!name.trim() || isCreating}
