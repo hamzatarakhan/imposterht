@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { RotateCcw, Home } from 'lucide-react';
+import { RotateCcw, Home, Trophy, Medal } from 'lucide-react';
 
 const ResultScreen: React.FC = () => {
-  const { players, winner, secretWord, playAgain, resetGame } = useGame();
+  const { players, winner, secretWord, playAgain, resetGame, getLeaderboard, roundNumber, resetScores } = useGame();
   const { playSound, vibrate } = useSettings();
   const hasPlayedSoundRef = useRef(false);
   
@@ -12,6 +12,7 @@ const ResultScreen: React.FC = () => {
   const sortedByVotes = [...players].sort((a, b) => b.votes - a.votes);
   const mostVoted = sortedByVotes[0];
   const playersWon = winner === 'players';
+  const leaderboard = getLeaderboard();
 
   // Play result sound on mount
   useEffect(() => {
@@ -36,7 +37,15 @@ const ResultScreen: React.FC = () => {
   const handleGoHome = () => {
     playSound('click');
     vibrate(30);
+    resetScores();
     resetGame();
+  };
+
+  const getMedalEmoji = (index: number) => {
+    if (index === 0) return '🥇';
+    if (index === 1) return '🥈';
+    if (index === 2) return '🥉';
+    return `${index + 1}.`;
   };
 
   return (
@@ -54,76 +63,113 @@ const ResultScreen: React.FC = () => {
       } animate-pulse`} />
       
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center">
+        {/* Round Number */}
+        <div className="mb-4 px-4 py-1 rounded-full bg-secondary text-sm font-medium">
+          الجولة {roundNumber}
+        </div>
+
         {/* Result Icon */}
-        <div className={`w-32 h-32 rounded-full flex items-center justify-center mb-6 ${
+        <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-4 ${
           playersWon ? 'bg-accent/20 glow-accent' : 'bg-imposter/20 glow-imposter'
         } animate-reveal`}>
-          <span className="text-7xl">{playersWon ? '🎉' : '😈'}</span>
+          <span className="text-5xl">{playersWon ? '🎉' : '😈'}</span>
         </div>
         
         {/* Result Message */}
         {playersWon ? (
           <>
-            <h1 className="text-4xl font-black mb-4 text-accent animate-slide-up">
+            <h1 className="text-3xl font-black mb-2 text-accent animate-slide-up">
               اكتشفتوا الإمبوستر!
             </h1>
-            <p className="text-xl text-muted-foreground mb-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <p className="text-lg text-muted-foreground mb-4 animate-slide-up">
               فوز اللاعبين! 🏆
             </p>
           </>
         ) : (
           <>
-            <h1 className="text-4xl font-black mb-4 text-gradient-imposter animate-slide-up">
+            <h1 className="text-3xl font-black mb-2 text-gradient-imposter animate-slide-up">
               الإمبوستر فاز!
             </h1>
-            <p className="text-xl text-muted-foreground mb-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <p className="text-lg text-muted-foreground mb-4 animate-slide-up">
               خدع الجميع بنجاح 😈
             </p>
           </>
         )}
         
-        {/* Imposter Reveal */}
-        <div className="card-game w-full max-w-sm mb-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <p className="text-muted-foreground mb-2">الإمبوستر كان:</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {imposters.map((imposter) => (
-              <div 
-                key={imposter.id}
-                className="flex flex-col items-center gap-2 px-4 py-3 rounded-xl bg-imposter/20"
-              >
-                <span className="text-4xl">{imposter.avatar || '😈'}</span>
-                <span className="text-imposter font-bold text-lg">{imposter.name}</span>
+        {/* Imposter Reveal & Secret Word - Combined */}
+        <div className="card-game w-full max-w-sm mb-4 animate-slide-up">
+          <div className="flex justify-between items-center mb-3">
+            <div>
+              <p className="text-muted-foreground text-sm mb-1">الإمبوستر:</p>
+              <div className="flex gap-2">
+                {imposters.map((imposter) => (
+                  <div key={imposter.id} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-imposter/20">
+                    <span className="text-xl">{imposter.avatar || '😈'}</span>
+                    <span className="text-imposter font-bold text-sm">{imposter.name}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            <div className="text-left">
+              <p className="text-muted-foreground text-sm mb-1">الكلمة:</p>
+              <span className="text-xl font-black text-gradient">{secretWord}</span>
+            </div>
           </div>
         </div>
-        
-        {/* Secret Word */}
-        <div className="card-game w-full max-w-sm mb-6 bg-primary/10 border-primary/30 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-          <p className="text-muted-foreground mb-2">الكلمة السرية:</p>
-          <span className="text-3xl font-black text-gradient">{secretWord}</span>
-        </div>
+
+        {/* Leaderboard */}
+        {leaderboard.length > 0 && (
+          <div className="card-game w-full max-w-sm mb-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Trophy size={18} className="text-yellow-500" />
+              <p className="font-bold">ترتيب النقاط</p>
+            </div>
+            <div className="space-y-2">
+              {leaderboard.slice(0, 4).map((player, index) => (
+                <div 
+                  key={player.playerId}
+                  className={`flex items-center justify-between p-2 rounded-xl ${
+                    index === 0 ? 'bg-yellow-500/20 border border-yellow-500/30' : 'bg-secondary/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 text-center">{getMedalEmoji(index)}</span>
+                    <span className="text-lg">{player.avatar}</span>
+                    <span className="font-medium text-sm">{player.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-primary">{player.score}</span>
+                    <span className="text-xs text-muted-foreground">نقطة</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              الإمبوستر الفائز = 3 نقاط | اللاعب الفائز = 1 نقطة
+            </p>
+          </div>
+        )}
         
         {/* Voting Results */}
-        <div className="card-game w-full max-w-sm animate-slide-up" style={{ animationDelay: '0.4s' }}>
-          <p className="text-muted-foreground mb-3">نتائج التصويت:</p>
-          <div className="space-y-2">
+        <div className="card-game w-full max-w-sm animate-slide-up" style={{ animationDelay: '0.3s' }}>
+          <p className="text-muted-foreground mb-2 text-sm">نتائج التصويت:</p>
+          <div className="space-y-1">
             {sortedByVotes.slice(0, 3).map((player, index) => (
               <div 
                 key={player.id}
-                className={`flex items-center justify-between p-3 rounded-xl ${
+                className={`flex items-center justify-between p-2 rounded-xl ${
                   index === 0 ? 'bg-secondary' : 'bg-secondary/50'
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <span>{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>
-                  <span className="text-xl">{player.avatar || '👤'}</span>
-                  <span className={player.isImposter ? 'text-imposter' : ''}>
+                  <span className="text-sm">{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>
+                  <span className="text-lg">{player.avatar || '👤'}</span>
+                  <span className={`text-sm ${player.isImposter ? 'text-imposter' : ''}`}>
                     {player.name}
                     {player.isImposter && ' 😈'}
                   </span>
                 </div>
-                <span className="font-bold">{player.votes} صوت</span>
+                <span className="font-bold text-sm">{player.votes} صوت</span>
               </div>
             ))}
           </div>
@@ -131,7 +177,7 @@ const ResultScreen: React.FC = () => {
       </div>
       
       {/* Actions */}
-      <div className="relative z-10 space-y-3 mt-6">
+      <div className="relative z-10 space-y-3 mt-4">
         <button
           onClick={handlePlayAgain}
           className="w-full btn-primary-game flex items-center justify-center gap-3"

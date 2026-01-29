@@ -24,6 +24,15 @@ export interface Player {
   votes: number;
 }
 
+export interface PlayerScore {
+  playerId: number;
+  name: string;
+  avatar: string;
+  score: number;
+  roundsPlayed: number;
+  roundsWon: number;
+}
+
 export const AVATAR_OPTIONS = [
   '👤', '😎', '🦊', '🐱', '🐶', '🦁', '🐼', '🐨', 
   '🦄', '🐸', '🐵', '🐰', '🐻', '🐯', '🦋', '🌟'
@@ -43,6 +52,8 @@ interface GameState {
   discussionTimeEnabled: boolean;
   discussionTime: number;
   winner: 'imposters' | 'players' | null;
+  playerScores: PlayerScore[];
+  roundNumber: number;
 }
 
 interface PlayerData {
@@ -67,6 +78,8 @@ interface GameContextType extends GameState {
   calculateResult: () => void;
   resetGame: () => void;
   playAgain: () => void;
+  resetScores: () => void;
+  getLeaderboard: () => PlayerScore[];
 }
 
 const initialState: GameState = {
@@ -83,6 +96,8 @@ const initialState: GameState = {
   discussionTimeEnabled: true,
   discussionTime: 90,
   winner: null,
+  playerScores: [],
+  roundNumber: 1,
 };
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -158,6 +173,26 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         players[randomIndex].isImposter = true;
       }
     }
+
+    // Initialize or update player scores
+    const newScores: PlayerScore[] = players.map(player => {
+      const existingScore = state.playerScores.find(s => s.playerId === player.id);
+      if (existingScore) {
+        return {
+          ...existingScore,
+          name: player.name,
+          avatar: player.avatar,
+        };
+      }
+      return {
+        playerId: player.id,
+        name: player.name,
+        avatar: player.avatar,
+        score: 0,
+        roundsPlayed: 0,
+        roundsWon: 0,
+      };
+    });
     
     setState(prev => ({
       ...prev,
@@ -167,6 +202,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       usedWords: [...prev.usedWords, word],
       currentPlayerIndex: 0,
       winner: null,
+      playerScores: newScores,
       screen: 'passPhone',
     }));
   };
@@ -206,19 +242,40 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     // Check if imposter was caught
     const imposterCaught = mostVoted.isImposter;
+    const gameWinner: 'players' | 'imposters' = imposterCaught ? 'players' : 'imposters';
     
-    setState(prev => ({
-      ...prev,
-      winner: imposterCaught ? 'players' : 'imposters',
-      screen: 'result',
-    }));
+    // Update scores
+    setState(prev => {
+      const updatedScores = prev.playerScores.map(score => {
+        const player = prev.players.find(p => p.id === score.playerId);
+        if (!player) return score;
+
+        const isWinner = gameWinner === 'players' ? !player.isImposter : player.isImposter;
+        // Imposter gets 3 points for winning, regular players get 1 point
+        const pointsEarned = isWinner ? (player.isImposter ? 3 : 1) : 0;
+
+        return {
+          ...score,
+          score: score.score + pointsEarned,
+          roundsPlayed: score.roundsPlayed + 1,
+          roundsWon: score.roundsWon + (isWinner ? 1 : 0),
+        };
+      });
+
+      return {
+        ...prev,
+        winner: gameWinner,
+        screen: 'result',
+        playerScores: updatedScores,
+      };
+    });
   };
 
   const resetGame = () => {
     setState(prev => ({
       ...initialState,
       usedWords: prev.usedWords,
-      screen: 'home', // Go to home screen instead of splash
+      screen: 'home',
     }));
   };
 
@@ -228,8 +285,21 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       players: prev.players.map(p => ({ ...p, hasSeenRole: false, votes: 0, isImposter: false })),
       currentPlayerIndex: 0,
       winner: null,
+      roundNumber: prev.roundNumber + 1,
       screen: 'setup',
     }));
+  };
+
+  const resetScores = () => {
+    setState(prev => ({
+      ...prev,
+      playerScores: [],
+      roundNumber: 1,
+    }));
+  };
+
+  const getLeaderboard = (): PlayerScore[] => {
+    return [...state.playerScores].sort((a, b) => b.score - a.score);
   };
 
   return (
@@ -252,6 +322,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         calculateResult,
         resetGame,
         playAgain,
+        resetScores,
+        getLeaderboard,
       }}
     >
       {children}
