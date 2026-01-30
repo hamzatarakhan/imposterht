@@ -105,29 +105,23 @@ const ShowRoleScreen: React.FC = () => {
               </>
             )}
             
+            <div className="space-y-3">
+              <button
+                onClick={handleNext}
+                className={`w-full text-xl flex items-center justify-center gap-3 ${
+                  isImposter ? 'btn-imposter' : 'btn-accent-game'
+                }`}
+              >
+                <EyeOff size={24} />
+                إخفاء وتمرير للي بعدي
+              </button>
+              <div className="flex justify-center">
+                <RestartButton />
+              </div>
+            </div>
           </div>
         )}
       </div>
-      
-      {/* Sticky Button for revealed state */}
-      {revealed && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4">
-          <div className="max-w-md mx-auto space-y-3">
-            <button
-              onClick={handleNext}
-              className={`w-full text-xl flex items-center justify-center gap-3 ${
-                isImposter ? 'btn-imposter' : 'btn-accent-game'
-              }`}
-            >
-              <EyeOff size={24} />
-              إخفاء وتمرير للي بعدي
-            </button>
-            <div className="flex justify-center">
-              <RestartButton />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

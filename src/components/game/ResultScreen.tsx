@@ -49,7 +49,7 @@ const ResultScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 pb-0 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
       {/* Background */}
       <div className={`absolute inset-0 transition-colors ${
         playersWon 
@@ -62,7 +62,7 @@ const ResultScreen: React.FC = () => {
         playersWon ? 'bg-accent/20' : 'bg-imposter/20'
       } animate-pulse`} />
       
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center pb-40">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center">
         {/* Round Number */}
         <div className="mb-4 px-4 py-1 rounded-full bg-secondary text-sm font-medium">
           الجولة {roundNumber}
@@ -176,25 +176,23 @@ const ResultScreen: React.FC = () => {
         </div>
       </div>
       
-      {/* Actions - Sticky */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4">
-        <div className="max-w-md mx-auto space-y-3">
-          <button
-            onClick={handlePlayAgain}
-            className="w-full btn-primary-game flex items-center justify-center gap-3"
-          >
-            <RotateCcw size={24} />
-            العب مرة أخرى
-          </button>
-          
-          <button
-            onClick={handleGoHome}
-            className="w-full btn-secondary-game flex items-center justify-center gap-3"
-          >
-            <Home size={24} />
-            الصفحة الرئيسية
-          </button>
-        </div>
+      {/* Actions */}
+      <div className="relative z-10 space-y-3 mt-4">
+        <button
+          onClick={handlePlayAgain}
+          className="w-full btn-primary-game flex items-center justify-center gap-3"
+        >
+          <RotateCcw size={24} />
+          العب مرة أخرى
+        </button>
+        
+        <button
+          onClick={handleGoHome}
+          className="w-full btn-secondary-game flex items-center justify-center gap-3"
+        >
+          <Home size={24} />
+          الصفحة الرئيسية
+        </button>
       </div>
     </div>
   );

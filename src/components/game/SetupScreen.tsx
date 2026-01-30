@@ -111,7 +111,7 @@ const SetupScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 pt-0 pb-0 relative">
+    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
       
@@ -129,7 +129,7 @@ const SetupScreen: React.FC = () => {
       </div>
       
       {/* Options */}
-      <div className="relative z-10 flex-1 space-y-6 overflow-auto pb-36">
+      <div className="relative z-10 flex-1 space-y-6 overflow-auto">
         {/* Player Count */}
         <div className="card-game">
           <div className="flex items-center gap-3 mb-4">
@@ -319,18 +319,16 @@ const SetupScreen: React.FC = () => {
         </div>
       </div>
       
-      {/* Start Button - Sticky */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4">
-        <div className="max-w-md mx-auto space-y-3">
-          <button
-            onClick={handleStart}
-            className="w-full btn-primary-game text-xl"
-          >
-            {selectedGroup ? 'ابدأ اللعبة! 🎮' : 'التالي: أسماء اللاعبين ✏️'}
-          </button>
-          <div className="flex justify-center">
-            <RestartButton />
-          </div>
+      {/* Start Button */}
+      <div className="relative z-10 mt-6 space-y-3">
+        <button
+          onClick={handleStart}
+          className="w-full btn-primary-game text-xl"
+        >
+          {selectedGroup ? 'ابدأ اللعبة! 🎮' : 'التالي: أسماء اللاعبين ✏️'}
+        </button>
+        <div className="flex justify-center">
+          <RestartButton />
         </div>
       </div>
 

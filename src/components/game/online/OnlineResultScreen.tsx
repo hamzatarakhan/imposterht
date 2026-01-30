@@ -71,7 +71,7 @@ const OnlineResultScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 pb-0 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
       {/* Background */}
       <div className={`absolute inset-0 ${
         room?.winner === 'players'
@@ -79,7 +79,7 @@ const OnlineResultScreen: React.FC = () => {
           : 'bg-gradient-to-br from-background via-imposter/10 to-background'
       }`} />
       
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center pb-40">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center">
         {/* Winner Announcement */}
         <div className="mb-6 animate-reveal">
           {room?.winner === 'players' ? (
@@ -201,11 +201,9 @@ const OnlineResultScreen: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Actions - Sticky */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4">
-        <div className="max-w-md mx-auto space-y-3">
+        {/* Actions */}
+        <div className="w-full max-w-sm space-y-3">
           <button
             onClick={handlePlayAgain}
             className="w-full btn-primary-game text-lg"

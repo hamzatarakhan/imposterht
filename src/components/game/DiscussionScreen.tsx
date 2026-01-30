@@ -76,11 +76,11 @@ const DiscussionScreen: React.FC = () => {
   // UI without timer
   if (!discussionTimeEnabled) {
     return (
-      <div className="min-h-screen flex flex-col p-6 pb-0 relative overflow-hidden">
+      <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
         
-        <div className="relative z-10 flex-1 flex flex-col pb-32">
+        <div className="relative z-10 flex-1 flex flex-col">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-black">وقت النقاش 💬</h1>
@@ -110,11 +110,9 @@ const DiscussionScreen: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* Actions - Sticky */}
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4">
-          <div className="max-w-md mx-auto space-y-3">
+          
+          {/* Actions */}
+          <div className="space-y-3">
             <button
               onClick={handleGoToVoting}
               className="w-full btn-primary-game flex items-center justify-center gap-3"
@@ -133,7 +131,7 @@ const DiscussionScreen: React.FC = () => {
 
   // UI with timer
   return (
-    <div className="min-h-screen flex flex-col p-6 pb-0 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col p-6 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
       
@@ -142,7 +140,7 @@ const DiscussionScreen: React.FC = () => {
         <div className="absolute inset-0 bg-imposter/10 animate-pulse" />
       )}
       
-      <div className="relative z-10 flex-1 flex flex-col pb-32">
+      <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-black">وقت النقاش 💬</h1>
@@ -217,11 +215,9 @@ const DiscussionScreen: React.FC = () => {
             </p>
           </div>
         </div>
-      </div>
-      
-      {/* Actions - Sticky */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4">
-        <div className="max-w-md mx-auto space-y-3">
+        
+        {/* Actions */}
+        <div className="space-y-3">
           <button
             onClick={handleGoToVoting}
             className="w-full btn-primary-game flex items-center justify-center gap-3"
