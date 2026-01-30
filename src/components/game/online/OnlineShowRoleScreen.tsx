@@ -163,16 +163,21 @@ const OnlineShowRoleScreen: React.FC = () => {
             )}
           </div>
 
-          {/* Confirm Button */}
-          {showRole && (
-            <button
-              onClick={handleConfirm}
-              className="w-full btn-primary-game text-xl animate-slide-up"
-            >
-              ✅ فهمت! متابعة
-            </button>
-          )}
         </div>
+        
+        {/* Confirm Button - Sticky */}
+        {showRole && (
+          <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4">
+            <div className="max-w-md mx-auto">
+              <button
+                onClick={handleConfirm}
+                className="w-full btn-primary-game text-xl animate-slide-up"
+              >
+                ✅ فهمت! متابعة
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

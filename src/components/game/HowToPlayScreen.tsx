@@ -48,7 +48,7 @@ const HowToPlayScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
+    <div className="min-h-screen flex flex-col p-6 pt-0 pb-0 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
       
@@ -66,7 +66,7 @@ const HowToPlayScreen: React.FC = () => {
       </div>
       
       {/* Content */}
-      <div className="relative z-10 flex-1 overflow-auto">
+      <div className="relative z-10 flex-1 overflow-auto pb-24">
         <div className="space-y-4">
           {steps.map((step, index) => (
             <div
@@ -102,14 +102,16 @@ const HowToPlayScreen: React.FC = () => {
         </div>
       </div>
       
-      {/* Start Button */}
-      <div className="relative z-10 mt-6">
-        <button
-          onClick={handleStartGame}
-          className="w-full btn-primary-game"
-        >
-          يلا نلعب! 🎮
-        </button>
+      {/* Start Button - Sticky */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4">
+        <div className="max-w-md mx-auto">
+          <button
+            onClick={handleStartGame}
+            className="w-full btn-primary-game"
+          >
+            يلا نلعب! 🎮
+          </button>
+        </div>
       </div>
     </div>
   );
