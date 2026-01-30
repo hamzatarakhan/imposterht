@@ -122,12 +122,12 @@ const VotingScreen: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
+    <div className="min-h-screen flex flex-col p-6 pt-0 pb-0 relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
       <div className="absolute top-1/4 right-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
       
-      <div className="relative z-10 flex-1 flex flex-col">
+      <div className="relative z-10 flex-1 flex flex-col pb-36">
         {/* Header - Sticky */}
         <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-2">
           <div className="flex items-center gap-4">
@@ -198,9 +198,11 @@ const VotingScreen: React.FC = () => {
             </button>
           ))}
         </div>
-        
-        {/* Vote Button */}
-        <div className="mt-6 space-y-3">
+      </div>
+      
+      {/* Vote Button - Sticky */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4">
+        <div className="max-w-md mx-auto space-y-3">
           <button
             onClick={handleVote}
             disabled={selectedPlayer === null}
