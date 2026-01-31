@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { RotateCcw, X } from 'lucide-react';
@@ -36,9 +37,9 @@ const RestartButton: React.FC = () => {
         إعادة اللعبة
       </button>
 
-      {/* Confirmation Dialog */}
-      {showConfirm && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 p-6 animate-fade-in flex items-center justify-center">
+      {/* Confirmation Dialog - Portal to body for proper centering */}
+      {showConfirm && createPortal(
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] p-6 animate-fade-in flex items-center justify-center">
           <div className="card-game max-w-sm w-[calc(100%-3rem)] text-center animate-scale-in">
             <div className="w-16 h-16 mx-auto rounded-full bg-destructive/20 flex items-center justify-center mb-4">
               <RotateCcw size={32} className="text-destructive" />
@@ -66,7 +67,8 @@ const RestartButton: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
