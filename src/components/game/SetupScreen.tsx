@@ -111,25 +111,26 @@ const SetupScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
+    <div className="min-h-screen flex flex-col relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
       
-      {/* Header - Sticky */}
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-4">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handleBack}
-            className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
-          >
-            <ArrowRight size={24} />
-          </button>
-          <h1 className="text-2xl font-bold">إعداد اللعبة</h1>
+      <div className="relative z-10 flex-1 flex flex-col">
+        {/* Header - Sticky */}
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md px-6 py-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleBack}
+              className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
+            >
+              <ArrowRight size={24} />
+            </button>
+            <h1 className="text-2xl font-bold">إعداد اللعبة</h1>
+          </div>
         </div>
-      </div>
-      
-      {/* Options */}
-      <div className="relative z-10 flex-1 space-y-6 overflow-auto">
+        
+        {/* Options */}
+        <div className="flex-1 overflow-auto px-6 pb-32 space-y-6">
         {/* Player Count */}
         <div className="card-game">
           <div className="flex items-center gap-3 mb-4">
@@ -317,10 +318,11 @@ const SetupScreen: React.FC = () => {
             </div>
           )}
         </div>
+        </div>
       </div>
       
-      {/* Start Button */}
-      <div className="relative z-10 mt-6 space-y-3">
+      {/* Sticky Start Button */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 space-y-3 max-w-md mx-auto">
         <button
           onClick={handleStart}
           className="w-full btn-primary-game text-xl"
