@@ -38,8 +38,8 @@ const RestartButton: React.FC = () => {
 
       {/* Confirmation Dialog */}
       {showConfirm && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-6 animate-fade-in">
-          <div className="card-game max-w-sm w-full text-center animate-reveal">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 p-6 animate-fade-in flex items-center justify-center">
+          <div className="card-game max-w-sm w-[calc(100%-3rem)] text-center animate-scale-in">
             <div className="w-16 h-16 mx-auto rounded-full bg-destructive/20 flex items-center justify-center mb-4">
               <RotateCcw size={32} className="text-destructive" />
             </div>
