@@ -102,8 +102,8 @@ const HowToPlayScreen: React.FC = () => {
         </div>
       </div>
       
-      {/* Start Button */}
-      <div className="relative z-10 mt-6">
+      {/* Start Button - Sticky */}
+      <div className="fixed bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <button
           onClick={handleStartGame}
           className="w-full btn-primary-game"
