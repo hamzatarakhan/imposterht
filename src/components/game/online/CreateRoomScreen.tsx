@@ -236,6 +236,14 @@ const CreateRoomScreen: React.FC = () => {
         {/* Sticky Buttons */}
         <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 space-y-3 max-w-md mx-auto">
           <button
+            onClick={handleJoinInstead}
+            className="w-full p-4 rounded-2xl bg-primary/10 border-2 border-primary/50 hover:bg-primary/20 hover:border-primary transition-all text-center"
+          >
+            <span className="text-muted-foreground">عندك كود؟</span>{' '}
+            <span className="text-primary font-bold text-lg">انضم لغرفة ←</span>
+          </button>
+          
+          <button
             onClick={handleCreate}
             disabled={!name.trim() || isCreating}
             className={`w-full btn-primary-game text-xl ${
@@ -250,14 +258,6 @@ const CreateRoomScreen: React.FC = () => {
             ) : (
               '🚀 إنشاء الغرفة'
             )}
-          </button>
-          
-          <button
-            onClick={handleJoinInstead}
-            className="w-full p-4 rounded-2xl bg-primary/10 border-2 border-primary/50 hover:bg-primary/20 hover:border-primary transition-all text-center"
-          >
-            <span className="text-muted-foreground">عندك كود؟</span>{' '}
-            <span className="text-primary font-bold text-lg">انضم لغرفة ←</span>
           </button>
         </div>
       </div>
