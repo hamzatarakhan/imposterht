@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Check, Loader2, Users } from 'lucide-react';
+import OnlineRestartButton from './OnlineRestartButton';
 
 const OnlineVotingScreen: React.FC = () => {
   const { room, players, currentPlayer, submitVote, calculateWinner, setScreen } = useOnlineGame();
@@ -196,8 +197,8 @@ const OnlineVotingScreen: React.FC = () => {
           ))}
         </div>
         
-        {/* Vote Button */}
-        <div className="mt-6">
+        {/* Vote Button + Restart */}
+        <div className="mt-6 space-y-3">
           <button
             onClick={handleVote}
             disabled={!selectedPlayer || isSubmitting}
@@ -214,6 +215,10 @@ const OnlineVotingScreen: React.FC = () => {
               '✅ تأكيد التصويت'
             )}
           </button>
+          
+          <div className="flex justify-center">
+            <OnlineRestartButton />
+          </div>
         </div>
       </div>
     </div>

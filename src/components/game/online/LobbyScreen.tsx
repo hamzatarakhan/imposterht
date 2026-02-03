@@ -3,6 +3,7 @@ import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Copy, Check, Users, Crown, Loader2, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
+import OnlineRestartButton from './OnlineRestartButton';
 
 const LobbyScreen: React.FC = () => {
   const { room, players, isHost, startGame, leaveRoom } = useOnlineGame();
@@ -177,33 +178,39 @@ const LobbyScreen: React.FC = () => {
         </div>
 
         {/* Sticky Start Button */}
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 max-w-md mx-auto">
-          {isHost ? (
-            <button
-              onClick={handleStartGame}
-              disabled={!canStart || isStarting}
-              className={`w-full btn-primary-game text-xl ${
-                !canStart || isStarting ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              {isStarting ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="animate-spin" size={20} />
-                  جاري البدء...
-                </span>
-              ) : players.length < 3 ? (
-                `تحتاج ${3 - players.length} لاعبين إضافيين`
-              ) : (
-                '🚀 ابدأ اللعبة'
-              )}
-            </button>
-          ) : (
-            <div className="card-game bg-secondary/50 text-center">
-              <p className="text-muted-foreground">
-                ⏳ في انتظار صاحب الغرفة لبدء اللعبة...
-              </p>
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-3">
+          <div className="w-full max-w-md mx-auto space-y-3">
+            {isHost ? (
+              <button
+                onClick={handleStartGame}
+                disabled={!canStart || isStarting}
+                className={`w-full btn-primary-game text-xl ${
+                  !canStart || isStarting ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {isStarting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="animate-spin" size={20} />
+                    جاري البدء...
+                  </span>
+                ) : players.length < 3 ? (
+                  `تحتاج ${3 - players.length} لاعبين إضافيين`
+                ) : (
+                  '🚀 ابدأ اللعبة'
+                )}
+              </button>
+            ) : (
+              <div className="card-game bg-secondary/50 text-center">
+                <p className="text-muted-foreground">
+                  ⏳ في انتظار صاحب الغرفة لبدء اللعبة...
+                </p>
+              </div>
+            )}
+            
+            <div className="flex justify-center">
+              <OnlineRestartButton />
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
