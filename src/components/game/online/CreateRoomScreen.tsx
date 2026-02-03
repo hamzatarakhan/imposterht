@@ -4,6 +4,7 @@ import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Users, Skull, Clock, Loader2 } from 'lucide-react';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { categoryNames, Category } from '@/data/words';
+import OnlineRestartButton from './OnlineRestartButton';
 
 const categories = Object.entries(categoryNames)
   .filter(([id]) => id !== 'custom')
@@ -213,31 +214,37 @@ const CreateRoomScreen: React.FC = () => {
         </div>
 
         {/* Sticky Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 space-y-3 max-w-md mx-auto">
-          <button
-            onClick={handleJoinInstead}
-            className="w-full p-4 rounded-2xl bg-primary/10 border-2 border-primary/50 hover:bg-primary/20 hover:border-primary transition-all text-center"
-          >
-            <span className="text-muted-foreground">عندك كود؟</span>{' '}
-            <span className="text-primary font-bold text-lg">انضم لغرفة ←</span>
-          </button>
-          
-          <button
-            onClick={handleCreate}
-            disabled={!name.trim() || isCreating}
-            className={`w-full btn-primary-game text-xl ${
-              !name.trim() || isCreating ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {isCreating ? (
-              <span className="flex items-center justify-center gap-2">
-                <Loader2 className="animate-spin" size={20} />
-                جاري الإنشاء...
-              </span>
-            ) : (
-              '🚀 إنشاء الغرفة'
-            )}
-          </button>
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-3">
+          <div className="w-full max-w-md mx-auto space-y-3">
+            <button
+              onClick={handleJoinInstead}
+              className="w-full p-4 rounded-2xl bg-primary/10 border-2 border-primary/50 hover:bg-primary/20 hover:border-primary transition-all text-center"
+            >
+              <span className="text-muted-foreground">عندك كود؟</span>{' '}
+              <span className="text-primary font-bold text-lg">انضم لغرفة ←</span>
+            </button>
+            
+            <button
+              onClick={handleCreate}
+              disabled={!name.trim() || isCreating}
+              className={`w-full btn-primary-game text-xl ${
+                !name.trim() || isCreating ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {isCreating ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="animate-spin" size={20} />
+                  جاري الإنشاء...
+                </span>
+              ) : (
+                '🚀 إنشاء الغرفة'
+              )}
+            </button>
+            
+            <div className="flex justify-center">
+              <OnlineRestartButton />
+            </div>
+          </div>
         </div>
       </div>
     </div>
