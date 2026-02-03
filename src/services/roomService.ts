@@ -29,7 +29,7 @@ export const createRoom = async (
   settings: {
     playerCount: number;
     imposterCount: number;
-    category: string;
+    categories: Category[];
     discussionTime: number;
     discussionTimeEnabled: boolean;
   }
@@ -45,7 +45,8 @@ export const createRoom = async (
       host_id: playerId,
       player_count: settings.playerCount,
       imposter_count: settings.imposterCount,
-      category: settings.category,
+      category: settings.categories[0] || 'random', // Keep for backward compat
+      categories: JSON.stringify(settings.categories), // New field for multiple
       discussion_time: settings.discussionTime,
       discussion_time_enabled: settings.discussionTimeEnabled,
       status: 'waiting',
@@ -222,11 +223,11 @@ export const getMyRole = async (roomId: string): Promise<boolean> => {
 };
 
 // Start the game (host only) - uses secure RPC
-export const startGame = async (roomId: string, category: Category): Promise<boolean> => {
+export const startGame = async (roomId: string, categories: Category[]): Promise<boolean> => {
   const playerId = getOrCreatePlayerId();
 
-  // Generate secret word
-  const secretWord = getRandomWord(category, []);
+  // Generate secret word from multiple categories
+  const secretWord = getRandomWord(categories, []);
 
   // Call secure RPC function
   const { data, error } = await supabase.rpc('start_game_secure', {

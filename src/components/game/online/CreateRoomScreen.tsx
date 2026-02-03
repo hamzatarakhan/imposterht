@@ -6,9 +6,9 @@ import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { categoryNames, Category } from '@/data/words';
 import OnlineRestartButton from './OnlineRestartButton';
 
-const categories = Object.entries(categoryNames)
+const categoryOptions = Object.entries(categoryNames)
   .filter(([id]) => id !== 'custom')
-  .map(([id, name]) => ({ id, name, icon: name.split(' ')[1] || '🎲' }));
+  .map(([id, name]) => ({ id: id as Category, name, icon: name.split(' ')[1] || '🎲' }));
 
 const CreateRoomScreen: React.FC = () => {
   const { setScreen, createRoom } = useOnlineGame();
@@ -18,7 +18,7 @@ const CreateRoomScreen: React.FC = () => {
   const [avatar, setAvatar] = useState('👤');
   const [playerCount, setPlayerCount] = useState(4);
   const [imposterCount, setImposterCount] = useState(1);
-  const [category, setCategory] = useState('random');
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>(['random']);
   const [discussionTime, setDiscussionTime] = useState(90);
   const [discussionTimeEnabled, setDiscussionTimeEnabled] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -33,7 +33,7 @@ const CreateRoomScreen: React.FC = () => {
     const success = await createRoom(name.trim(), avatar, {
       playerCount,
       imposterCount,
-      category,
+      categories: selectedCategories,
       discussionTime,
       discussionTimeEnabled,
     });
@@ -150,26 +150,55 @@ const CreateRoomScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Category */}
+          {/* Category - Multi-Select */}
           <div className="card-game">
-            <label className="block text-sm font-medium mb-2">الفئة</label>
+            <label className="block text-sm font-medium mb-2">
+              الفئة {selectedCategories.includes('random') 
+                ? '(كل الفئات)' 
+                : selectedCategories.length > 1 
+                  ? `(${selectedCategories.length} فئات)` 
+                  : ''}
+            </label>
             <div className="grid grid-cols-2 gap-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => {
-                    playSound('click');
-                    setCategory(cat.id);
-                  }}
-                  className={`p-3 rounded-xl text-sm font-medium transition-all ${
-                    category === cat.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-secondary hover:bg-secondary/80'
-                  }`}
-                >
-                  {cat.icon} {cat.name}
-                </button>
-              ))}
+              {categoryOptions.map((cat) => {
+                const isSelected = selectedCategories.includes(cat.id);
+                const isRandom = cat.id === 'random';
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      playSound('click');
+                      vibrate(30);
+                      // Toggle category logic
+                      if (isRandom) {
+                        setSelectedCategories(['random']);
+                      } else if (selectedCategories.includes('random')) {
+                        setSelectedCategories([cat.id]);
+                      } else if (isSelected) {
+                        if (selectedCategories.length > 1) {
+                          setSelectedCategories(selectedCategories.filter(c => c !== cat.id));
+                        }
+                      } else {
+                        setSelectedCategories([...selectedCategories, cat.id]);
+                      }
+                    }}
+                    className={`p-3 rounded-xl text-sm font-medium transition-all relative ${
+                      isSelected
+                        ? isRandom
+                          ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
+                          : 'bg-primary text-primary-foreground'
+                        : 'bg-secondary hover:bg-secondary/80'
+                    }`}
+                  >
+                    {isSelected && !isRandom && (
+                      <span className="absolute top-1 left-1 w-4 h-4 bg-accent rounded-full flex items-center justify-center text-[10px]">
+                        ✓
+                      </span>
+                    )}
+                    {cat.icon} {cat.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

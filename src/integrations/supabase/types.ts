@@ -76,6 +76,7 @@ export type Database = {
       }
       rooms: {
         Row: {
+          categories: string | null
           category: string
           code: string
           created_at: string
@@ -92,6 +93,7 @@ export type Database = {
           winner: string | null
         }
         Insert: {
+          categories?: string | null
           category?: string
           code: string
           created_at?: string
@@ -108,6 +110,7 @@ export type Database = {
           winner?: string | null
         }
         Update: {
+          categories?: string | null
           category?: string
           code?: string
           created_at?: string

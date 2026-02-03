@@ -15,8 +15,8 @@ const SetupScreen: React.FC = () => {
     setPlayerCount, 
     imposterCount, 
     setImposterCount,
-    category,
-    setCategory,
+    categories: selectedCategories,
+    toggleCategory,
     discussionTimeEnabled,
     setDiscussionTimeEnabled,
     discussionTime,
@@ -41,7 +41,7 @@ const SetupScreen: React.FC = () => {
     }
   }, [playSound, vibrate]);
 
-  const categories: Category[] = ['random', 'things', 'places', 'food', 'jobs', 'animals', 'sports', 'celebrities', 'movies'];
+  const categoryOptions: Category[] = ['random', 'things', 'places', 'food', 'jobs', 'animals', 'sports', 'celebrities', 'movies'];
 
   const handlePlayerCountChange = (delta: number) => {
     playSound('click');
@@ -61,10 +61,10 @@ const SetupScreen: React.FC = () => {
     setImposterCount(count);
   };
 
-  const handleCategoryChange = (cat: Category) => {
+  const handleCategoryToggle = (cat: Category) => {
     playSound('click');
     vibrate(30);
-    setCategory(cat);
+    toggleCategory(cat);
   };
 
   const handleDiscussionTimeToggle = () => {
@@ -245,7 +245,7 @@ const SetupScreen: React.FC = () => {
           </div>
         </div>
         
-        {/* Category */}
+        {/* Category - Multi-Select */}
         <div className="card-game">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
@@ -253,23 +253,40 @@ const SetupScreen: React.FC = () => {
             </div>
             <div>
               <h3 className="font-bold">فئة الكلمات</h3>
-              <p className="text-sm text-muted-foreground">اختر نوع الكلمات</p>
+              <p className="text-sm text-muted-foreground">
+                {selectedCategories.includes('random') 
+                  ? 'كل الفئات' 
+                  : selectedCategories.length === 1 
+                    ? 'فئة واحدة' 
+                    : `${selectedCategories.length} فئات محددة`}
+              </p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => handleCategoryChange(cat)}
-                className={`py-3 px-4 rounded-2xl text-sm font-bold transition-all ${
-                  category === cat
-                    ? 'bg-primary text-primary-foreground glow-primary'
-                    : 'bg-secondary text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {categoryNames[cat]}
-              </button>
-            ))}
+            {categoryOptions.map((cat) => {
+              const isSelected = selectedCategories.includes(cat);
+              const isRandom = cat === 'random';
+              return (
+                <button
+                  key={cat}
+                  onClick={() => handleCategoryToggle(cat)}
+                  className={`py-3 px-4 rounded-2xl text-sm font-bold transition-all relative ${
+                    isSelected
+                      ? isRandom 
+                        ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground glow-primary'
+                        : 'bg-primary text-primary-foreground glow-primary'
+                      : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+                  }`}
+                >
+                  {isSelected && !isRandom && (
+                    <span className="absolute top-1 left-1 w-5 h-5 bg-accent rounded-full flex items-center justify-center text-xs">
+                      ✓
+                    </span>
+                  )}
+                  {categoryNames[cat]}
+                </button>
+              );
+            })}
           </div>
         </div>
         

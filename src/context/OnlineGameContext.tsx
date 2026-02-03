@@ -17,7 +17,7 @@ interface OnlineGameContextType extends OnlineGameState {
   createRoom: (name: string, avatar: string, settings: {
     playerCount: number;
     imposterCount: number;
-    category: string;
+    categories: Category[];
     discussionTime: number;
     discussionTimeEnabled: boolean;
   }) => Promise<boolean>;
@@ -115,7 +115,7 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
     settings: {
       playerCount: number;
       imposterCount: number;
-      category: string;
+      categories: Category[];
       discussionTime: number;
       discussionTimeEnabled: boolean;
     }
@@ -164,9 +164,18 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
   const startGame = useCallback(async (): Promise<boolean> => {
     if (!state.room || !state.isHost) return false;
 
+    // Parse categories from room (stored as JSON string)
+    let categories: Category[] = ['random'];
+    try {
+      const parsed = JSON.parse(state.room.categories || '["random"]');
+      categories = Array.isArray(parsed) ? parsed : ['random'];
+    } catch {
+      categories = ['random'];
+    }
+
     const success = await roomService.startGame(
       state.room.id,
-      state.room.category as Category
+      categories
     );
 
     return success;

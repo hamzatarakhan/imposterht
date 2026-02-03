@@ -435,11 +435,24 @@ export const getWordsByCategory = (category: Category): string[] => {
   return words[category];
 };
 
-export const getRandomWord = (category: Category, usedWords: string[] = []): string => {
-  const availableWords = getWordsByCategory(category).filter(w => !usedWords.includes(w));
+export const getRandomWord = (category: Category | Category[], usedWords: string[] = []): string => {
+  let allAvailableWords: string[] = [];
+  
+  // Handle multiple categories
+  const categories = Array.isArray(category) ? category : [category];
+  
+  for (const cat of categories) {
+    const catWords = getWordsByCategory(cat);
+    allAvailableWords = [...allAvailableWords, ...catWords];
+  }
+  
+  // Remove duplicates
+  allAvailableWords = [...new Set(allAvailableWords)];
+  
+  const availableWords = allAvailableWords.filter(w => !usedWords.includes(w));
   if (availableWords.length === 0) {
     // If all words used, reset
-    return getWordsByCategory(category)[Math.floor(Math.random() * getWordsByCategory(category).length)];
+    return allAvailableWords[Math.floor(Math.random() * allAvailableWords.length)];
   }
   return availableWords[Math.floor(Math.random() * availableWords.length)];
 };

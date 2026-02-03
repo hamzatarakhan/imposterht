@@ -8,6 +8,7 @@ export interface Room {
   player_count: number;
   imposter_count: number;
   category: string;
+  categories: string; // JSON string of Category[]
   secret_word: string | null;
   discussion_time: number;
   discussion_time_enabled: boolean;
