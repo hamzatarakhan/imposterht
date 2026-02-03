@@ -133,32 +133,31 @@ const SetupScreen: React.FC = () => {
         <div className="flex-1 overflow-auto px-6 pb-44 space-y-6">
         {/* Player Count */}
         <div className="card-game">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
-              <Users className="text-accent" size={20} />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Users size={18} className="text-primary" />
+              <span className="font-medium">عدد اللاعبين</span>
             </div>
-            <div>
-              <h3 className="font-bold">عدد اللاعبين</h3>
-              <p className="text-sm text-muted-foreground">من 3 إلى 10</p>
-            </div>
+            <span className="text-2xl font-bold text-primary">{playerCount}</span>
           </div>
-          <div className="flex items-center justify-between gap-3">
-            <button
-              onClick={() => handlePlayerCountChange(-1)}
-              className="w-11 h-11 rounded-xl bg-secondary text-xl font-bold hover:bg-secondary/80 transition-colors"
-              disabled={playerCount <= 3}
-            >
-              -
-            </button>
-            <span className="text-3xl font-black text-primary">{playerCount}</span>
-            <button
-              onClick={() => handlePlayerCountChange(1)}
-              className="w-11 h-11 rounded-xl bg-secondary text-xl font-bold hover:bg-secondary/80 transition-colors"
-              disabled={playerCount >= 10}
-            >
-              +
-            </button>
-          </div>
+          <input
+            type="range"
+            min={3}
+            max={10}
+            value={playerCount}
+            onChange={(e) => {
+              const count = parseInt(e.target.value);
+              playSound('click');
+              vibrate(30);
+              setPlayerCount(count);
+              if (count < 4) setImposterCount(1);
+              // Clear selected group if count doesn't match
+              if (selectedGroup && count !== selectedGroup.members.length) {
+                setSelectedGroup(null);
+              }
+            }}
+            className="w-full accent-primary"
+          />
         </div>
 
         {/* Group Selection */}
@@ -211,37 +210,36 @@ const SetupScreen: React.FC = () => {
         
         {/* Imposter Count */}
         <div className="card-game">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-imposter/20 flex items-center justify-center">
-              <UserX className="text-imposter" size={20} />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <UserX size={18} className="text-imposter" />
+              <span className="font-medium">عدد الإمبوسترز</span>
             </div>
-            <div>
-              <h3 className="font-bold">عدد الإمبوستر</h3>
-              <p className="text-sm text-muted-foreground">
-                {playerCount < 4 ? 'يتطلب 4+ لاعبين لإمبوسترين' : 'للمتقدمين: جرب 2'}
-              </p>
-            </div>
+            <span className="text-2xl font-bold text-imposter">{imposterCount}</span>
           </div>
           <div className="flex gap-2">
-            {[1, 2].map((count) => {
-              const isDisabled = count === 2 && playerCount < 4;
-              return (
-                <button
-                  key={count}
-                  onClick={() => handleImposterCountChange(count, isDisabled)}
-                  disabled={isDisabled}
-                  className={`flex-1 py-2.5 rounded-xl text-base font-bold transition-all ${
-                    imposterCount === count
-                      ? 'bg-imposter text-white glow-imposter'
-                      : isDisabled
-                        ? 'bg-secondary/50 text-muted-foreground/50 cursor-not-allowed'
-                        : 'bg-secondary text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {count} 😈
-                </button>
-              );
-            })}
+            {[1, 2, 3].map((count) => (
+              <button
+                key={count}
+                onClick={() => {
+                  if (playerCount >= 4 || count === 1) {
+                    playSound('click');
+                    vibrate(30);
+                    setImposterCount(count);
+                  }
+                }}
+                disabled={playerCount < 4 && count > 1}
+                className={`flex-1 py-2 rounded-xl font-bold transition-all ${
+                  imposterCount === count
+                    ? 'bg-imposter text-white'
+                    : playerCount < 4 && count > 1
+                    ? 'bg-secondary/50 text-muted-foreground cursor-not-allowed'
+                    : 'bg-secondary hover:bg-secondary/80'
+                }`}
+              >
+                {count}
+              </button>
+            ))}
           </div>
         </div>
         
@@ -292,46 +290,40 @@ const SetupScreen: React.FC = () => {
         
         {/* Discussion Time */}
         <div className="card-game">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
-                <Clock className="text-accent" size={20} />
-              </div>
-              <div>
-                <h3 className="font-bold">وقت النقاش</h3>
-                <p className="text-sm text-muted-foreground">
-                  {discussionTimeEnabled ? 'مؤقت تنازلي' : 'بدون مؤقت'}
-                </p>
-              </div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Clock size={18} className="text-accent" />
+              <span className="font-medium">وقت النقاش</span>
             </div>
             <button
               onClick={handleDiscussionTimeToggle}
-              className={`w-14 h-8 rounded-full transition-colors relative ${
-                discussionTimeEnabled ? 'bg-accent' : 'bg-secondary'
+              className={`px-3 py-1 rounded-full text-sm transition-all ${
+                discussionTimeEnabled
+                  ? 'bg-accent text-accent-foreground'
+                  : 'bg-secondary text-muted-foreground'
               }`}
             >
-              <div 
-                className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${
-                  discussionTimeEnabled ? 'left-1' : 'right-1'
-                }`}
-              />
+              {discussionTimeEnabled ? 'مفعّل' : 'معطّل'}
             </button>
           </div>
           {discussionTimeEnabled && (
-            <div className="flex gap-2">
-              {[60, 90, 120].map((time) => (
-                <button
-                  key={time}
-                  onClick={() => handleDiscussionTimeChange(time)}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                    discussionTime === time
-                      ? 'bg-accent text-accent-foreground glow-accent'
-                      : 'bg-secondary text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {time}s
-                </button>
-              ))}
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={30}
+                max={300}
+                step={30}
+                value={discussionTime}
+                onChange={(e) => {
+                  playSound('click');
+                  vibrate(30);
+                  setDiscussionTime(parseInt(e.target.value));
+                }}
+                className="flex-1 accent-accent"
+              />
+              <span className="text-lg font-bold w-16 text-left">
+                {Math.floor(discussionTime / 60)}:{(discussionTime % 60).toString().padStart(2, '0')}
+              </span>
             </div>
           )}
         </div>
