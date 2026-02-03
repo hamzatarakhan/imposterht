@@ -14,6 +14,8 @@ export interface Room {
   discussion_time_enabled: boolean;
   current_player_index: number;
   winner: 'imposters' | 'players' | null;
+  timer_started_at: string | null;
+  timer_remaining: number | null;
   created_at: string;
   updated_at: string;
 }

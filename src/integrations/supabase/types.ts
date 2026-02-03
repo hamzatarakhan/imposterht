@@ -89,6 +89,8 @@ export type Database = {
           player_count: number
           secret_word: string | null
           status: string
+          timer_remaining: number | null
+          timer_started_at: string | null
           updated_at: string
           winner: string | null
         }
@@ -106,6 +108,8 @@ export type Database = {
           player_count?: number
           secret_word?: string | null
           status?: string
+          timer_remaining?: number | null
+          timer_started_at?: string | null
           updated_at?: string
           winner?: string | null
         }
@@ -123,6 +127,8 @@ export type Database = {
           player_count?: number
           secret_word?: string | null
           status?: string
+          timer_remaining?: number | null
+          timer_started_at?: string | null
           updated_at?: string
           winner?: string | null
         }
@@ -258,6 +264,15 @@ export type Database = {
           p_room_id: string
           p_status?: string
           p_winner?: string
+        }
+        Returns: boolean
+      }
+      update_timer_secure: {
+        Args: {
+          p_host_player_id: string
+          p_room_id: string
+          p_timer_remaining?: number
+          p_timer_started_at?: string
         }
         Returns: boolean
       }

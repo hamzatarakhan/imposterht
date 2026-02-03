@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Clock, Users, MessageSquare, ArrowRight, Play, Pause, RotateCcw, Vote } from 'lucide-react';
 import OnlineRestartButton from './OnlineRestartButton';
+import * as roomService from '@/services/roomService';
 
 const OnlineDiscussionScreen: React.FC = () => {
   const { room, players, isHost, setScreen, leaveRoom, startDiscussion } = useOnlineGame();
@@ -13,43 +14,71 @@ const OnlineDiscussionScreen: React.FC = () => {
   const lastTimeRef = useRef(timeLeft);
   const hasPlayedAlarmRef = useRef(false);
 
-  // Timer countdown - only when manually started
+  // Sync timer state from room data
+  useEffect(() => {
+    if (!room) return;
+    
+    if (room.timer_started_at) {
+      // Timer is running - calculate remaining time
+      const startTime = new Date(room.timer_started_at).getTime();
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const remaining = Math.max(0, (room.timer_remaining || room.discussion_time) - elapsed);
+      setTimeLeft(remaining);
+      setIsRunning(remaining > 0);
+    } else if (room.timer_remaining !== null && room.timer_remaining !== undefined) {
+      // Timer is paused
+      setTimeLeft(room.timer_remaining);
+      setIsRunning(false);
+    } else {
+      // Timer not started yet
+      setTimeLeft(room.discussion_time || 90);
+      setIsRunning(false);
+    }
+  }, [room?.timer_started_at, room?.timer_remaining, room?.discussion_time]);
+
+  // Timer countdown - synced across all devices
   useEffect(() => {
     if (!room?.discussion_time_enabled || !isRunning || timeLeft <= 0) return;
 
     const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        const newTime = prev - 1;
+      if (room.timer_started_at) {
+        const startTime = new Date(room.timer_started_at).getTime();
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const remaining = Math.max(0, (room.timer_remaining || room.discussion_time) - elapsed);
         
-        if (newTime > 0 && newTime !== lastTimeRef.current) {
-          playSound('tick');
-          if (newTime <= 10) {
-            vibrate(100);
+        if (remaining !== lastTimeRef.current) {
+          if (remaining > 0) {
+            playSound('tick');
+            if (remaining <= 10) {
+              vibrate(100);
+            }
           }
+          lastTimeRef.current = remaining;
         }
         
-        lastTimeRef.current = newTime;
-        return newTime;
-      });
+        setTimeLeft(remaining);
+        
+        if (remaining === 0) {
+          setIsRunning(false);
+        }
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isRunning, timeLeft, room?.discussion_time_enabled, playSound, vibrate]);
+  }, [isRunning, room?.timer_started_at, room?.timer_remaining, room?.discussion_time, room?.discussion_time_enabled, playSound, vibrate]);
 
   // Handle timer end
   useEffect(() => {
-    if (timeLeft === 0 && !hasPlayedAlarmRef.current) {
-      setIsRunning(false);
+    if (timeLeft === 0 && !hasPlayedAlarmRef.current && room?.timer_started_at) {
       playSound('alarm');
       vibrate([200, 100, 200, 100, 200]);
       hasPlayedAlarmRef.current = true;
     }
-  }, [timeLeft, playSound, vibrate]);
+  }, [timeLeft, playSound, vibrate, room?.timer_started_at]);
 
   const handleGoToVoting = async () => {
     playSound('click');
     vibrate(50);
-    // Update room status to 'voting' so all players navigate to voting screen
     await startDiscussion();
     setScreen('onlineVoting');
   };
@@ -60,19 +89,29 @@ const OnlineDiscussionScreen: React.FC = () => {
     await leaveRoom();
   };
 
-  const handlePlayPause = () => {
+  const handlePlayPause = useCallback(async () => {
+    if (!room?.id) return;
     playSound('click');
     vibrate(30);
-    setIsRunning(!isRunning);
-  };
+    
+    if (isRunning) {
+      // Pause: save remaining time, clear start time
+      await roomService.updateTimer(room.id, null, timeLeft);
+    } else {
+      // Start: set start time
+      hasPlayedAlarmRef.current = false;
+      await roomService.updateTimer(room.id, new Date().toISOString(), timeLeft);
+    }
+  }, [room?.id, isRunning, timeLeft, playSound, vibrate]);
 
-  const handleResetTimer = () => {
+  const handleResetTimer = useCallback(async () => {
+    if (!room?.id) return;
     playSound('click');
     vibrate(50);
-    setTimeLeft(room?.discussion_time || 90);
-    setIsRunning(false);
     hasPlayedAlarmRef.current = false;
-  };
+    // Reset: clear start time, set remaining to full time
+    await roomService.updateTimer(room.id, null, room.discussion_time || 90);
+  }, [room?.id, room?.discussion_time, playSound, vibrate]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -232,6 +271,9 @@ const OnlineDiscussionScreen: React.FC = () => {
               </span>
               {timeLeft === 0 && (
                 <span className="text-lg text-imposter mt-2">انتهى الوقت! ⏰</span>
+              )}
+              {!isHost && isRunning && (
+                <span className="text-xs text-muted-foreground mt-1">⏱️ العد جاري...</span>
               )}
             </div>
           </div>
