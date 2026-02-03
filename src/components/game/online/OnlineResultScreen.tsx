@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Trophy, Skull, Home, RotateCcw, Medal } from 'lucide-react';
+import * as roomService from '@/services/roomService';
 
 interface PlayerWithScore {
   id: string;
@@ -14,10 +15,22 @@ interface PlayerWithScore {
 const OnlineResultScreen: React.FC = () => {
   const { room, players, currentPlayer, leaveRoom, resetOnlineGame } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
+  const [secretWord, setSecretWord] = useState<string | null>(null);
 
   const isWinner = room?.winner === 'players' 
     ? !currentPlayer?.is_imposter 
     : currentPlayer?.is_imposter;
+
+  // Fetch secret word when game is finished
+  useEffect(() => {
+    const fetchSecretWord = async () => {
+      if (room?.id && room.status === 'finished') {
+        const word = await roomService.getFinishedGameWord(room.id);
+        setSecretWord(word);
+      }
+    };
+    fetchSecretWord();
+  }, [room?.id, room?.status]);
 
   // Calculate scores based on the round result
   const playersWithScores = useMemo((): PlayerWithScore[] => {
@@ -129,7 +142,7 @@ const OnlineResultScreen: React.FC = () => {
           <div className="flex justify-between items-center">
             <div>
               <p className="text-xs text-muted-foreground mb-1">الكلمة السرية</p>
-              <span className="text-xl font-black text-gradient">{room?.secret_word}</span>
+              <span className="text-xl font-black text-gradient">{secretWord || '...'}</span>
             </div>
             <div className="text-left">
               <p className="text-xs text-muted-foreground mb-1">الإمبوستر{imposters.length > 1 ? 'ز' : ''}</p>

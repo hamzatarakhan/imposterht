@@ -321,6 +321,22 @@ export const calculateWinner = async (roomId: string): Promise<'imposters' | 'pl
   return (data as 'imposters' | 'players') || 'imposters';
 };
 
+// Get secret word after game is finished (safe to show to all)
+export const getFinishedGameWord = async (roomId: string): Promise<string | null> => {
+  const { data, error } = await supabase.rpc('get_finished_game_word', {
+    p_room_id: roomId
+  });
+  
+  if (error) {
+    if (import.meta.env.DEV) {
+      console.error('Get finished word failed:', error.code);
+    }
+    return null;
+  }
+  
+  return data;
+};
+
 // Leave room - uses secure RPC
 export const leaveRoom = async (roomId: string): Promise<void> => {
   const playerId = getOrCreatePlayerId();

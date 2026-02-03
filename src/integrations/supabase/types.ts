@@ -218,6 +218,7 @@ export type Database = {
         Returns: boolean
       }
       generate_room_code: { Args: never; Returns: string }
+      get_finished_game_word: { Args: { p_room_id: string }; Returns: string }
       get_my_role: {
         Args: { p_player_id: string; p_room_id: string }
         Returns: boolean

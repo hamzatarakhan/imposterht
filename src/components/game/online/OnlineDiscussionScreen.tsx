@@ -144,15 +144,21 @@ const OnlineDiscussionScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Vote Button + Restart */}
+          {/* Vote Button + Restart - Only host can start voting */}
           <div className="space-y-3">
-            <button
-              onClick={handleGoToVoting}
-              className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
-            >
-              <Vote size={24} />
-              بدء التصويت
-            </button>
+            {isHost ? (
+              <button
+                onClick={handleGoToVoting}
+                className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
+              >
+                <Vote size={24} />
+                بدء التصويت
+              </button>
+            ) : (
+              <div className="w-full p-4 rounded-2xl bg-secondary/50 text-center">
+                <p className="text-muted-foreground">⏳ انتظر الهوست ليبدأ التصويت</p>
+              </div>
+            )}
             
             <div className="flex justify-center">
               <OnlineRestartButton />
@@ -230,27 +236,33 @@ const OnlineDiscussionScreen: React.FC = () => {
             </div>
           </div>
           
-          {/* Controls */}
-          <div className="flex gap-4 mb-6">
-            <button
-              onClick={handlePlayPause}
-              className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all ${
-                isRunning 
-                  ? 'bg-secondary text-foreground' 
-                  : 'bg-primary text-primary-foreground glow-primary'
-              }`}
-              disabled={timeLeft === 0}
-            >
-              {isRunning ? <Pause size={32} /> : <Play size={32} fill="currentColor" />}
-            </button>
-            
-            <button
-              onClick={handleResetTimer}
-              className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors"
-            >
-              <RotateCcw size={28} />
-            </button>
-          </div>
+          {/* Controls - Only host can control timer */}
+          {isHost ? (
+            <div className="flex gap-4 mb-6">
+              <button
+                onClick={handlePlayPause}
+                className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all ${
+                  isRunning 
+                    ? 'bg-secondary text-foreground' 
+                    : 'bg-primary text-primary-foreground glow-primary'
+                }`}
+                disabled={timeLeft === 0}
+              >
+                {isRunning ? <Pause size={32} /> : <Play size={32} fill="currentColor" />}
+              </button>
+              
+              <button
+                onClick={handleResetTimer}
+                className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors"
+              >
+                <RotateCcw size={28} />
+              </button>
+            </div>
+          ) : (
+            <div className="mb-6 text-center">
+              <p className="text-sm text-muted-foreground">🎮 الهوست يتحكم بالوقت</p>
+            </div>
+          )}
           
           {/* Hint */}
           <div className="text-center mb-4">
@@ -281,15 +293,21 @@ const OnlineDiscussionScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Vote Button + Restart */}
+        {/* Vote Button + Restart - Only host can start voting */}
         <div className="space-y-3">
-          <button
-            onClick={handleGoToVoting}
-            className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
-          >
-            <Vote size={24} />
-            بدء التصويت
-          </button>
+          {isHost ? (
+            <button
+              onClick={handleGoToVoting}
+              className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
+            >
+              <Vote size={24} />
+              بدء التصويت
+            </button>
+          ) : (
+            <div className="w-full p-4 rounded-2xl bg-secondary/50 text-center">
+              <p className="text-muted-foreground">⏳ انتظر الهوست ليبدأ التصويت</p>
+            </div>
+          )}
           
           <div className="flex justify-center">
             <OnlineRestartButton />
