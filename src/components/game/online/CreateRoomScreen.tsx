@@ -254,9 +254,10 @@ const CreateRoomScreen: React.FC = () => {
           
           <button
             onClick={handleJoinInstead}
-            className="w-full p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors text-center"
+            className="w-full p-4 rounded-2xl bg-primary/10 border-2 border-primary/50 hover:bg-primary/20 hover:border-primary transition-all text-center"
           >
-            عندك كود؟ <span className="text-primary font-bold">انضم لغرفة</span>
+            <span className="text-muted-foreground">عندك كود؟</span>{' '}
+            <span className="text-primary font-bold text-lg">انضم لغرفة ←</span>
           </button>
         </div>
       </div>
