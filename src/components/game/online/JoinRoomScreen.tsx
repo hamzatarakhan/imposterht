@@ -3,6 +3,7 @@ import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
+import OnlineRestartButton from './OnlineRestartButton';
 
 const JoinRoomScreen: React.FC = () => {
   const { setScreen, joinRoom } = useOnlineGame();
@@ -141,6 +142,10 @@ const JoinRoomScreen: React.FC = () => {
                 ما عندك كود؟ أنشئ غرفة جديدة
               </span>
             </button>
+            
+            <div className="flex justify-center">
+              <OnlineRestartButton />
+            </div>
           </div>
         </div>
       </div>
