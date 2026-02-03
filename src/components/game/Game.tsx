@@ -20,16 +20,26 @@ const GameContent: React.FC = () => {
   const { screen } = useGame();
   const { screen: onlineScreen, pendingJoinCode } = useOnlineGame();
 
-  // If we have a pending join code or are in online flow, show online screens
-  if (screen === 'modeSelect' || pendingJoinCode) {
-    // If online game has progressed or has pending join code, show online screens
-    if (onlineScreen !== 'modeSelect' || pendingJoinCode) {
-      return (
-        <div className="max-w-md mx-auto min-h-screen bg-background relative">
-          <OnlineGame />
-        </div>
-      );
-    }
+  // If we have a pending join code, go directly to online join screen
+  if (pendingJoinCode || onlineScreen === 'joinRoom') {
+    return (
+      <div className="max-w-md mx-auto min-h-screen bg-background relative">
+        <OnlineGame />
+      </div>
+    );
+  }
+
+  // If in online flow (not modeSelect), show online screens
+  if (onlineScreen !== 'modeSelect') {
+    return (
+      <div className="max-w-md mx-auto min-h-screen bg-background relative">
+        <OnlineGame />
+      </div>
+    );
+  }
+
+  // If user selected modeSelect from home, show mode selection
+  if (screen === 'modeSelect') {
     return (
       <div className="max-w-md mx-auto min-h-screen bg-background relative">
         <ModeSelectScreen />
