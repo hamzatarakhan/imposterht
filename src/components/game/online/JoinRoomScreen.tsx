@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Loader2 } from 'lucide-react';
@@ -6,7 +6,7 @@ import { AVATAR_OPTIONS } from '@/context/GameContext';
 import OnlineRestartButton from './OnlineRestartButton';
 
 const JoinRoomScreen: React.FC = () => {
-  const { setScreen, joinRoom } = useOnlineGame();
+  const { setScreen, joinRoom, pendingJoinCode, clearPendingJoinCode } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
   
   const [name, setName] = useState('');
@@ -14,6 +14,14 @@ const JoinRoomScreen: React.FC = () => {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [isJoining, setIsJoining] = useState(false);
+
+  // Pre-fill code from URL if available
+  useEffect(() => {
+    if (pendingJoinCode) {
+      setCode(pendingJoinCode);
+      clearPendingJoinCode();
+    }
+  }, [pendingJoinCode, clearPendingJoinCode]);
 
   const handleJoin = async () => {
     if (!name.trim() || !code.trim() || isJoining) return;

@@ -18,12 +18,12 @@ import ModeSelectScreen from './online/ModeSelectScreen';
 
 const GameContent: React.FC = () => {
   const { screen } = useGame();
-  const { screen: onlineScreen } = useOnlineGame();
+  const { screen: onlineScreen, pendingJoinCode } = useOnlineGame();
 
-  // If we're in mode select, show mode select screen
-  if (screen === 'modeSelect') {
-    // If online game has progressed, show online screens
-    if (onlineScreen !== 'modeSelect') {
+  // If we have a pending join code or are in online flow, show online screens
+  if (screen === 'modeSelect' || pendingJoinCode) {
+    // If online game has progressed or has pending join code, show online screens
+    if (onlineScreen !== 'modeSelect' || pendingJoinCode) {
       return (
         <div className="max-w-md mx-auto min-h-screen bg-background relative">
           <OnlineGame />
