@@ -71,16 +71,14 @@ const GameContent: React.FC = () => {
   );
 };
 
-const Game: React.FC = () => {
-  return (
-    <SettingsProvider>
-      <GameProvider>
-        <OnlineGameProvider>
-          <GameContent />
-        </OnlineGameProvider>
-      </GameProvider>
-    </SettingsProvider>
-  );
-};
+const Game: React.FC = () => (
+  <SettingsProvider>
+    <GameProvider>
+      <OnlineGameProvider>
+        <GameContent />
+      </OnlineGameProvider>
+    </GameProvider>
+  </SettingsProvider>
+);
 
 export default Game;
