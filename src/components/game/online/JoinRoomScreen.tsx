@@ -108,30 +108,32 @@ const JoinRoomScreen: React.FC = () => {
         </div>
 
         {/* Sticky Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 space-y-3 max-w-md mx-auto">
-          <button
-            onClick={handleJoin}
-            disabled={!name.trim() || code.length !== 6 || isJoining}
-            className={`w-full btn-accent text-xl ${
-              !name.trim() || code.length !== 6 || isJoining ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {isJoining ? (
-              <span className="flex items-center justify-center gap-2">
-                <Loader2 className="animate-spin" size={20} />
-                جاري الانضمام...
-              </span>
-            ) : (
-              '🚪 انضم للغرفة'
-            )}
-          </button>
-          
-          <button
-            onClick={handleCreateInstead}
-            className="w-full p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors text-center"
-          >
-            ما عندك كود؟ <span className="text-accent font-bold">أنشئ غرفة</span>
-          </button>
+        <div className="fixed bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-3">
+          <div className="w-full max-w-md mx-auto space-y-3">
+            <button
+              onClick={handleJoin}
+              disabled={!name.trim() || code.length !== 6 || isJoining}
+              className={`w-full btn-accent text-xl ${
+                !name.trim() || code.length !== 6 || isJoining ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {isJoining ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="animate-spin" size={20} />
+                  جاري الانضمام...
+                </span>
+              ) : (
+                '🚪 انضم للغرفة'
+              )}
+            </button>
+            
+            <button
+              onClick={handleCreateInstead}
+              className="w-full p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors text-center"
+            >
+              ما عندك كود؟ <span className="text-accent font-bold">أنشئ غرفة</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
