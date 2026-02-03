@@ -14,11 +14,13 @@ const JoinRoomScreen: React.FC = () => {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [isJoining, setIsJoining] = useState(false);
+  const [isFromLink, setIsFromLink] = useState(false);
 
-  // Pre-fill code from URL if available
+  // Pre-fill code from URL if available and mark as from link
   useEffect(() => {
     if (pendingJoinCode) {
       setCode(pendingJoinCode);
+      setIsFromLink(true);
       clearPendingJoinCode();
     }
   }, [pendingJoinCode, clearPendingJoinCode]);
@@ -43,6 +45,11 @@ const JoinRoomScreen: React.FC = () => {
   const handleBack = () => {
     playSound('click');
     vibrate(30);
+    if (isFromLink) {
+      // If came from link, go to mode select instead
+      setIsFromLink(false);
+      setCode('');
+    }
     setScreen('modeSelect');
   };
 
@@ -58,6 +65,87 @@ const JoinRoomScreen: React.FC = () => {
     setCode(cleaned);
     setError('');
   };
+
+  // Simplified UI when coming from a shared link
+  if (isFromLink) {
+    return (
+      <div className="min-h-screen flex flex-col relative">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
+        <div className="absolute top-1/3 left-1/4 w-48 h-48 bg-accent/10 rounded-full blur-3xl" />
+        
+        <div className="relative z-10 flex-1 flex flex-col">
+          {/* Header */}
+          <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md px-6 py-4">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleBack}
+                className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
+              >
+                <ArrowRight size={24} />
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold">🎉 تمت دعوتك!</h1>
+                <p className="text-sm text-muted-foreground">أدخل اسمك للانضمام للغرفة</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Simplified Form - Only Name */}
+          <div className="flex-1 flex flex-col justify-center space-y-6 px-6 pb-48">
+            {/* Room Code Display */}
+            <div className="card-game bg-gradient-to-br from-accent/20 to-primary/20 text-center">
+              <p className="text-sm text-muted-foreground mb-2">كود الغرفة</p>
+              <span className="text-3xl font-mono font-black tracking-[0.3em] text-gradient">
+                {code}
+              </span>
+            </div>
+
+            {/* Name Input */}
+            <div className="card-game">
+              <label className="block text-sm font-medium mb-2">اسمك</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="أدخل اسمك..."
+                className="w-full p-4 rounded-xl bg-secondary border-2 border-transparent focus:border-primary outline-none text-center text-xl"
+                maxLength={20}
+                autoFocus
+              />
+              {error && (
+                <p className="text-imposter text-center mt-2 text-sm">{error}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Sticky Join Button */}
+          <div className="fixed bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="w-full max-w-md mx-auto">
+              <button
+                onClick={handleJoin}
+                disabled={!name.trim() || isJoining}
+                className={`w-full p-4 rounded-xl font-bold text-lg transition-all ${
+                  !name.trim() || isJoining 
+                    ? 'bg-muted text-muted-foreground cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-accent to-primary text-primary-foreground hover:brightness-110 shadow-[0_0_20px_hsl(var(--accent)/0.4)]'
+                }`}
+              >
+                {isJoining ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="animate-spin" size={20} />
+                    جاري الانضمام...
+                  </span>
+                ) : (
+                  '🚀 انضم للعبة'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col relative">
