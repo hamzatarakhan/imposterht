@@ -5,7 +5,7 @@ import { Clock, Users, MessageSquare, ArrowRight, Play, Pause, RotateCcw, Vote }
 import OnlineRestartButton from './OnlineRestartButton';
 
 const OnlineDiscussionScreen: React.FC = () => {
-  const { room, players, isHost, setScreen, leaveRoom } = useOnlineGame();
+  const { room, players, isHost, setScreen, leaveRoom, startDiscussion } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
   
   const [timeLeft, setTimeLeft] = useState(room?.discussion_time || 90);
@@ -46,9 +46,11 @@ const OnlineDiscussionScreen: React.FC = () => {
     }
   }, [timeLeft, playSound, vibrate]);
 
-  const handleGoToVoting = () => {
+  const handleGoToVoting = async () => {
     playSound('click');
     vibrate(50);
+    // Update room status to 'voting' so all players navigate to voting screen
+    await startDiscussion();
     setScreen('onlineVoting');
   };
 

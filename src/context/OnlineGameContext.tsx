@@ -93,8 +93,9 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
         }
         break;
       case 'voting':
+        // When voting status, allow staying in discussion or voting screen
         if (state.screen !== 'onlineVoting' && state.screen !== 'onlineDiscussion') {
-          setState(prev => ({ ...prev, screen: 'onlineDiscussion' }));
+          setState(prev => ({ ...prev, screen: 'onlineVoting' }));
         }
         break;
       case 'finished':
