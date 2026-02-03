@@ -54,7 +54,9 @@ export const createRoom = async (
     .single();
 
   if (roomError || !room) {
-    console.error('Error creating room:', roomError);
+    if (import.meta.env.DEV) {
+      console.error('Room creation failed:', roomError?.code);
+    }
     return null;
   }
 
@@ -73,9 +75,14 @@ export const createRoom = async (
     .single();
 
   if (playerError || !player) {
-    console.error('Error adding host:', playerError);
-    // Clean up room if player creation failed
-    await supabase.from('rooms').delete().eq('id', room.id);
+    if (import.meta.env.DEV) {
+      console.error('Host addition failed:', playerError?.code);
+    }
+    // Clean up room if player creation failed - use secure RPC
+    await supabase.rpc('delete_room_secure', { 
+      p_room_id: room.id, 
+      p_host_player_id: playerId 
+    });
     return null;
   }
 
@@ -91,12 +98,12 @@ export const joinRoom = async (
   const playerId = getOrCreatePlayerId();
   const upperCode = code.toUpperCase();
 
-  // Find room by code
+  // Find room by code using the public view (excludes secret_word)
   const { data: room, error: roomError } = await supabase
-    .from('rooms')
+    .from('public_rooms')
     .select('*')
     .eq('code', upperCode)
-    .single();
+    .maybeSingle();
 
   if (roomError || !room) {
     return { error: 'الغرفة غير موجودة' };
@@ -112,7 +119,7 @@ export const joinRoom = async (
     .select('*')
     .eq('room_id', room.id)
     .eq('player_id', playerId)
-    .single();
+    .maybeSingle();
 
   if (existingPlayer) {
     return { room: room as Room, player: existingPlayer as RoomPlayer };
@@ -143,29 +150,31 @@ export const joinRoom = async (
     .single();
 
   if (playerError || !player) {
-    console.error('Error joining room:', playerError);
+    if (import.meta.env.DEV) {
+      console.error('Room join failed:', playerError?.code);
+    }
     return { error: 'فشل الانضمام للغرفة' };
   }
 
   return { room: room as Room, player: player as RoomPlayer };
 };
 
-// Get room by ID
+// Get room by ID using public view (excludes secret_word)
 export const getRoom = async (roomId: string): Promise<Room | null> => {
   const { data, error } = await supabase
-    .from('rooms')
+    .from('public_rooms')
     .select('*')
     .eq('id', roomId)
-    .single();
+    .maybeSingle();
 
   if (error || !data) return null;
   return data as Room;
 };
 
-// Get all players in a room
+// Get all players in a room using public view (hides is_imposter until game finished)
 export const getRoomPlayers = async (roomId: string): Promise<RoomPlayer[]> => {
   const { data, error } = await supabase
-    .from('room_players')
+    .from('public_room_players')
     .select('*')
     .eq('room_id', roomId)
     .order('player_order', { ascending: true });
@@ -174,166 +183,172 @@ export const getRoomPlayers = async (roomId: string): Promise<RoomPlayer[]> => {
   return data as RoomPlayer[];
 };
 
-// Start the game (host only)
+// Get my secret word securely (returns NULL for imposters)
+export const getMySecretWord = async (roomId: string): Promise<string | null> => {
+  const playerId = getOrCreatePlayerId();
+  
+  const { data, error } = await supabase.rpc('get_player_word', {
+    p_room_id: roomId,
+    p_player_id: playerId
+  });
+  
+  if (error) {
+    if (import.meta.env.DEV) {
+      console.error('Get word failed:', error.code);
+    }
+    return null;
+  }
+  
+  return data;
+};
+
+// Get my imposter status securely
+export const getMyRole = async (roomId: string): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  
+  const { data, error } = await supabase.rpc('get_my_role', {
+    p_room_id: roomId,
+    p_player_id: playerId
+  });
+  
+  if (error) {
+    if (import.meta.env.DEV) {
+      console.error('Get role failed:', error.code);
+    }
+    return false;
+  }
+  
+  return data || false;
+};
+
+// Start the game (host only) - uses secure RPC
 export const startGame = async (roomId: string, category: Category): Promise<boolean> => {
   const playerId = getOrCreatePlayerId();
-
-  // Verify host
-  const { data: room } = await supabase
-    .from('rooms')
-    .select('*')
-    .eq('id', roomId)
-    .single();
-
-  if (!room || room.host_id !== playerId) return false;
-
-  // Get all players
-  const { data: players } = await supabase
-    .from('room_players')
-    .select('*')
-    .eq('room_id', roomId)
-    .order('player_order', { ascending: true });
-
-  if (!players || players.length < 3) return false;
 
   // Generate secret word
   const secretWord = getRandomWord(category, []);
 
-  // Randomly select imposters
-  const imposterIndices: number[] = [];
-  while (imposterIndices.length < room.imposter_count) {
-    const randomIndex = Math.floor(Math.random() * players.length);
-    if (!imposterIndices.includes(randomIndex)) {
-      imposterIndices.push(randomIndex);
+  // Call secure RPC function
+  const { data, error } = await supabase.rpc('start_game_secure', {
+    p_room_id: roomId,
+    p_host_player_id: playerId,
+    p_secret_word: secretWord
+  });
+
+  if (error) {
+    if (import.meta.env.DEV) {
+      console.error('Start game failed:', error.code);
     }
+    return false;
   }
 
-  // Shuffle player order
-  const shuffledOrder = players.map((_, i) => i).sort(() => Math.random() - 0.5);
-
-  // Update each player
-  for (let i = 0; i < players.length; i++) {
-    await supabase
-      .from('room_players')
-      .update({
-        is_imposter: imposterIndices.includes(i),
-        player_order: shuffledOrder[i],
-        has_seen_role: false,
-        votes: 0,
-        voted_for: null,
-      })
-      .eq('id', players[i].id);
-  }
-
-  // Update room status
-  await supabase
-    .from('rooms')
-    .update({
-      status: 'playing',
-      secret_word: secretWord,
-      current_player_index: 0,
-    })
-    .eq('id', roomId);
-
-  return true;
+  return data || false;
 };
 
-// Mark player as having seen their role
+// Mark player as having seen their role - uses secure RPC
 export const markRoleSeen = async (roomId: string): Promise<void> => {
   const playerId = getOrCreatePlayerId();
 
-  await supabase
-    .from('room_players')
-    .update({ has_seen_role: true })
-    .eq('room_id', roomId)
-    .eq('player_id', playerId);
-};
+  const { error } = await supabase.rpc('mark_role_seen_secure', {
+    p_room_id: roomId,
+    p_player_id: playerId
+  });
 
-// Update current player index
-export const updateCurrentPlayerIndex = async (roomId: string, index: number): Promise<void> => {
-  await supabase
-    .from('rooms')
-    .update({ current_player_index: index })
-    .eq('id', roomId);
-};
-
-// Move to discussion phase
-export const startDiscussion = async (roomId: string): Promise<void> => {
-  await supabase
-    .from('rooms')
-    .update({ status: 'voting' })
-    .eq('id', roomId);
-};
-
-// Submit vote
-export const submitVote = async (roomId: string, votedForPlayerId: string): Promise<void> => {
-  const playerId = getOrCreatePlayerId();
-
-  // Update voter's voted_for
-  await supabase
-    .from('room_players')
-    .update({ voted_for: votedForPlayerId })
-    .eq('room_id', roomId)
-    .eq('player_id', playerId);
-
-  // Increment votes for the voted player
-  const { data: votedPlayer } = await supabase
-    .from('room_players')
-    .select('votes')
-    .eq('room_id', roomId)
-    .eq('player_id', votedForPlayerId)
-    .single();
-
-  if (votedPlayer) {
-    await supabase
-      .from('room_players')
-      .update({ votes: votedPlayer.votes + 1 })
-      .eq('room_id', roomId)
-      .eq('player_id', votedForPlayerId);
+  if (error && import.meta.env.DEV) {
+    console.error('Mark role seen failed:', error.code);
   }
 };
 
-// Calculate and set winner
-export const calculateWinner = async (roomId: string): Promise<'imposters' | 'players'> => {
-  const { data: players } = await supabase
-    .from('room_players')
-    .select('*')
-    .eq('room_id', roomId)
-    .order('votes', { ascending: false });
+// Update current player index - uses secure RPC
+export const updateCurrentPlayerIndex = async (roomId: string, index: number): Promise<void> => {
+  const playerId = getOrCreatePlayerId();
+  
+  const { error } = await supabase.rpc('update_room_secure', {
+    p_room_id: roomId,
+    p_host_player_id: playerId,
+    p_current_player_index: index
+  });
 
-  if (!players || players.length === 0) return 'imposters';
-
-  const mostVoted = players[0];
-  const winner = mostVoted.is_imposter ? 'players' : 'imposters';
-
-  await supabase
-    .from('rooms')
-    .update({
-      status: 'finished',
-      winner,
-    })
-    .eq('id', roomId);
-
-  return winner;
+  if (error && import.meta.env.DEV) {
+    console.error('Update index failed:', error.code);
+  }
 };
 
-// Leave room
+// Move to discussion phase - uses secure RPC
+export const startDiscussion = async (roomId: string): Promise<void> => {
+  const playerId = getOrCreatePlayerId();
+  
+  const { error } = await supabase.rpc('update_room_secure', {
+    p_room_id: roomId,
+    p_host_player_id: playerId,
+    p_status: 'voting'
+  });
+
+  if (error && import.meta.env.DEV) {
+    console.error('Start discussion failed:', error.code);
+  }
+};
+
+// Submit vote - uses atomic RPC (fixes race condition)
+export const submitVote = async (roomId: string, votedForPlayerId: string): Promise<void> => {
+  const playerId = getOrCreatePlayerId();
+
+  const { error } = await supabase.rpc('submit_vote_atomic', {
+    p_room_id: roomId,
+    p_voter_player_id: playerId,
+    p_voted_for_player_id: votedForPlayerId
+  });
+
+  if (error && import.meta.env.DEV) {
+    console.error('Submit vote failed:', error.code);
+  }
+};
+
+// Calculate and set winner - uses secure RPC
+export const calculateWinner = async (roomId: string): Promise<'imposters' | 'players'> => {
+  const { data, error } = await supabase.rpc('calculate_winner_secure', {
+    p_room_id: roomId
+  });
+
+  if (error) {
+    if (import.meta.env.DEV) {
+      console.error('Calculate winner failed:', error.code);
+    }
+    return 'imposters';
+  }
+
+  return (data as 'imposters' | 'players') || 'imposters';
+};
+
+// Leave room - uses secure RPC
 export const leaveRoom = async (roomId: string): Promise<void> => {
   const playerId = getOrCreatePlayerId();
 
-  await supabase
-    .from('room_players')
-    .delete()
-    .eq('room_id', roomId)
-    .eq('player_id', playerId);
+  const { error } = await supabase.rpc('leave_room_secure', {
+    p_room_id: roomId,
+    p_player_id: playerId
+  });
+
+  if (error && import.meta.env.DEV) {
+    console.error('Leave room failed:', error.code);
+  }
 };
 
-// Delete room (host only)
+// Delete room (host only) - uses secure RPC
 export const deleteRoom = async (roomId: string): Promise<void> => {
-  await supabase.from('rooms').delete().eq('id', roomId);
+  const playerId = getOrCreatePlayerId();
+  
+  const { error } = await supabase.rpc('delete_room_secure', {
+    p_room_id: roomId,
+    p_host_player_id: playerId
+  });
+
+  if (error && import.meta.env.DEV) {
+    console.error('Delete room failed:', error.code);
+  }
 };
 
-// Subscribe to room changes
+// Subscribe to room changes (uses public views for security)
 export const subscribeToRoom = (
   roomId: string,
   onRoomChange: (room: Room) => void,
@@ -349,9 +364,11 @@ export const subscribeToRoom = (
         table: 'rooms',
         filter: `id=eq.${roomId}`,
       },
-      (payload) => {
-        if (payload.new) {
-          onRoomChange(payload.new as Room);
+      async () => {
+        // Refetch room data via public view
+        const room = await getRoom(roomId);
+        if (room) {
+          onRoomChange(room);
         }
       }
     )
@@ -364,7 +381,7 @@ export const subscribeToRoom = (
         filter: `room_id=eq.${roomId}`,
       },
       async () => {
-        // Refetch all players when any change happens
+        // Refetch all players via public view
         const players = await getRoomPlayers(roomId);
         onPlayersChange(players);
       }
