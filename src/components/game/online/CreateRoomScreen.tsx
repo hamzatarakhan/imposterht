@@ -243,32 +243,33 @@ const CreateRoomScreen: React.FC = () => {
         </div>
 
         {/* Sticky Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-3">
-          <div className="w-full max-w-md mx-auto space-y-3">
-            <button
-              onClick={handleJoinInstead}
-              className="w-full p-4 rounded-2xl bg-primary/10 border-2 border-primary/50 hover:bg-primary/20 hover:border-primary transition-all text-center"
-            >
-              <span className="text-muted-foreground">عندك كود؟</span>{' '}
-              <span className="text-primary font-bold text-lg">انضم لغرفة ←</span>
-            </button>
-            
-            <button
-              onClick={handleCreate}
-              disabled={!name.trim() || isCreating}
-              className={`w-full btn-primary-game text-xl ${
-                !name.trim() || isCreating ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              {isCreating ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="animate-spin" size={20} />
-                  جاري الإنشاء...
-                </span>
-              ) : (
-                '🚀 إنشاء الغرفة'
-              )}
-            </button>
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div className="w-full max-w-md mx-auto space-y-2">
+            <div className="flex gap-2">
+              <button
+                onClick={handleJoinInstead}
+                className="flex-1 p-3 rounded-xl bg-secondary border border-primary/30 hover:bg-primary/20 hover:border-primary transition-all text-center"
+              >
+                <span className="text-primary font-bold text-sm">انضم لغرفة ←</span>
+              </button>
+              
+              <button
+                onClick={handleCreate}
+                disabled={!name.trim() || isCreating}
+                className={`flex-1 p-3 rounded-xl bg-gradient-to-r from-primary to-orange-500 text-primary-foreground font-bold text-sm transition-all ${
+                  !name.trim() || isCreating ? 'opacity-50 cursor-not-allowed' : 'hover:brightness-110'
+                }`}
+              >
+                {isCreating ? (
+                  <span className="flex items-center justify-center gap-1">
+                    <Loader2 className="animate-spin" size={16} />
+                    جاري...
+                  </span>
+                ) : (
+                  '🚀 إنشاء الغرفة'
+                )}
+              </button>
+            </div>
             
             <div className="flex justify-center">
               <OnlineRestartButton />
