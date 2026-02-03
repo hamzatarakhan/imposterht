@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Eye, EyeOff, Check, Users } from 'lucide-react';
+import { getMySecretWord, getMyRole } from '@/services/roomService';
 
 const OnlineShowRoleScreen: React.FC = () => {
   const { room, players, currentPlayer, markRoleSeen, moveToNextPlayer } = useOnlineGame();
@@ -9,6 +10,9 @@ const OnlineShowRoleScreen: React.FC = () => {
   
   const [showRole, setShowRole] = useState(false);
   const [hasConfirmed, setHasConfirmed] = useState(false);
+  const [secretWord, setSecretWord] = useState<string | null>(null);
+  const [isImposter, setIsImposter] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Check if current player has already seen their role
   useEffect(() => {
@@ -17,10 +21,30 @@ const OnlineShowRoleScreen: React.FC = () => {
     }
   }, [currentPlayer?.has_seen_role]);
 
-  const handleShowRole = () => {
+  const handleShowRole = async () => {
+    if (!room) return;
+    
     playSound('click');
     vibrate(50);
-    setShowRole(true);
+    setIsLoading(true);
+    
+    try {
+      // Securely fetch role and word from server
+      const [role, word] = await Promise.all([
+        getMyRole(room.id),
+        getMySecretWord(room.id)
+      ]);
+      
+      setIsImposter(role);
+      setSecretWord(word);
+      setShowRole(true);
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error('Failed to fetch role');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleConfirm = async () => {
@@ -122,7 +146,7 @@ const OnlineShowRoleScreen: React.FC = () => {
           <div 
             className={`card-game p-8 mb-8 transition-all duration-500 ${
               showRole 
-                ? currentPlayer?.is_imposter 
+                ? isImposter 
                   ? 'bg-imposter/20 border-imposter glow-imposter' 
                   : 'bg-primary/20 border-primary glow-primary'
                 : 'bg-secondary'
@@ -130,7 +154,7 @@ const OnlineShowRoleScreen: React.FC = () => {
           >
             {showRole ? (
               <div className="animate-reveal">
-                {currentPlayer?.is_imposter ? (
+                {isImposter ? (
                   <>
                     <div className="text-6xl mb-4">😈</div>
                     <h2 className="text-3xl font-black text-imposter mb-2">إمبوستر!</h2>
@@ -144,7 +168,7 @@ const OnlineShowRoleScreen: React.FC = () => {
                     <h2 className="text-2xl font-black text-primary mb-2">الكلمة السرية</h2>
                     <div className="card-game bg-card/50 inline-block px-6 py-3">
                       <span className="text-3xl font-black text-gradient">
-                        {room?.secret_word}
+                        {secretWord}
                       </span>
                     </div>
                   </>
@@ -153,12 +177,19 @@ const OnlineShowRoleScreen: React.FC = () => {
             ) : (
               <button 
                 onClick={handleShowRole}
-                className="w-full py-8 flex flex-col items-center gap-4"
+                disabled={isLoading}
+                className="w-full py-8 flex flex-col items-center gap-4 disabled:opacity-50"
               >
                 <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Eye size={32} className="text-primary" />
+                  {isLoading ? (
+                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Eye size={32} className="text-primary" />
+                  )}
                 </div>
-                <span className="text-xl font-bold">👁️ اضغط لكشف دورك</span>
+                <span className="text-xl font-bold">
+                  {isLoading ? 'جاري التحميل...' : '👁️ اضغط لكشف دورك'}
+                </span>
               </button>
             )}
           </div>

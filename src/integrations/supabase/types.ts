@@ -62,6 +62,13 @@ export type Database = {
             foreignKeyName: "room_players_room_id_fkey"
             columns: ["room_id"]
             isOneToOne: false
+            referencedRelation: "public_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
             referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
@@ -120,10 +127,136 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_room_players: {
+        Row: {
+          avatar: string | null
+          has_seen_role: boolean | null
+          id: string | null
+          is_host: boolean | null
+          is_imposter: boolean | null
+          joined_at: string | null
+          name: string | null
+          player_id: string | null
+          player_order: number | null
+          room_id: string | null
+          voted_for: string | null
+          votes: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "public_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_rooms: {
+        Row: {
+          category: string | null
+          code: string | null
+          created_at: string | null
+          current_player_index: number | null
+          discussion_time: number | null
+          discussion_time_enabled: boolean | null
+          host_id: string | null
+          id: string | null
+          imposter_count: number | null
+          player_count: number | null
+          status: string | null
+          updated_at: string | null
+          winner: string | null
+        }
+        Insert: {
+          category?: string | null
+          code?: string | null
+          created_at?: string | null
+          current_player_index?: number | null
+          discussion_time?: number | null
+          discussion_time_enabled?: boolean | null
+          host_id?: string | null
+          id?: string | null
+          imposter_count?: number | null
+          player_count?: number | null
+          status?: string | null
+          updated_at?: string | null
+          winner?: string | null
+        }
+        Update: {
+          category?: string | null
+          code?: string | null
+          created_at?: string | null
+          current_player_index?: number | null
+          discussion_time?: number | null
+          discussion_time_enabled?: boolean | null
+          host_id?: string | null
+          id?: string | null
+          imposter_count?: number | null
+          player_count?: number | null
+          status?: string | null
+          updated_at?: string | null
+          winner?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      calculate_winner_secure: { Args: { p_room_id: string }; Returns: string }
+      delete_room_secure: {
+        Args: { p_host_player_id: string; p_room_id: string }
+        Returns: boolean
+      }
       generate_room_code: { Args: never; Returns: string }
+      get_my_role: {
+        Args: { p_player_id: string; p_room_id: string }
+        Returns: boolean
+      }
+      get_player_word: {
+        Args: { p_player_id: string; p_room_id: string }
+        Returns: string
+      }
+      leave_room_secure: {
+        Args: { p_player_id: string; p_room_id: string }
+        Returns: boolean
+      }
+      mark_role_seen_secure: {
+        Args: { p_player_id: string; p_room_id: string }
+        Returns: boolean
+      }
+      start_game_secure: {
+        Args: {
+          p_host_player_id: string
+          p_room_id: string
+          p_secret_word: string
+        }
+        Returns: boolean
+      }
+      submit_vote_atomic: {
+        Args: {
+          p_room_id: string
+          p_voted_for_player_id: string
+          p_voter_player_id: string
+        }
+        Returns: boolean
+      }
+      update_room_secure: {
+        Args: {
+          p_current_player_index?: number
+          p_host_player_id: string
+          p_room_id: string
+          p_status?: string
+          p_winner?: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
