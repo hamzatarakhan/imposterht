@@ -41,7 +41,7 @@ const SetupScreen: React.FC = () => {
     }
   }, [playSound, vibrate]);
 
-  const categories: Category[] = ['random', 'things', 'places', 'food', 'jobs'];
+  const categories: Category[] = ['random', 'things', 'places', 'food', 'jobs', 'animals', 'sports', 'celebrities', 'movies'];
 
   const handlePlayerCountChange = (delta: number) => {
     playSound('click');
