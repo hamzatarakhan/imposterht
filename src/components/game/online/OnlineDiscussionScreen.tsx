@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Clock, Users, MessageSquare, ArrowRight, Play, Pause, RotateCcw, Vote } from 'lucide-react';
+import OnlineRestartButton from './OnlineRestartButton';
 
 const OnlineDiscussionScreen: React.FC = () => {
   const { room, players, isHost, setScreen, leaveRoom } = useOnlineGame();
@@ -141,14 +142,20 @@ const OnlineDiscussionScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Vote Button */}
-          <button
-            onClick={handleGoToVoting}
-            className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
-          >
-            <Vote size={24} />
-            بدء التصويت
-          </button>
+          {/* Vote Button + Restart */}
+          <div className="space-y-3">
+            <button
+              onClick={handleGoToVoting}
+              className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
+            >
+              <Vote size={24} />
+              بدء التصويت
+            </button>
+            
+            <div className="flex justify-center">
+              <OnlineRestartButton />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -272,14 +279,20 @@ const OnlineDiscussionScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Vote Button */}
-        <button
-          onClick={handleGoToVoting}
-          className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
-        >
-          <Vote size={24} />
-          بدء التصويت
-        </button>
+        {/* Vote Button + Restart */}
+        <div className="space-y-3">
+          <button
+            onClick={handleGoToVoting}
+            className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
+          >
+            <Vote size={24} />
+            بدء التصويت
+          </button>
+          
+          <div className="flex justify-center">
+            <OnlineRestartButton />
+          </div>
+        </div>
       </div>
     </div>
   );
