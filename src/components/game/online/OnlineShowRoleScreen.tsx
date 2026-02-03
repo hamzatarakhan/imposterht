@@ -177,7 +177,8 @@ const OnlineShowRoleScreen: React.FC = () => {
     );
   }
 
-  // All players saw, waiting for transition
+  // All players saw - this state is now handled by auto-navigation in context
+  // Show a brief transition message
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
