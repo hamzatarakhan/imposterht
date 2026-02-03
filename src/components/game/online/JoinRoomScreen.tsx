@@ -109,39 +109,35 @@ const JoinRoomScreen: React.FC = () => {
         </div>
 
         {/* Sticky Buttons */}
-        <div className="fixed bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-3">
-          <div className="w-full max-w-md mx-auto space-y-3">
-            <button
-              onClick={handleJoin}
-              disabled={!name.trim() || code.length !== 6 || isJoining}
-              className={`relative w-full py-5 px-6 rounded-2xl text-xl font-bold transition-all overflow-hidden ${
-                !name.trim() || code.length !== 6 || isJoining 
-                  ? 'bg-muted text-muted-foreground cursor-not-allowed' 
-                  : 'bg-card border-2 border-accent text-accent hover:bg-accent hover:text-accent-foreground hover:scale-[1.02] active:scale-[0.98] shadow-[0_0_20px_hsl(var(--accent)/0.4)] hover:shadow-[0_0_30px_hsl(var(--accent)/0.6)]'
-              }`}
-            >
-              {isJoining ? (
-                <span className="flex items-center justify-center gap-3">
-                  <Loader2 className="animate-spin" size={24} />
-                  جاري الانضمام...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-3">
-                  <span className="text-2xl animate-pulse">🚪</span>
-                  <span>انضم للغرفة</span>
-                </span>
-              )}
-            </button>
-            
-            <button
-              onClick={handleCreateInstead}
-              className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-primary/90 to-primary/70 text-primary-foreground font-bold text-lg shadow-md hover:shadow-primary/30 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all"
-            >
-              <span className="flex items-center justify-center gap-2">
-                <span className="text-xl">✨</span>
-                ما عندك كود؟ أنشئ غرفة جديدة
-              </span>
-            </button>
+        <div className="fixed bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div className="w-full max-w-md mx-auto space-y-2">
+            <div className="flex gap-2">
+              <button
+                onClick={handleJoin}
+                disabled={!name.trim() || code.length !== 6 || isJoining}
+                className={`flex-1 p-3 rounded-xl font-bold text-sm transition-all ${
+                  !name.trim() || code.length !== 6 || isJoining 
+                    ? 'bg-muted text-muted-foreground cursor-not-allowed' 
+                    : 'bg-card border-2 border-accent text-accent hover:bg-accent hover:text-accent-foreground shadow-[0_0_15px_hsl(var(--accent)/0.3)]'
+                }`}
+              >
+                {isJoining ? (
+                  <span className="flex items-center justify-center gap-1">
+                    <Loader2 className="animate-spin" size={16} />
+                    جاري...
+                  </span>
+                ) : (
+                  '🚪 انضم للغرفة'
+                )}
+              </button>
+              
+              <button
+                onClick={handleCreateInstead}
+                className="flex-1 p-3 rounded-xl bg-gradient-to-r from-primary to-orange-500 text-primary-foreground font-bold text-sm transition-all hover:brightness-110"
+              >
+                ✨ أنشئ غرفة
+              </button>
+            </div>
             
             <div className="flex justify-center">
               <OnlineRestartButton />
