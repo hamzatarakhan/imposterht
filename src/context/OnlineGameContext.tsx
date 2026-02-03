@@ -75,13 +75,20 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
     return unsubscribe;
   }, [state.room?.id, state.myPlayerId]);
 
-  // Auto-navigate based on room status
+  // Auto-navigate based on room status and players state
   useEffect(() => {
     if (!state.room) return;
 
     switch (state.room.status) {
       case 'playing':
-        if (state.screen !== 'onlineShowRole') {
+        // Check if all players have seen their roles
+        const allSeen = state.players.length > 0 && state.players.every(p => p.has_seen_role);
+        if (allSeen) {
+          // All players saw their roles, move to discussion
+          if (state.screen !== 'onlineDiscussion') {
+            setState(prev => ({ ...prev, screen: 'onlineDiscussion' }));
+          }
+        } else if (state.screen !== 'onlineShowRole') {
           setState(prev => ({ ...prev, screen: 'onlineShowRole' }));
         }
         break;
@@ -96,7 +103,7 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
         }
         break;
     }
-  }, [state.room?.status, state.screen]);
+  }, [state.room?.status, state.screen, state.players]);
 
   const setScreen = useCallback((screen: OnlineGameScreen) => {
     setState(prev => ({ ...prev, screen }));
@@ -172,12 +179,9 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
 
   const moveToNextPlayer = useCallback(async (): Promise<void> => {
     if (!state.room) return;
-
-    const allSeen = state.players.every(p => p.has_seen_role);
-    if (allSeen) {
-      setState(prev => ({ ...prev, screen: 'onlineDiscussion' }));
-    }
-  }, [state.room, state.players]);
+    // Navigation is handled by auto-navigate effect based on room status
+    // This is called after marking role as seen
+  }, [state.room]);
 
   const startDiscussion = useCallback(async (): Promise<void> => {
     if (!state.room) return;
