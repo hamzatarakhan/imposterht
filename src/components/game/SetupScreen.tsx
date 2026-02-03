@@ -130,7 +130,7 @@ const SetupScreen: React.FC = () => {
         </div>
         
         {/* Options */}
-        <div className="flex-1 overflow-auto px-6 pb-32 space-y-6">
+        <div className="flex-1 overflow-auto px-6 pb-44 space-y-6">
         {/* Player Count */}
         <div className="card-game">
           <div className="flex items-center gap-3 mb-4">
