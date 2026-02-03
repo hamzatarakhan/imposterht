@@ -337,6 +337,28 @@ export const getFinishedGameWord = async (roomId: string): Promise<string | null
   return data;
 };
 
+// Update timer state (host only) - uses secure RPC
+export const updateTimer = async (
+  roomId: string, 
+  timerStartedAt: string | null, 
+  timerRemaining: number | null
+): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  
+  const { data, error } = await supabase.rpc('update_timer_secure', {
+    p_room_id: roomId,
+    p_host_player_id: playerId,
+    p_timer_started_at: timerStartedAt,
+    p_timer_remaining: timerRemaining
+  });
+
+  if (error && import.meta.env.DEV) {
+    console.error('Update timer failed:', error.code);
+  }
+  
+  return data || false;
+};
+
 // Leave room - uses secure RPC
 export const leaveRoom = async (roomId: string): Promise<void> => {
   const playerId = getOrCreatePlayerId();
