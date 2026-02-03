@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useOnlineGame } from '@/context/OnlineGameContext';
+import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { RotateCcw, X } from 'lucide-react';
 
 const OnlineRestartButton: React.FC = () => {
   const { leaveRoom } = useOnlineGame();
+  const { setScreen } = useGame();
   const { playSound, vibrate } = useSettings();
   const [showConfirm, setShowConfirm] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
@@ -43,6 +45,7 @@ const OnlineRestartButton: React.FC = () => {
     vibrate(100);
     setIsLeaving(true);
     await leaveRoom();
+    setScreen('modeSelect');
     setShowConfirm(false);
     setIsLeaving(false);
   };
