@@ -42,7 +42,7 @@ interface GameState {
   screen: GameScreen;
   playerCount: number;
   imposterCount: number;
-  category: Category;
+  categories: Category[];
   customWords: string[];
   players: Player[];
   playerNames: string[];
@@ -65,7 +65,8 @@ interface GameContextType extends GameState {
   setScreen: (screen: GameScreen) => void;
   setPlayerCount: (count: number) => void;
   setImposterCount: (count: number) => void;
-  setCategory: (category: Category) => void;
+  setCategories: (categories: Category[]) => void;
+  toggleCategory: (category: Category) => void;
   setCustomWords: (words: string[]) => void;
   setDiscussionTimeEnabled: (enabled: boolean) => void;
   setDiscussionTime: (time: number) => void;
@@ -86,7 +87,7 @@ const initialState: GameState = {
   screen: 'splash',
   playerCount: 4,
   imposterCount: 1,
-  category: 'random',
+  categories: ['random'],
   customWords: [],
   players: [],
   playerNames: [],
@@ -122,8 +123,35 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setState(prev => ({ ...prev, imposterCount: count }));
   };
 
-  const setCategory = (category: Category) => {
-    setState(prev => ({ ...prev, category }));
+  const setCategories = (categories: Category[]) => {
+    setState(prev => ({ ...prev, categories }));
+  };
+
+  const toggleCategory = (category: Category) => {
+    setState(prev => {
+      const currentCategories = prev.categories;
+      
+      // If clicking 'random', select only random
+      if (category === 'random') {
+        return { ...prev, categories: ['random'] };
+      }
+      
+      // If random is selected and clicking another, replace with that category
+      if (currentCategories.includes('random')) {
+        return { ...prev, categories: [category] };
+      }
+      
+      // Toggle the category
+      if (currentCategories.includes(category)) {
+        // Don't allow empty selection - keep at least one
+        if (currentCategories.length === 1) {
+          return prev;
+        }
+        return { ...prev, categories: currentCategories.filter(c => c !== category) };
+      } else {
+        return { ...prev, categories: [...currentCategories, category] };
+      }
+    });
   };
 
   const setCustomWords = (words: string[]) => {
@@ -147,8 +175,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const startGame = (playerData?: PlayerData[]) => {
-    // Generate random word
-    const word = getRandomWord(state.category, state.usedWords);
+    // Generate random word from selected categories
+    const word = getRandomWord(state.categories, state.usedWords);
     
     // Create players array with custom names and avatars
     const players: Player[] = [];
@@ -309,7 +337,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setScreen,
         setPlayerCount,
         setImposterCount,
-        setCategory,
+        setCategories,
+        toggleCategory,
         setCustomWords,
         setDiscussionTimeEnabled,
         setDiscussionTime,
