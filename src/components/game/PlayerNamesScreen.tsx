@@ -197,39 +197,10 @@ const PlayerNamesScreen: React.FC = () => {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col items-center justify-center">
-          {/* Avatar Picker */}
-          <button
-            onClick={handleAvatarPickerToggle}
-            className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center mb-4 glow-primary animate-float hover:scale-110 transition-transform relative"
-          >
+          {/* Avatar Display - Selection Hidden for now */}
+          <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center mb-8 glow-primary animate-float">
             <span className="text-5xl">{selectedAvatar}</span>
-            <span className="absolute -bottom-1 -right-1 w-8 h-8 bg-accent rounded-full flex items-center justify-center text-xs">
-              ✏️
-            </span>
-          </button>
-          
-          <p className="text-sm text-muted-foreground mb-4">اضغط لتغيير الأفاتار</p>
-
-          {/* Avatar Options */}
-          {showAvatarPicker && (
-            <div className="bg-card/90 backdrop-blur-sm rounded-2xl p-4 mb-6 animate-scale-in border border-border/50">
-              <div className="grid grid-cols-8 gap-2">
-                {AVATAR_OPTIONS.map((avatar) => (
-                  <button
-                    key={avatar}
-                    onClick={() => handleAvatarSelect(avatar)}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-2xl transition-all hover:scale-110 ${
-                      selectedAvatar === avatar 
-                        ? 'bg-primary/30 ring-2 ring-primary' 
-                        : 'bg-secondary/50 hover:bg-secondary'
-                    }`}
-                  >
-                    {avatar}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          </div>
 
           <h2 className="text-xl text-muted-foreground mb-2">اسم اللاعب</h2>
           <span className="text-4xl font-black text-gradient mb-6">

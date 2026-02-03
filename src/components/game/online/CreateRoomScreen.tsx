@@ -92,28 +92,7 @@ const CreateRoomScreen: React.FC = () => {
             />
           </div>
 
-          {/* Avatar Selection */}
-          <div className="card-game">
-            <label className="block text-sm font-medium mb-2">الأفاتار</label>
-            <div className="grid grid-cols-8 gap-2">
-              {AVATAR_OPTIONS.map((av) => (
-                <button
-                  key={av}
-                  onClick={() => {
-                    playSound('click');
-                    setAvatar(av);
-                  }}
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all ${
-                    avatar === av
-                      ? 'bg-primary scale-110'
-                      : 'bg-secondary hover:bg-secondary/80'
-                  }`}
-                >
-                  {av}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Avatar Selection - Hidden for now */}
 
           {/* Player Count */}
           <div className="card-game">
