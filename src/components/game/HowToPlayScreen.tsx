@@ -48,12 +48,12 @@ const HowToPlayScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 pt-0 relative">
+    <div className="min-h-screen flex flex-col relative">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
       
       {/* Header - Sticky */}
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 mb-4">
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md px-6 py-4">
         <div className="flex items-center gap-4">
           <button
             onClick={handleBack}
@@ -65,8 +65,8 @@ const HowToPlayScreen: React.FC = () => {
         </div>
       </div>
       
-      {/* Content */}
-      <div className="relative z-10 flex-1 overflow-auto">
+      {/* Content - Scrollable */}
+      <div className="relative z-10 flex-1 overflow-y-auto px-6 pb-28">
         <div className="space-y-4">
           {steps.map((step, index) => (
             <div
@@ -102,7 +102,7 @@ const HowToPlayScreen: React.FC = () => {
         </div>
       </div>
       
-      {/* Start Button - Sticky */}
+      {/* Start Button - Fixed */}
       <div className="fixed bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <button
           onClick={handleStartGame}
