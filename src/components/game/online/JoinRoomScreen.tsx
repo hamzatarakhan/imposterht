@@ -116,7 +116,7 @@ const JoinRoomScreen: React.FC = () => {
               className={`w-full py-5 px-6 rounded-2xl text-xl font-bold shadow-lg transition-all ${
                 !name.trim() || code.length !== 6 || isJoining 
                   ? 'bg-muted text-muted-foreground cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-accent to-accent/80 text-accent-foreground hover:shadow-accent/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
+                  : 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:shadow-orange-500/40 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
               }`}
             >
               {isJoining ? (
@@ -134,9 +134,12 @@ const JoinRoomScreen: React.FC = () => {
             
             <button
               onClick={handleCreateInstead}
-              className="w-full p-4 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors text-center"
+              className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-primary/90 to-primary/70 text-primary-foreground font-bold text-lg shadow-md hover:shadow-primary/30 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all"
             >
-              ما عندك كود؟ <span className="text-accent font-bold">أنشئ غرفة</span>
+              <span className="flex items-center justify-center gap-2">
+                <span className="text-xl">✨</span>
+                ما عندك كود؟ أنشئ غرفة جديدة
+              </span>
             </button>
           </div>
         </div>
