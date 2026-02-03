@@ -38,24 +38,31 @@ const LobbyScreen: React.FC = () => {
     // Create deep link with room code
     const joinUrl = `${window.location.origin}?join=${room.code}`;
     
+    // Format message nicely with room code separate
+    const shareMessage = `🎭 انضم للعبة الإمبوستر!
+
+📋 كود الغرفة: ${room.code}
+
+🔗 اضغط على الرابط للانضمام مباشرة:
+${joinUrl}`;
+    
     const shareData = {
       title: 'انضم للعبة الإمبوستر! 🎭',
-      text: `انضم للعبة الإمبوستر معي!`,
-      url: joinUrl,
+      text: shareMessage,
     };
 
     try {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(joinUrl);
-        toast.success('تم نسخ رابط الانضمام!');
+        await navigator.clipboard.writeText(shareMessage);
+        toast.success('تم نسخ الدعوة!');
       }
     } catch (err) {
       // User cancelled share or error
       if ((err as Error).name !== 'AbortError') {
-        await navigator.clipboard.writeText(joinUrl);
-        toast.success('تم نسخ رابط الانضمام!');
+        await navigator.clipboard.writeText(shareMessage);
+        toast.success('تم نسخ الدعوة!');
       }
     }
   };
