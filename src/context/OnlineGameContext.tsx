@@ -10,6 +10,7 @@ interface OnlineGameState {
   currentPlayer: RoomPlayer | null;
   isHost: boolean;
   myPlayerId: string;
+  pendingJoinCode: string | null;
 }
 
 interface OnlineGameContextType extends OnlineGameState {
@@ -30,6 +31,7 @@ interface OnlineGameContextType extends OnlineGameState {
   calculateWinner: () => Promise<void>;
   leaveRoom: () => Promise<void>;
   resetOnlineGame: () => void;
+  clearPendingJoinCode: () => void;
 }
 
 const initialState: OnlineGameState = {
@@ -39,6 +41,7 @@ const initialState: OnlineGameState = {
   currentPlayer: null,
   isHost: false,
   myPlayerId: '',
+  pendingJoinCode: null,
 };
 
 const OnlineGameContext = createContext<OnlineGameContextType | undefined>(undefined);
@@ -46,10 +49,26 @@ const OnlineGameContext = createContext<OnlineGameContextType | undefined>(undef
 export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, setState] = useState<OnlineGameState>(initialState);
 
-  // Initialize player ID
+  // Initialize player ID and check for join code in URL
   useEffect(() => {
     const playerId = roomService.getOrCreatePlayerId();
-    setState(prev => ({ ...prev, myPlayerId: playerId }));
+    
+    // Check URL for join code
+    const urlParams = new URLSearchParams(window.location.search);
+    const joinCode = urlParams.get('join');
+    
+    if (joinCode && joinCode.length === 6) {
+      // Clean up the URL
+      window.history.replaceState({}, '', window.location.pathname);
+      setState(prev => ({ 
+        ...prev, 
+        myPlayerId: playerId,
+        pendingJoinCode: joinCode.toUpperCase(),
+        screen: 'joinRoom'
+      }));
+    } else {
+      setState(prev => ({ ...prev, myPlayerId: playerId }));
+    }
   }, []);
 
   // Subscribe to room changes
@@ -230,6 +249,10 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
     }));
   }, []);
 
+  const clearPendingJoinCode = useCallback(() => {
+    setState(prev => ({ ...prev, pendingJoinCode: null }));
+  }, []);
+
   return (
     <OnlineGameContext.Provider
       value={{
@@ -245,6 +268,7 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
         calculateWinner,
         leaveRoom,
         resetOnlineGame,
+        clearPendingJoinCode,
       }}
     >
       {children}
