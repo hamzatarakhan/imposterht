@@ -6,8 +6,8 @@ import { useSettings } from '@/context/SettingsContext';
 import { RotateCcw, X } from 'lucide-react';
 
 const OnlineRestartButton: React.FC = () => {
-  const { leaveRoom } = useOnlineGame();
-  const { setScreen } = useGame();
+  const { leaveRoom, resetOnlineGame, room, setScreen: setOnlineScreen } = useOnlineGame();
+  const { setScreen: setGameScreen } = useGame();
   const { playSound, vibrate } = useSettings();
   const [showConfirm, setShowConfirm] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
@@ -44,8 +44,17 @@ const OnlineRestartButton: React.FC = () => {
     playSound('click');
     vibrate(100);
     setIsLeaving(true);
-    await leaveRoom();
-    setScreen('modeSelect');
+
+    // If we're not in a room yet (e.g. Join/Create screens), leaving is a no-op.
+    // We must reset the online flow so Game.tsx doesn't keep rendering OnlineGame.
+    if (room?.id) {
+      await leaveRoom();
+    } else {
+      resetOnlineGame();
+    }
+
+    setOnlineScreen('modeSelect');
+    setGameScreen('modeSelect');
     setShowConfirm(false);
     setIsLeaving(false);
   };
