@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { GameProvider, useGame } from '@/context/GameContext';
 import { OnlineGameProvider, useOnlineGame } from '@/context/OnlineGameContext';
 import { SettingsProvider } from '@/context/SettingsContext';
