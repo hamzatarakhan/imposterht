@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
@@ -8,6 +8,23 @@ const RestartButton: React.FC = () => {
   const { resetGame } = useGame();
   const { playSound, vibrate } = useSettings();
   const [showConfirm, setShowConfirm] = useState(false);
+
+  // Prevent background scroll + iOS viewport “jump” while modal is open
+  useEffect(() => {
+    if (!showConfirm) return;
+
+    const body = document.body;
+    const prevOverflow = body.style.overflow;
+    const prevTouchAction = body.style.touchAction;
+
+    body.style.overflow = 'hidden';
+    body.style.touchAction = 'none';
+
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.touchAction = prevTouchAction;
+    };
+  }, [showConfirm]);
 
   const handleShowConfirm = () => {
     playSound('click');
@@ -39,8 +56,17 @@ const RestartButton: React.FC = () => {
 
       {/* Confirmation Dialog - Portal to body for proper centering */}
       {showConfirm && createPortal(
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] p-6 animate-fade-in flex items-center justify-center">
-          <div className="card-game max-w-sm w-[calc(100%-3rem)] text-center animate-scale-in">
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 sm:p-6 animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-label="تأكيد إعادة اللعبة"
+          onClick={handleCancel}
+        >
+          <div
+            className="card-game w-[min(24rem,calc(100vw-2rem))] max-h-[calc(100dvh-2rem)] overflow-auto text-center animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="w-16 h-16 mx-auto rounded-full bg-destructive/20 flex items-center justify-center mb-4">
               <RotateCcw size={32} className="text-destructive" />
             </div>
