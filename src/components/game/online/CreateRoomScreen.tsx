@@ -79,7 +79,7 @@ const CreateRoomScreen: React.FC = () => {
         </div>
 
         {/* Form */}
-        <div className="flex-1 overflow-auto space-y-4 px-6 pb-48">
+        <div className="flex-1 overflow-auto space-y-4 px-6 pb-56">
           {/* Name Input */}
           <div className="card-game">
             <label className="block text-sm font-medium mb-2">اسمك</label>
