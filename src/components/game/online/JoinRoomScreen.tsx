@@ -113,17 +113,22 @@ const JoinRoomScreen: React.FC = () => {
             <button
               onClick={handleJoin}
               disabled={!name.trim() || code.length !== 6 || isJoining}
-              className={`w-full btn-accent text-xl ${
-                !name.trim() || code.length !== 6 || isJoining ? 'opacity-50 cursor-not-allowed' : ''
+              className={`w-full py-5 px-6 rounded-2xl text-xl font-bold shadow-lg transition-all ${
+                !name.trim() || code.length !== 6 || isJoining 
+                  ? 'bg-muted text-muted-foreground cursor-not-allowed' 
+                  : 'bg-gradient-to-r from-accent to-accent/80 text-accent-foreground hover:shadow-accent/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
               }`}
             >
               {isJoining ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="animate-spin" size={20} />
+                <span className="flex items-center justify-center gap-3">
+                  <Loader2 className="animate-spin" size={24} />
                   جاري الانضمام...
                 </span>
               ) : (
-                '🚪 انضم للغرفة'
+                <span className="flex items-center justify-center gap-2">
+                  <span className="text-2xl">🚪</span>
+                  انضم للغرفة
+                </span>
               )}
             </button>
             
