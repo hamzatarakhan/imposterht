@@ -181,6 +181,8 @@ export type Database = {
           imposter_count: number | null
           player_count: number | null
           status: string | null
+          timer_remaining: number | null
+          timer_started_at: string | null
           updated_at: string | null
           winner: string | null
         }
@@ -196,6 +198,8 @@ export type Database = {
           imposter_count?: number | null
           player_count?: number | null
           status?: string | null
+          timer_remaining?: number | null
+          timer_started_at?: string | null
           updated_at?: string | null
           winner?: string | null
         }
@@ -211,6 +215,8 @@ export type Database = {
           imposter_count?: number | null
           player_count?: number | null
           status?: string | null
+          timer_remaining?: number | null
+          timer_started_at?: string | null
           updated_at?: string | null
           winner?: string | null
         }

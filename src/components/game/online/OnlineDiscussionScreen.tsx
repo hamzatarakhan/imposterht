@@ -119,7 +119,8 @@ const OnlineDiscussionScreen: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const impostorCount = players.filter(p => p.is_imposter).length;
+  // Use room.imposter_count instead of counting from players (is_imposter is hidden for non-imposters)
+  const impostorCount = room?.imposter_count || 1;
   const progress = room?.discussion_time ? (timeLeft / room.discussion_time) * 100 : 100;
 
   // UI without timer
