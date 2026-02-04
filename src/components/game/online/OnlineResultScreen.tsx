@@ -240,7 +240,7 @@ const OnlineResultScreen: React.FC = () => {
 
         {/* Actions */}
         <div className="w-full max-w-sm space-y-3">
-          {isHost ? (
+          {isHost && (
             <button
               onClick={handlePlayAgain}
               disabled={isRestarting}
@@ -251,10 +251,6 @@ const OnlineResultScreen: React.FC = () => {
                 {isRestarting ? 'جاري إعادة اللعب...' : 'العب مرة ثانية'}
               </span>
             </button>
-          ) : (
-            <div className="w-full p-3 rounded-2xl bg-secondary/50 text-center text-muted-foreground text-sm">
-              انتظر الهوست يبدأ جولة جديدة...
-            </div>
           )}
           
           <button
