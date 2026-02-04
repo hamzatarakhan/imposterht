@@ -12,57 +12,80 @@ interface PlayerWithScore {
   is_imposter: boolean;
 }
 
+interface ImposterInfo {
+  player_id: string;
+  name: string;
+  avatar: string;
+}
+
 const OnlineResultScreen: React.FC = () => {
-  const { room, players, currentPlayer, leaveRoom, resetOnlineGame } = useOnlineGame();
+  const { room, players, currentPlayer, leaveRoom, restartGame, isHost } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
   const [secretWord, setSecretWord] = useState<string | null>(null);
+  const [imposters, setImposters] = useState<ImposterInfo[]>([]);
+  const [isRestarting, setIsRestarting] = useState(false);
 
-  const isWinner = room?.winner === 'players' 
-    ? !currentPlayer?.is_imposter 
-    : currentPlayer?.is_imposter;
-
-  // Fetch secret word when game is finished
+  // Fetch secret word and imposters when game is finished
   useEffect(() => {
-    const fetchSecretWord = async () => {
+    const fetchGameData = async () => {
       if (room?.id && room.status === 'finished') {
-        const word = await roomService.getFinishedGameWord(room.id);
+        const [word, impostersList] = await Promise.all([
+          roomService.getFinishedGameWord(room.id),
+          roomService.getImpostersAfterFinish(room.id)
+        ]);
         setSecretWord(word);
+        setImposters(impostersList);
       }
     };
-    fetchSecretWord();
+    fetchGameData();
   }, [room?.id, room?.status]);
+
+  const isWinner = room?.winner === 'players' 
+    ? !imposters.some(imp => imp.player_id === currentPlayer?.player_id)
+    : imposters.some(imp => imp.player_id === currentPlayer?.player_id);
 
   // Calculate scores based on the round result
   const playersWithScores = useMemo((): PlayerWithScore[] => {
     return players.map(player => {
-      const isPlayerWinner = room?.winner === 'players' ? !player.is_imposter : player.is_imposter;
+      const isImposter = imposters.some(imp => imp.player_id === player.player_id);
+      const isPlayerWinner = room?.winner === 'players' ? !isImposter : isImposter;
       // Imposter gets 3 points for winning, regular players get 1 point
-      const score = isPlayerWinner ? (player.is_imposter ? 3 : 1) : 0;
+      const score = isPlayerWinner ? (isImposter ? 3 : 1) : 0;
       return {
         id: player.id,
         name: player.name,
         avatar: player.avatar,
         score,
-        is_imposter: player.is_imposter,
+        is_imposter: isImposter,
       };
     }).sort((a, b) => b.score - a.score);
-  }, [players, room?.winner]);
+  }, [players, room?.winner, imposters]);
 
   // Sound and vibration on result
   useEffect(() => {
-    if (isWinner) {
-      playSound('win');
-      vibrate(100);
-    } else {
-      playSound('lose');
-      vibrate(200);
+    if (imposters.length > 0) {
+      if (isWinner) {
+        playSound('win');
+        vibrate(100);
+      } else {
+        playSound('lose');
+        vibrate(200);
+      }
     }
-  }, [isWinner, playSound, vibrate]);
+  }, [isWinner, playSound, vibrate, imposters.length]);
 
-  const handlePlayAgain = () => {
+  const handlePlayAgain = async () => {
+    if (!isHost) return;
+    
     playSound('click');
     vibrate(50);
-    resetOnlineGame();
+    setIsRestarting(true);
+    
+    const success = await restartGame();
+    if (!success) {
+      setIsRestarting(false);
+    }
+    // If success, the room status will change and auto-navigate will handle the rest
   };
 
   const handleLeave = async () => {
@@ -74,7 +97,7 @@ const OnlineResultScreen: React.FC = () => {
   // Sort players by votes
   const sortedPlayers = [...players].sort((a, b) => b.votes - a.votes);
   const mostVoted = sortedPlayers[0];
-  const imposters = players.filter(p => p.is_imposter);
+  const mostVotedIsImposter = imposters.some(imp => imp.player_id === mostVoted?.player_id);
 
   const getMedalEmoji = (index: number) => {
     if (index === 0) return '🥇';
@@ -148,7 +171,7 @@ const OnlineResultScreen: React.FC = () => {
               <p className="text-xs text-muted-foreground mb-1">الإمبوستر{imposters.length > 1 ? 'ز' : ''}</p>
               <div className="flex gap-1">
                 {imposters.map((imposter) => (
-                  <div key={imposter.id} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-imposter/20">
+                  <div key={imposter.player_id} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-imposter/20">
                     <span className="text-lg">{imposter.avatar}</span>
                     <span className="text-xs font-medium text-imposter">{imposter.name}</span>
                   </div>
@@ -199,7 +222,7 @@ const OnlineResultScreen: React.FC = () => {
           <p className="text-xs text-muted-foreground mb-2">الأكثر تصويتاً</p>
           <div className="flex items-center justify-center gap-2">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-              mostVoted?.is_imposter ? 'bg-imposter' : 'bg-secondary'
+              mostVotedIsImposter ? 'bg-imposter' : 'bg-secondary'
             }`}>
               <span className="text-lg">{mostVoted?.avatar}</span>
             </div>
@@ -207,7 +230,7 @@ const OnlineResultScreen: React.FC = () => {
               <p className="font-bold text-sm">{mostVoted?.name}</p>
               <p className="text-xs text-muted-foreground">
                 {mostVoted?.votes} أصوات
-                {mostVoted?.is_imposter && (
+                {mostVotedIsImposter && (
                   <span className="text-imposter mr-1">😈</span>
                 )}
               </p>
@@ -217,15 +240,22 @@ const OnlineResultScreen: React.FC = () => {
 
         {/* Actions */}
         <div className="w-full max-w-sm space-y-3">
-          <button
-            onClick={handlePlayAgain}
-            className="w-full btn-primary-game text-lg"
-          >
-            <span className="flex items-center justify-center gap-2">
-              <RotateCcw size={20} />
-              العب مرة ثانية
-            </span>
-          </button>
+          {isHost ? (
+            <button
+              onClick={handlePlayAgain}
+              disabled={isRestarting}
+              className="w-full btn-primary-game text-lg disabled:opacity-50"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <RotateCcw size={20} className={isRestarting ? 'animate-spin' : ''} />
+                {isRestarting ? 'جاري إعادة اللعب...' : 'العب مرة ثانية'}
+              </span>
+            </button>
+          ) : (
+            <div className="w-full p-3 rounded-2xl bg-secondary/50 text-center text-muted-foreground text-sm">
+              انتظر الهوست يبدأ جولة جديدة...
+            </div>
+          )}
           
           <button
             onClick={handleLeave}

@@ -337,6 +337,45 @@ export const getFinishedGameWord = async (roomId: string): Promise<string | null
   return data;
 };
 
+// Get imposters after game is finished (safe reveal for all players)
+export const getImpostersAfterFinish = async (roomId: string): Promise<{ player_id: string; name: string; avatar: string }[]> => {
+  const { data, error } = await supabase.rpc('get_imposters_after_finish', {
+    p_room_id: roomId
+  });
+  
+  if (error) {
+    if (import.meta.env.DEV) {
+      console.error('Get imposters failed:', error.code);
+    }
+    return [];
+  }
+  
+  return data || [];
+};
+
+// Restart game with same room and players (host only)
+export const restartGame = async (roomId: string, categories: Category[]): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  
+  // Generate new secret word
+  const secretWord = getRandomWord(categories, []);
+  
+  const { data, error } = await supabase.rpc('restart_game_secure', {
+    p_room_id: roomId,
+    p_host_player_id: playerId,
+    p_secret_word: secretWord
+  });
+  
+  if (error) {
+    if (import.meta.env.DEV) {
+      console.error('Restart game failed:', error.code);
+    }
+    return false;
+  }
+  
+  return data || false;
+};
+
 // Update timer state (host only) - uses secure RPC
 export const updateTimer = async (
   roomId: string, 

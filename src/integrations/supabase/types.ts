@@ -231,6 +231,14 @@ export type Database = {
       }
       generate_room_code: { Args: never; Returns: string }
       get_finished_game_word: { Args: { p_room_id: string }; Returns: string }
+      get_imposters_after_finish: {
+        Args: { p_room_id: string }
+        Returns: {
+          avatar: string
+          name: string
+          player_id: string
+        }[]
+      }
       get_my_role: {
         Args: { p_player_id: string; p_room_id: string }
         Returns: boolean
@@ -245,6 +253,14 @@ export type Database = {
       }
       mark_role_seen_secure: {
         Args: { p_player_id: string; p_room_id: string }
+        Returns: boolean
+      }
+      restart_game_secure: {
+        Args: {
+          p_host_player_id: string
+          p_room_id: string
+          p_secret_word: string
+        }
         Returns: boolean
       }
       start_game_secure: {
