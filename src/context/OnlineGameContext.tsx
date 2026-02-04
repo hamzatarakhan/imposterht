@@ -30,6 +30,7 @@ interface OnlineGameContextType extends OnlineGameState {
   submitVote: (votedForPlayerId: string) => Promise<void>;
   calculateWinner: () => Promise<void>;
   leaveRoom: () => Promise<void>;
+  restartGame: () => Promise<boolean>;
   resetOnlineGame: () => void;
   clearPendingJoinCode: () => void;
 }
@@ -227,6 +228,21 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
     await roomService.calculateWinner(state.room.id);
   }, [state.room]);
 
+  const restartGameHandler = useCallback(async (): Promise<boolean> => {
+    if (!state.room || !state.isHost) return false;
+    
+    // Parse categories from room
+    let categories: Category[] = ['random'];
+    try {
+      const parsed = JSON.parse(state.room.categories || '["random"]');
+      categories = Array.isArray(parsed) ? parsed : ['random'];
+    } catch {
+      categories = ['random'];
+    }
+    
+    return await roomService.restartGame(state.room.id, categories);
+  }, [state.room, state.isHost]);
+
   const leaveRoom = useCallback(async (): Promise<void> => {
     if (!state.room) return;
 
@@ -267,6 +283,7 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
         submitVote,
         calculateWinner,
         leaveRoom,
+        restartGame: restartGameHandler,
         resetOnlineGame,
         clearPendingJoinCode,
       }}
