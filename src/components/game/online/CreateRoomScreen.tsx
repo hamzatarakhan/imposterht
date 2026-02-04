@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { ArrowRight, Users, Skull, Clock, Loader2 } from 'lucide-react';
+import { useSavedGroups } from '@/hooks/useSavedGroups';
+import { ArrowRight, Users, Skull, Clock, Loader2, FolderOpen } from 'lucide-react';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { categoryNames, Category } from '@/data/words';
 import OnlineRestartButton from './OnlineRestartButton';
+import GroupManagementModal from '../GroupManagementModal';
+import { SavedPlayer } from '@/hooks/useSavedPlayers';
 
 const categoryOptions = Object.entries(categoryNames)
   .filter(([id]) => id !== 'custom')
@@ -13,6 +16,7 @@ const categoryOptions = Object.entries(categoryNames)
 const CreateRoomScreen: React.FC = () => {
   const { setScreen, createRoom } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
+  const { groups } = useSavedGroups();
   
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('👤');
@@ -22,6 +26,8 @@ const CreateRoomScreen: React.FC = () => {
   const [discussionTime, setDiscussionTime] = useState(90);
   const [discussionTimeEnabled, setDiscussionTimeEnabled] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [showGroupsModal, setShowGroupsModal] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<{ name: string; members: SavedPlayer[] } | null>(null);
 
   const handleCreate = async () => {
     if (!name.trim() || isCreating) return;
@@ -54,6 +60,19 @@ const CreateRoomScreen: React.FC = () => {
     playSound('click');
     vibrate(30);
     setScreen('joinRoom');
+  };
+
+  const handleSelectGroup = (members: SavedPlayer[]) => {
+    setSelectedGroup({ name: '', members });
+    setPlayerCount(members.length);
+    playSound('click');
+    vibrate(50);
+  };
+
+  const handleClearGroup = () => {
+    playSound('click');
+    vibrate(30);
+    setSelectedGroup(null);
   };
 
   return (
@@ -116,6 +135,87 @@ const CreateRoomScreen: React.FC = () => {
               }}
               className="w-full accent-primary"
             />
+          </div>
+
+          {/* Group Selection */}
+          <div className="card-game">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <FolderOpen className="text-primary" size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold">مجموعة سريعة</h3>
+                <p className="text-sm text-muted-foreground">
+                  {selectedGroup ? `${selectedGroup.members.length} لاعبين` : 'لتحديد عدد اللاعبين بسرعة'}
+                </p>
+              </div>
+            </div>
+            
+            {selectedGroup ? (
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedGroup.members.map((member, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-1 bg-primary/20 rounded-lg text-xs flex items-center gap-1"
+                    >
+                      {member.avatar} {member.name}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  onClick={handleClearGroup}
+                  className="w-full py-2 bg-secondary rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  إلغاء المجموعة ✕
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {/* Show existing groups directly */}
+                {groups.length > 0 && (
+                  <div className="space-y-2 mb-3">
+                    {groups.map((group) => (
+                      <button
+                        key={group.name}
+                        onClick={() => {
+                          handleSelectGroup(group.members);
+                        }}
+                        className="w-full p-3 bg-secondary/50 hover:bg-secondary rounded-xl transition-colors text-right"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">
+                            {group.members.length} لاعبين
+                          </span>
+                          <span className="font-medium">{group.name}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-2 justify-end">
+                          {group.members.slice(0, 5).map((m, i) => (
+                            <span key={i} className="text-sm">{m.avatar}</span>
+                          ))}
+                          {group.members.length > 5 && (
+                            <span className="text-xs text-muted-foreground">+{group.members.length - 5}</span>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Create new group button */}
+                <button
+                  onClick={() => {
+                    playSound('click');
+                    vibrate(30);
+                    setShowGroupsModal(true);
+                  }}
+                  className="w-full py-3 border-2 border-dashed border-muted-foreground/30 rounded-xl text-muted-foreground hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
+                >
+                  <FolderOpen size={18} />
+                  {groups.length > 0 ? 'إدارة المجموعات' : 'إنشاء مجموعة جديدة'}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Imposter Count */}
@@ -277,6 +377,13 @@ const CreateRoomScreen: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Groups Modal */}
+      <GroupManagementModal
+        isOpen={showGroupsModal}
+        onClose={() => setShowGroupsModal(false)}
+        onSelectGroup={handleSelectGroup}
+      />
     </div>
   );
 };

@@ -169,7 +169,7 @@ const SetupScreen: React.FC = () => {
             <div>
               <h3 className="font-bold">مجموعة سريعة</h3>
               <p className="text-sm text-muted-foreground">
-                {selectedGroup ? `${selectedGroup.members.length} لاعبين جاهزين` : 'اختر مجموعة محفوظة'}
+                {selectedGroup ? `${selectedGroup.members.length} لاعبين جاهزين` : 'اختر أو أنشئ مجموعة'}
               </p>
             </div>
           </div>
@@ -194,17 +194,50 @@ const SetupScreen: React.FC = () => {
               </button>
             </div>
           ) : (
-            <button
-              onClick={() => {
-                playSound('click');
-                vibrate(30);
-                setShowGroupsModal(true);
-              }}
-              className="w-full py-3 border-2 border-dashed border-muted-foreground/30 rounded-xl text-muted-foreground hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
-            >
-              <FolderOpen size={18} />
-              {groups.length > 0 ? `اختر من ${groups.length} مجموعات` : 'إنشاء مجموعة جديدة'}
-            </button>
+            <div className="space-y-2">
+              {/* Show existing groups directly */}
+              {groups.length > 0 && (
+                <div className="space-y-2 mb-3">
+                  {groups.map((group) => (
+                    <button
+                      key={group.name}
+                      onClick={() => {
+                        handleSelectGroup(group.members);
+                      }}
+                      className="w-full p-3 bg-secondary/50 hover:bg-secondary rounded-xl transition-colors text-right"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">
+                          {group.members.length} لاعبين
+                        </span>
+                        <span className="font-medium">{group.name}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-2 justify-end">
+                        {group.members.slice(0, 5).map((m, i) => (
+                          <span key={i} className="text-sm">{m.avatar}</span>
+                        ))}
+                        {group.members.length > 5 && (
+                          <span className="text-xs text-muted-foreground">+{group.members.length - 5}</span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* Create new group button */}
+              <button
+                onClick={() => {
+                  playSound('click');
+                  vibrate(30);
+                  setShowGroupsModal(true);
+                }}
+                className="w-full py-3 border-2 border-dashed border-muted-foreground/30 rounded-xl text-muted-foreground hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
+              >
+                <FolderOpen size={18} />
+                {groups.length > 0 ? 'إدارة المجموعات' : 'إنشاء مجموعة جديدة'}
+              </button>
+            </div>
           )}
         </div>
         
