@@ -353,24 +353,6 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
                           maxLength={20}
                         />
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {AVATAR_OPTIONS.map((avatar) => (
-                          <button
-                            key={avatar}
-                            onClick={() => {
-                              playSound("click");
-                              setNewMemberAvatar(avatar);
-                            }}
-                            className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-all ${
-                              newMemberAvatar === avatar
-                                ? "bg-primary scale-110"
-                                : "bg-background hover:bg-primary/20"
-                            }`}
-                          >
-                            {avatar}
-                          </button>
-                        ))}
-                      </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => setShowAddMember(false)}
