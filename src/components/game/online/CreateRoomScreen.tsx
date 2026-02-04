@@ -164,20 +164,24 @@ const CreateRoomScreen: React.FC = () => {
                   ))}
                 </div>
                 <button
-                  onClick={handleClearGroup}
+                  onClick={() => {
+                    playSound('click');
+                    vibrate(30);
+                    setShowGroupsModal(true);
+                  }}
                   className="w-full py-2 bg-secondary rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  إلغاء المجموعة ✕
+                  اختر مجموعة ثانية 🔄
                 </button>
               </div>
             ) : (
               <div className="space-y-2">
                 {/* Show existing groups directly */}
-                {groups.length > 0 && (
-                  <div className="space-y-2 mb-3">
+                {groups.length > 0 ? (
+                  <div className="space-y-2">
                     {groups.map((group) => (
                       <button
-                        key={group.name}
+                        key={group.id}
                         onClick={() => {
                           handleSelectGroup(group.members);
                         }}
@@ -199,21 +203,33 @@ const CreateRoomScreen: React.FC = () => {
                         </div>
                       </button>
                     ))}
+                    
+                    {/* Create/manage groups button */}
+                    <button
+                      onClick={() => {
+                        playSound('click');
+                        vibrate(30);
+                        setShowGroupsModal(true);
+                      }}
+                      className="w-full py-2 text-sm text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-2"
+                    >
+                      <FolderOpen size={16} />
+                      إدارة المجموعات
+                    </button>
                   </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      playSound('click');
+                      vibrate(30);
+                      setShowGroupsModal(true);
+                    }}
+                    className="w-full py-3 border-2 border-dashed border-muted-foreground/30 rounded-xl text-muted-foreground hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
+                  >
+                    <FolderOpen size={18} />
+                    إنشاء مجموعة جديدة
+                  </button>
                 )}
-                
-                {/* Create new group button */}
-                <button
-                  onClick={() => {
-                    playSound('click');
-                    vibrate(30);
-                    setShowGroupsModal(true);
-                  }}
-                  className="w-full py-3 border-2 border-dashed border-muted-foreground/30 rounded-xl text-muted-foreground hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
-                >
-                  <FolderOpen size={18} />
-                  {groups.length > 0 ? 'إدارة المجموعات' : 'إنشاء مجموعة جديدة'}
-                </button>
               </div>
             )}
           </div>
