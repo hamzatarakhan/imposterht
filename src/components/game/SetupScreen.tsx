@@ -227,18 +227,18 @@ const SetupScreen: React.FC = () => {
                     </button>
                   ))}
                   
-                  {/* Create/manage groups button */}
-                  <button
-                    onClick={() => {
-                      playSound('click');
-                      vibrate(30);
-                      setShowGroupsModal(true);
-                    }}
-                    className="w-full py-2 text-sm text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-2"
-                  >
-                    <FolderOpen size={16} />
-                    إدارة المجموعات
-                  </button>
+                    {/* Create/manage groups button */}
+                    <button
+                      onClick={() => {
+                        playSound('click');
+                        vibrate(30);
+                        setShowGroupsModal(true);
+                      }}
+                      className="w-full py-3 mt-2 border-2 border-primary/40 rounded-xl text-primary font-medium hover:bg-primary/10 hover:border-primary transition-all flex items-center justify-center gap-2"
+                    >
+                      <FolderOpen size={18} />
+                      إدارة المجموعات ⚙️
+                    </button>
                 </div>
               ) : (
                 <button
