@@ -108,7 +108,11 @@
   }
 
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-white/10;
+    @apply bg-card/80 backdrop-blur-xl border border-border/50 shadow-lg;
+  }
+
+  .dark .glass-card {
+    @apply border-white/10;
   }
 
   .btn-game {
