@@ -308,13 +308,36 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const playAgain = () => {
+    // Get a new random word
+    const newWord = getRandomWord(state.categories, state.usedWords);
+    
+    // Reset players with new imposters
+    const resetPlayers = state.players.map(p => ({ 
+      ...p, 
+      hasSeenRole: false, 
+      votes: 0, 
+      isImposter: false 
+    }));
+    
+    // Randomly select new imposters
+    const imposterIndices: number[] = [];
+    while (imposterIndices.length < state.imposterCount) {
+      const randomIndex = Math.floor(Math.random() * resetPlayers.length);
+      if (!imposterIndices.includes(randomIndex)) {
+        imposterIndices.push(randomIndex);
+        resetPlayers[randomIndex].isImposter = true;
+      }
+    }
+
     setState(prev => ({
       ...prev,
-      players: prev.players.map(p => ({ ...p, hasSeenRole: false, votes: 0, isImposter: false })),
+      players: resetPlayers,
+      secretWord: newWord,
+      usedWords: [...prev.usedWords, newWord],
       currentPlayerIndex: 0,
       winner: null,
       roundNumber: prev.roundNumber + 1,
-      screen: 'setup',
+      screen: 'passPhone',
     }));
   };
 
