@@ -110,10 +110,10 @@ const SettingsScreen: React.FC = () => {
           </button>
         </div>
 
-        {/* Dark Mode Toggle - Hidden for now, can be re-enabled later
+        {/* Dark Mode Toggle */}
         <div className="card-game p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {darkMode ? <Moon size={24} className="text-primary" /> : <Sun size={24} className="text-muted-foreground" />}
+            {darkMode ? <Moon size={24} className="text-primary" /> : <Sun size={24} className="text-primary" />}
             <div>
               <p className="font-medium">الوضع الداكن</p>
               <p className="text-sm text-muted-foreground">تغيير مظهر التطبيق</p>
@@ -126,13 +126,12 @@ const SettingsScreen: React.FC = () => {
             }`}
           >
             <div 
-              className={`absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${
+              className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow-md transition-all ${
                 darkMode ? 'left-1' : 'right-1'
               }`}
             />
           </button>
         </div>
-        */}
 
         {/* App Info */}
         <div className="card-game p-4 mt-8">
