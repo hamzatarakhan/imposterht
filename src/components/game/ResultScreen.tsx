@@ -62,7 +62,7 @@ const ResultScreen: React.FC = () => {
         playersWon ? 'bg-accent/20' : 'bg-imposter/20'
       } animate-pulse`} />
       
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center p-6 pb-40">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center p-6 pb-48">
         {/* Round Number */}
         <div className="mb-4 px-4 py-1 rounded-full bg-secondary text-sm font-medium">
           الجولة {roundNumber}
