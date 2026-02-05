@@ -305,10 +305,13 @@ export const submitVote = async (roomId: string, votedForPlayerId: string): Prom
   }
 };
 
-// Calculate and set winner - uses secure RPC
+// Calculate and set winner - uses secure RPC (host only)
 export const calculateWinner = async (roomId: string): Promise<'imposters' | 'players'> => {
+  const playerId = getOrCreatePlayerId();
+  
   const { data, error } = await supabase.rpc('calculate_winner_secure', {
-    p_room_id: roomId
+    p_room_id: roomId,
+    p_host_player_id: playerId
   });
 
   if (error) {

@@ -170,6 +170,7 @@ export type Database = {
       }
       public_rooms: {
         Row: {
+          categories: string | null
           category: string | null
           code: string | null
           created_at: string | null
@@ -187,6 +188,7 @@ export type Database = {
           winner: string | null
         }
         Insert: {
+          categories?: string | null
           category?: string | null
           code?: string | null
           created_at?: string | null
@@ -204,6 +206,7 @@ export type Database = {
           winner?: string | null
         }
         Update: {
+          categories?: string | null
           category?: string | null
           code?: string | null
           created_at?: string | null
@@ -224,7 +227,13 @@ export type Database = {
       }
     }
     Functions: {
-      calculate_winner_secure: { Args: { p_room_id: string }; Returns: string }
+      calculate_winner_secure:
+        | { Args: { p_room_id: string }; Returns: string }
+        | {
+            Args: { p_host_player_id: string; p_room_id: string }
+            Returns: string
+          }
+      cleanup_old_rooms: { Args: never; Returns: undefined }
       delete_room_secure: {
         Args: { p_host_player_id: string; p_room_id: string }
         Returns: boolean
