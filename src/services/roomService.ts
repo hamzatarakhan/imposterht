@@ -123,7 +123,7 @@ export const joinRoom = async (
     .maybeSingle();
 
   if (existingPlayer) {
-    return { room: room as Room, player: existingPlayer as RoomPlayer };
+    return { room: { ...room, secret_word: null } as Room, player: existingPlayer as RoomPlayer };
   }
 
   // Get current player count
@@ -157,7 +157,7 @@ export const joinRoom = async (
     return { error: 'فشل الانضمام للغرفة' };
   }
 
-  return { room: room as Room, player: player as RoomPlayer };
+  return { room: { ...room, secret_word: null } as Room, player: player as RoomPlayer };
 };
 
 // Get room by ID using public view (excludes secret_word)
@@ -169,7 +169,7 @@ export const getRoom = async (roomId: string): Promise<Room | null> => {
     .maybeSingle();
 
   if (error || !data) return null;
-  return data as Room;
+  return { ...data, secret_word: null } as Room;
 };
 
 // Get all players in a room using public view (hides is_imposter until game finished)
