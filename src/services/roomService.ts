@@ -123,7 +123,7 @@ export const joinRoom = async (
     .maybeSingle();
 
   if (existingPlayer) {
-    return { room: { ...room, secret_word: null } as Room, player: existingPlayer as RoomPlayer };
+    return { room: room as Room, player: existingPlayer as RoomPlayer };
   }
 
   // Get current player count
@@ -157,7 +157,7 @@ export const joinRoom = async (
     return { error: 'فشل الانضمام للغرفة' };
   }
 
-  return { room: { ...room, secret_word: null } as Room, player: player as RoomPlayer };
+  return { room: room as Room, player: player as RoomPlayer };
 };
 
 // Get room by ID using public view (excludes secret_word)
@@ -169,7 +169,7 @@ export const getRoom = async (roomId: string): Promise<Room | null> => {
     .maybeSingle();
 
   if (error || !data) return null;
-  return { ...data, secret_word: null } as Room;
+  return data as Room;
 };
 
 // Get all players in a room using public view (hides is_imposter until game finished)
@@ -354,6 +354,26 @@ export const getImpostersAfterFinish = async (roomId: string): Promise<{ player_
   }
   
   return data || [];
+};
+
+// Submit word guess for imposter
+export const submitWordGuess = async (roomId: string, guessedWord: string): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  
+  const { data, error } = await supabase.rpc('submit_word_guess', {
+    p_room_id: roomId,
+    p_player_id: playerId,
+    p_guessed_word: guessedWord
+  });
+  
+  if (error) {
+    if (import.meta.env.DEV) {
+      console.error('Submit word guess failed:', error.code);
+    }
+    return false;
+  }
+  
+  return data || false;
 };
 
 // Restart game with same room and players (host only)

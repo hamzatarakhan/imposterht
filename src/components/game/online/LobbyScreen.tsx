@@ -49,7 +49,6 @@ ${joinUrl}`;
     const shareData = {
       title: 'انضم للعبة الإمبوستر! 🎭',
       text: shareMessage,
-      url: joinUrl,
     };
 
     try {
