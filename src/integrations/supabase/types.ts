@@ -26,7 +26,6 @@ export type Database = {
           player_id: string
           player_order: number
           room_id: string
-          score: number
           voted_for: string | null
           votes: number
         }
@@ -41,7 +40,6 @@ export type Database = {
           player_id: string
           player_order?: number
           room_id: string
-          score?: number
           voted_for?: string | null
           votes?: number
         }
@@ -56,7 +54,6 @@ export type Database = {
           player_id?: string
           player_order?: number
           room_id?: string
-          score?: number
           voted_for?: string | null
           votes?: number
         }
@@ -96,8 +93,6 @@ export type Database = {
           timer_started_at: string | null
           updated_at: string
           winner: string | null
-          word_guess_status: string | null
-          word_guessed: boolean | null
         }
         Insert: {
           categories?: string | null
@@ -117,8 +112,6 @@ export type Database = {
           timer_started_at?: string | null
           updated_at?: string
           winner?: string | null
-          word_guess_status?: string | null
-          word_guessed?: boolean | null
         }
         Update: {
           categories?: string | null
@@ -138,8 +131,6 @@ export type Database = {
           timer_started_at?: string | null
           updated_at?: string
           winner?: string | null
-          word_guess_status?: string | null
-          word_guessed?: boolean | null
         }
         Relationships: []
       }
@@ -157,39 +148,8 @@ export type Database = {
           player_id: string | null
           player_order: number | null
           room_id: string | null
-          score: number | null
           voted_for: string | null
           votes: number | null
-        }
-        Insert: {
-          avatar?: string | null
-          has_seen_role?: boolean | null
-          id?: string | null
-          is_host?: boolean | null
-          is_imposter?: never
-          joined_at?: string | null
-          name?: string | null
-          player_id?: string | null
-          player_order?: number | null
-          room_id?: string | null
-          score?: number | null
-          voted_for?: string | null
-          votes?: number | null
-        }
-        Update: {
-          avatar?: string | null
-          has_seen_role?: boolean | null
-          id?: string | null
-          is_host?: boolean | null
-          is_imposter?: never
-          joined_at?: string | null
-          name?: string | null
-          player_id?: string | null
-          player_order?: number | null
-          room_id?: string | null
-          score?: number | null
-          voted_for?: string | null
-          votes?: number | null
         }
         Relationships: [
           {
@@ -226,8 +186,6 @@ export type Database = {
           timer_started_at: string | null
           updated_at: string | null
           winner: string | null
-          word_guess_status: string | null
-          word_guessed: boolean | null
         }
         Insert: {
           categories?: string | null
@@ -246,8 +204,6 @@ export type Database = {
           timer_started_at?: string | null
           updated_at?: string | null
           winner?: string | null
-          word_guess_status?: string | null
-          word_guessed?: boolean | null
         }
         Update: {
           categories?: string | null
@@ -266,8 +222,6 @@ export type Database = {
           timer_started_at?: string | null
           updated_at?: string | null
           winner?: string | null
-          word_guess_status?: string | null
-          word_guessed?: boolean | null
         }
         Relationships: []
       }
@@ -332,14 +286,6 @@ export type Database = {
           p_voted_for_player_id: string
           p_voter_player_id: string
         }
-        Returns: boolean
-      }
-      submit_word_guess: {
-        Args: { p_guessed_word: string; p_player_id: string; p_room_id: string }
-        Returns: boolean
-      }
-      update_player_scores: {
-        Args: { p_room_id: string; p_winner: string }
         Returns: boolean
       }
       update_room_secure: {
