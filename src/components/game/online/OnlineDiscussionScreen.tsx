@@ -77,12 +77,10 @@ const OnlineDiscussionScreen: React.FC = () => {
   }, [timeLeft, playSound, vibrate, room?.timer_started_at]);
 
   const handleGoToVoting = async () => {
-    if (!room?.id) return;
     playSound('click');
     vibrate(50);
-    // Call RPC directly to ensure it completes before screen change
-    await roomService.startDiscussion(room.id);
-    // The auto-navigate effect in context will handle screen change for all players
+    await startDiscussion();
+    setScreen('onlineVoting');
   };
 
   const handleBack = async () => {

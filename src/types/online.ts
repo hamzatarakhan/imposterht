@@ -16,8 +16,6 @@ export interface Room {
   winner: 'imposters' | 'players' | null;
   timer_started_at: string | null;
   timer_remaining: number | null;
-  word_guess_status: 'none' | 'pending' | 'completed';
-  word_guessed: boolean | null;
   created_at: string;
   updated_at: string;
 }
@@ -34,7 +32,6 @@ export interface RoomPlayer {
   votes: number;
   voted_for: string | null;
   player_order: number;
-  score: number;
   joined_at: string;
 }
 
