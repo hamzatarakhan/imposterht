@@ -6,7 +6,7 @@ import { useSettings } from '@/context/SettingsContext';
 import { RotateCcw, X } from 'lucide-react';
 
 const OnlineRestartButton: React.FC = () => {
-  const { leaveRoom, resetOnlineGame, room, setScreen: setOnlineScreen } = useOnlineGame();
+  const { leaveRoom, resetOnlineGame, room, isHost, setScreen: setOnlineScreen } = useOnlineGame();
   const { setScreen: setGameScreen } = useGame();
   const { playSound, vibrate } = useSettings();
   const [showConfirm, setShowConfirm] = useState(false);
@@ -58,6 +58,11 @@ const OnlineRestartButton: React.FC = () => {
     setShowConfirm(false);
     setIsLeaving(false);
   };
+
+  // Only show restart button for host
+  if (!isHost) {
+    return null;
+  }
 
   return (
     <>
