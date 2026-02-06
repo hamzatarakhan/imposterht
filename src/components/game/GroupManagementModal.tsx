@@ -126,9 +126,10 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
 
     const newMember: SavedPlayer = { name: trimmedName, avatar: newMemberAvatar };
     setSelectedMembers(current => [...current, newMember]);
+    // Reset inputs but keep modal open for adding more
     setNewMemberName("");
     setNewMemberAvatar("👤");
-    setShowAddMember(false);
+    // Stay in add mode for quick batch entry
   };
 
   const removeMemberFromSelection = (name: string) => {
@@ -358,14 +359,14 @@ const GroupManagementModal: React.FC<GroupManagementModalProps> = ({
                           onClick={() => setShowAddMember(false)}
                           className="flex-1 py-2 bg-secondary rounded-lg font-medium"
                         >
-                          إلغاء
+                          إغلاق
                         </button>
                         <button
                           onClick={handleAddNewMember}
                           disabled={!newMemberName.trim()}
                           className="flex-1 py-2 bg-accent text-accent-foreground rounded-lg font-medium disabled:opacity-50"
                         >
-                          إضافة ✓
+                          حفظ وإضافة آخر +
                         </button>
                       </div>
                     </div>
