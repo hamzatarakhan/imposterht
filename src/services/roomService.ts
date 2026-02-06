@@ -356,6 +356,26 @@ export const getImpostersAfterFinish = async (roomId: string): Promise<{ player_
   return data || [];
 };
 
+// Submit word guess for imposter
+export const submitWordGuess = async (roomId: string, guessedWord: string): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  
+  const { data, error } = await supabase.rpc('submit_word_guess', {
+    p_room_id: roomId,
+    p_player_id: playerId,
+    p_guessed_word: guessedWord
+  });
+  
+  if (error) {
+    if (import.meta.env.DEV) {
+      console.error('Submit word guess failed:', error.code);
+    }
+    return false;
+  }
+  
+  return data || false;
+};
+
 // Restart game with same room and players (host only)
 export const restartGame = async (roomId: string, categories: Category[]): Promise<boolean> => {
   const playerId = getOrCreatePlayerId();
