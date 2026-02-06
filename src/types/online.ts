@@ -8,14 +8,16 @@ export interface Room {
   player_count: number;
   imposter_count: number;
   category: string;
-  categories: string; // JSON string of Category[]
-  secret_word: string | null;
+  categories: string | null; // JSON string of Category[]
+  secret_word?: string | null; // Optional - hidden in public view
   discussion_time: number;
   discussion_time_enabled: boolean;
   current_player_index: number;
   winner: 'imposters' | 'players' | null;
   timer_started_at: string | null;
   timer_remaining: number | null;
+  word_guess_status?: string | null;
+  word_guessed?: boolean | null;
   created_at: string;
   updated_at: string;
 }
