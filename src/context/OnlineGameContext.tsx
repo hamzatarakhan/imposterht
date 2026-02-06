@@ -76,23 +76,54 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
   useEffect(() => {
     if (!state.room?.id) return;
 
-    const unsubscribe = roomService.subscribeToRoom(
-      state.room.id,
-      (room) => {
-        setState(prev => ({ ...prev, room }));
-      },
-      (players) => {
-        const myPlayer = players.find(p => p.player_id === state.myPlayerId);
-        setState(prev => ({
-          ...prev,
-          players,
-          currentPlayer: myPlayer || null,
-          isHost: myPlayer?.is_host || false,
-        }));
-      }
-    );
+    let unsubscribe: (() => void) | null = null;
 
-    return unsubscribe;
+    const setupSubscription = () => {
+      unsubscribe = roomService.subscribeToRoom(
+        state.room!.id,
+        (room) => {
+          setState(prev => ({ ...prev, room }));
+        },
+        (players) => {
+          const myPlayer = players.find(p => p.player_id === state.myPlayerId);
+          setState(prev => ({
+            ...prev,
+            players,
+            currentPlayer: myPlayer || null,
+            isHost: myPlayer?.is_host || false,
+          }));
+        }
+      );
+    };
+
+    setupSubscription();
+
+    // Re-fetch data when page becomes visible again (phone unlocked)
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible' && state.room?.id) {
+        // Refetch room and players to sync state
+        const room = await roomService.getRoom(state.room.id);
+        const players = await roomService.getRoomPlayers(state.room.id);
+        
+        if (room) {
+          const myPlayer = players.find(p => p.player_id === state.myPlayerId);
+          setState(prev => ({
+            ...prev,
+            room,
+            players,
+            currentPlayer: myPlayer || null,
+            isHost: myPlayer?.is_host || false,
+          }));
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [state.room?.id, state.myPlayerId]);
 
   // Auto-navigate based on room status and players state
