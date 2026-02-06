@@ -77,16 +77,19 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
     if (!state.room?.id) return;
 
     let unsubscribe: (() => void) | null = null;
+    let cancelled = false;
 
     const setupSubscription = () => {
       unsubscribe = roomService.subscribeToRoom(
         state.room!.id,
         (room) => {
-          setState(prev => ({ ...prev, room }));
+          if (cancelled) return;
+          setState((prev) => ({ ...prev, room }));
         },
         (players) => {
-          const myPlayer = players.find(p => p.player_id === state.myPlayerId);
-          setState(prev => ({
+          if (cancelled) return;
+          const myPlayer = players.find((p) => p.player_id === state.myPlayerId);
+          setState((prev) => ({
             ...prev,
             players,
             currentPlayer: myPlayer || null,
@@ -96,33 +99,60 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
       );
     };
 
-    setupSubscription();
-
-    // Re-fetch data when page becomes visible again (phone unlocked)
-    const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible' && state.room?.id) {
-        // Refetch room and players to sync state
-        const room = await roomService.getRoom(state.room.id);
-        const players = await roomService.getRoomPlayers(state.room.id);
-        
-        if (room) {
-          const myPlayer = players.find(p => p.player_id === state.myPlayerId);
-          setState(prev => ({
-            ...prev,
-            room,
-            players,
-            currentPlayer: myPlayer || null,
-            isHost: myPlayer?.is_host || false,
-          }));
-        }
-      }
+    const teardownSubscription = () => {
+      if (unsubscribe) unsubscribe();
+      unsubscribe = null;
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    const syncFromServer = async () => {
+      if (cancelled || !state.room?.id) return;
+
+      const [room, players] = await Promise.all([
+        roomService.getRoom(state.room.id),
+        roomService.getRoomPlayers(state.room.id),
+      ]);
+
+      if (cancelled || !room) return;
+
+      const myPlayer = players.find((p) => p.player_id === state.myPlayerId);
+      setState((prev) => ({
+        ...prev,
+        room,
+        players,
+        currentPlayer: myPlayer || null,
+        isHost: myPlayer?.is_host || false,
+      }));
+    };
+
+    setupSubscription();
+
+    // When the app becomes active again (unlock / tab focus / BFCache restore),
+    // force-sync + re-subscribe in case realtime dropped while in background.
+    const handleAppBecameActive = async () => {
+      if (document.visibilityState !== 'visible') return;
+      await syncFromServer();
+      teardownSubscription();
+      setupSubscription();
+    };
+
+    document.addEventListener('visibilitychange', handleAppBecameActive);
+    window.addEventListener('focus', handleAppBecameActive);
+    window.addEventListener('pageshow', handleAppBecameActive);
+
+    // Safety net: light polling while visible to catch any missed transitions.
+    const poll = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        void syncFromServer();
+      }
+    }, 5000);
 
     return () => {
-      if (unsubscribe) unsubscribe();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      cancelled = true;
+      teardownSubscription();
+      document.removeEventListener('visibilitychange', handleAppBecameActive);
+      window.removeEventListener('focus', handleAppBecameActive);
+      window.removeEventListener('pageshow', handleAppBecameActive);
+      window.clearInterval(poll);
     };
   }, [state.room?.id, state.myPlayerId]);
 
