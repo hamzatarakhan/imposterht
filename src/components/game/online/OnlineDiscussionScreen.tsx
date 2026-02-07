@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Clock, Users, MessageSquare, ArrowRight, Play, Pause, RotateCcw, Vote } from 'lucide-react';
+import { Clock, Users, MessageSquare, ArrowRight, Play, Pause, RotateCcw, Vote, RefreshCw } from 'lucide-react';
 import OnlineRestartButton from './OnlineRestartButton';
 import * as roomService from '@/services/roomService';
 
 const OnlineDiscussionScreen: React.FC = () => {
-  const { room, players, isHost, setScreen, leaveRoom, startDiscussion } = useOnlineGame();
+  const { room, players, isHost, setScreen, leaveRoom, startDiscussion, restartGame } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
   
   const [timeLeft, setTimeLeft] = useState(room?.discussion_time || 90);
@@ -113,6 +113,20 @@ const OnlineDiscussionScreen: React.FC = () => {
     await roomService.updateTimer(room.id, null, room.discussion_time || 90);
   }, [room?.id, room?.discussion_time, playSound, vibrate]);
 
+  const [isRestarting, setIsRestarting] = useState(false);
+  
+  const handleRestartWithNewWord = useCallback(async () => {
+    if (!isHost || isRestarting) return;
+    playSound('click');
+    vibrate(50);
+    setIsRestarting(true);
+    try {
+      await restartGame();
+    } finally {
+      setIsRestarting(false);
+    }
+  }, [isHost, isRestarting, restartGame, playSound, vibrate]);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -187,13 +201,24 @@ const OnlineDiscussionScreen: React.FC = () => {
           {/* Vote Button + Restart - Only host can start voting */}
           <div className="space-y-3">
             {isHost ? (
-              <button
-                onClick={handleGoToVoting}
-                className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
-              >
-                <Vote size={24} />
-                بدء التصويت
-              </button>
+              <>
+                <button
+                  onClick={handleGoToVoting}
+                  className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
+                >
+                  <Vote size={24} />
+                  بدء التصويت
+                </button>
+                
+                <button
+                  onClick={handleRestartWithNewWord}
+                  disabled={isRestarting}
+                  className="w-full p-4 rounded-2xl bg-secondary/80 hover:bg-secondary transition-colors flex items-center justify-center gap-2 text-muted-foreground"
+                >
+                  <RefreshCw size={20} className={isRestarting ? 'animate-spin' : ''} />
+                  {isRestarting ? 'جاري الإعادة...' : 'إعادة بكلمة ثانية'}
+                </button>
+              </>
             ) : (
               <div className="w-full p-4 rounded-2xl bg-secondary/50 text-center">
                 <p className="text-muted-foreground">⏳ انتظر الهوست ليبدأ التصويت</p>
@@ -339,13 +364,24 @@ const OnlineDiscussionScreen: React.FC = () => {
         {/* Vote Button + Restart - Only host can start voting */}
         <div className="space-y-3">
           {isHost ? (
-            <button
-              onClick={handleGoToVoting}
-              className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
-            >
-              <Vote size={24} />
-              بدء التصويت
-            </button>
+            <>
+              <button
+                onClick={handleGoToVoting}
+                className="w-full btn-imposter text-xl flex items-center justify-center gap-2"
+              >
+                <Vote size={24} />
+                بدء التصويت
+              </button>
+              
+              <button
+                onClick={handleRestartWithNewWord}
+                disabled={isRestarting}
+                className="w-full p-4 rounded-2xl bg-secondary/80 hover:bg-secondary transition-colors flex items-center justify-center gap-2 text-muted-foreground"
+              >
+                <RefreshCw size={20} className={isRestarting ? 'animate-spin' : ''} />
+                {isRestarting ? 'جاري الإعادة...' : 'إعادة بكلمة ثانية'}
+              </button>
+            </>
           ) : (
             <div className="w-full p-4 rounded-2xl bg-secondary/50 text-center">
               <p className="text-muted-foreground">⏳ انتظر الهوست ليبدأ التصويت</p>
