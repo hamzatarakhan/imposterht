@@ -41,8 +41,6 @@ const LobbyScreen: React.FC = () => {
     // Format message nicely with room code separate
     const shareMessage = `🎭 انضم للعبة الإمبوستر!
 
-📋 كود الغرفة: ${room.code}
-
 🔗 اضغط على الرابط للانضمام مباشرة:
 ${joinUrl}`;
     
