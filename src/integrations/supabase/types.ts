@@ -310,6 +310,16 @@ export type Database = {
         Args: { p_player_id: string; p_room_id: string }
         Returns: boolean
       }
+      rename_player_secure: {
+        Args: {
+          p_new_avatar?: string
+          p_new_name: string
+          p_requester_player_id: string
+          p_room_id: string
+          p_target_player_id: string
+        }
+        Returns: boolean
+      }
       restart_game_secure: {
         Args: {
           p_host_player_id: string
