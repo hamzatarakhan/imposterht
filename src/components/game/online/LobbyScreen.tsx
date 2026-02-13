@@ -174,6 +174,7 @@ const LobbyScreen: React.FC = () => {
               {players.map((player, index) => {
                 const isSelf = player.player_id === currentPlayer?.player_id;
                 const canEdit = isSelf || isHost;
+                console.log('[LobbyDebug]', { playerName: player.name, playerId: player.player_id, currentPlayerId: currentPlayer?.player_id, isSelf, isHost, canEdit });
                 const isEditing = editingPlayer === player.player_id;
 
                 if (isEditing) {
