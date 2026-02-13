@@ -34,6 +34,7 @@ export interface RoomPlayer {
   votes: number;
   voted_for: string | null;
   player_order: number;
+  score: number;
   joined_at: string;
 }
 
