@@ -7,6 +7,7 @@ import LobbyScreen from './LobbyScreen';
 import OnlineShowRoleScreen from './OnlineShowRoleScreen';
 import OnlineDiscussionScreen from './OnlineDiscussionScreen';
 import OnlineVotingScreen from './OnlineVotingScreen';
+import OnlineWordGuessScreen from './OnlineWordGuessScreen';
 import OnlineResultScreen from './OnlineResultScreen';
 
 const OnlineGame: React.FC = () => {
@@ -20,6 +21,7 @@ const OnlineGame: React.FC = () => {
     onlineShowRole: OnlineShowRoleScreen,
     onlineDiscussion: OnlineDiscussionScreen,
     onlineVoting: OnlineVotingScreen,
+    onlineWordGuess: OnlineWordGuessScreen,
     onlineResult: OnlineResultScreen,
   };
 

@@ -379,6 +379,40 @@ export const restartGame = async (roomId: string, categories: Category[]): Promi
   return data || false;
 };
 
+// Set word guess options (host only)
+export const setWordGuessOptions = async (roomId: string, options: string[]): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  
+  const { data, error } = await supabase.rpc('set_word_guess_options_secure', {
+    p_room_id: roomId,
+    p_host_player_id: playerId,
+    p_options: JSON.stringify(options)
+  });
+
+  if (error && import.meta.env.DEV) {
+    console.error('Set word guess options failed:', error.code);
+  }
+
+  return data || false;
+};
+
+// Submit word guess (imposter only)
+export const submitWordGuess = async (roomId: string, guessedWord: string): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  
+  const { data, error } = await supabase.rpc('submit_word_guess', {
+    p_room_id: roomId,
+    p_player_id: playerId,
+    p_guessed_word: guessedWord
+  });
+
+  if (error && import.meta.env.DEV) {
+    console.error('Submit word guess failed:', error.code);
+  }
+
+  return data || false;
+};
+
 // Update timer state (host only) - uses secure RPC
 export const updateTimer = async (
   roomId: string, 

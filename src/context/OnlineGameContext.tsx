@@ -175,17 +175,20 @@ export const OnlineGameProvider: React.FC<{ children: ReactNode }> = ({ children
         break;
       case 'voting':
         // When room status is voting, move ALL players to voting screen
-        if (state.screen !== 'onlineVoting' && state.screen !== 'onlineResult') {
+        if (state.screen !== 'onlineVoting' && state.screen !== 'onlineResult' && state.screen !== 'onlineWordGuess') {
           setState(prev => ({ ...prev, screen: 'onlineVoting' }));
         }
         break;
       case 'finished':
-        if (state.screen !== 'onlineResult') {
+        // Check if word guess phase is pending
+        if (state.room.word_guess_status === 'pending' && state.screen !== 'onlineWordGuess') {
+          setState(prev => ({ ...prev, screen: 'onlineWordGuess' }));
+        } else if (state.room.word_guess_status !== 'pending' && state.screen !== 'onlineResult') {
           setState(prev => ({ ...prev, screen: 'onlineResult' }));
         }
         break;
     }
-  }, [state.room?.status, state.screen, state.players]);
+  }, [state.room?.status, state.room?.word_guess_status, state.screen, state.players]);
 
   const setScreen = useCallback((screen: OnlineGameScreen) => {
     setState(prev => ({ ...prev, screen }));

@@ -18,6 +18,7 @@ export interface Room {
   timer_remaining: number | null;
   word_guess_status?: string | null;
   word_guessed?: boolean | null;
+  word_guess_options?: string | null; // JSON array of word choices
   created_at: string;
   updated_at: string;
 }
@@ -46,4 +47,5 @@ export type OnlineGameScreen =
   | 'onlineShowRole'
   | 'onlineDiscussion'
   | 'onlineVoting'
+  | 'onlineWordGuess'
   | 'onlineResult';
