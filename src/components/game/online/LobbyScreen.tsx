@@ -3,7 +3,6 @@ import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Copy, Check, Users, Crown, Loader2, Share2, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { AVATAR_OPTIONS } from '@/context/GameContext';
 import * as roomService from '@/services/roomService';
 import OnlineRestartButton from './OnlineRestartButton';
 
@@ -179,23 +178,7 @@ const LobbyScreen: React.FC = () => {
 
                 if (isEditing) {
                   return (
-                    <div key={player.id} className="p-3 rounded-xl bg-primary/10 border border-primary/30 space-y-3">
-                      {/* Avatar picker */}
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        {AVATAR_OPTIONS.map(avatar => (
-                          <button
-                            key={avatar}
-                            onClick={() => setEditAvatar(avatar)}
-                            className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-all ${
-                              editAvatar === avatar 
-                                ? 'bg-primary ring-2 ring-primary scale-110' 
-                                : 'bg-secondary hover:bg-secondary/80'
-                            }`}
-                          >
-                            {avatar}
-                          </button>
-                        ))}
-                      </div>
+                    <div key={player.id} className="p-3 rounded-xl bg-primary/10 border border-primary/30">
                       {/* Name input + actions */}
                       <div className="flex gap-2">
                         <input
