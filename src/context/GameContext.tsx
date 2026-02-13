@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Category, getRandomWord } from '@/data/words';
+import { Category, getRandomWord, getWordsByCategory } from '@/data/words';
 
 export type GameScreen = 
   | 'splash'
@@ -13,6 +13,7 @@ export type GameScreen =
   | 'showRole'
   | 'discussion'
   | 'voting'
+  | 'wordGuess'
   | 'result';
 
 export interface Player {
@@ -57,6 +58,8 @@ interface GameState {
   winner: 'imposters' | 'players' | null;
   playerScores: PlayerScore[];
   roundNumber: number;
+  wordGuessOptions: string[];
+  wordGuessed: boolean | null;
 }
 
 interface PlayerData {
@@ -84,6 +87,8 @@ interface GameContextType extends GameState {
   playAgain: () => void;
   resetScores: () => void;
   getLeaderboard: () => PlayerScore[];
+  submitWordGuess: (word: string) => void;
+  skipWordGuess: () => void;
 }
 
 const initialState: GameState = {
@@ -102,6 +107,8 @@ const initialState: GameState = {
   winner: null,
   playerScores: [],
   roundNumber: 1,
+  wordGuessOptions: [],
+  wordGuessed: null,
 };
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -329,11 +336,26 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
       });
 
+      // Generate word guess options if players won
+      let wordGuessOptions: string[] = [];
+      if (gameWinner === 'players') {
+        let allWords: string[] = [];
+        for (const cat of prev.categories) {
+          allWords = [...allWords, ...getWordsByCategory(cat)];
+        }
+        allWords = [...new Set(allWords)].filter(w => w !== prev.secretWord);
+        const shuffled = allWords.sort(() => Math.random() - 0.5);
+        const fakeWords = shuffled.slice(0, 3);
+        wordGuessOptions = [...fakeWords, prev.secretWord].sort(() => Math.random() - 0.5);
+      }
+
       return {
         ...prev,
         winner: gameWinner,
-        screen: 'result',
+        screen: gameWinner === 'players' ? 'wordGuess' : 'result',
         playerScores: updatedScores,
+        wordGuessOptions,
+        wordGuessed: null,
       };
     });
   };
@@ -377,6 +399,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       currentPlayerIndex: 0,
       winner: null,
       roundNumber: prev.roundNumber + 1,
+      wordGuessOptions: [],
+      wordGuessed: null,
       screen: 'passPhone',
     }));
   };
@@ -391,6 +415,28 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const getLeaderboard = (): PlayerScore[] => {
     return [...state.playerScores].sort((a, b) => b.score - a.score);
+  };
+
+  const submitWordGuess = (word: string) => {
+    const correct = word === state.secretWord;
+    setState(prev => {
+      if (correct) {
+        // Give +2 bonus to the caught imposter
+        const sortedByVotes = [...prev.players].sort((a, b) => b.votes - a.votes);
+        const caughtImposterId = sortedByVotes[0]?.id;
+        const updatedScores = prev.playerScores.map(score =>
+          score.playerId === caughtImposterId
+            ? { ...score, score: score.score + 2 }
+            : score
+        );
+        return { ...prev, wordGuessed: correct, playerScores: updatedScores };
+      }
+      return { ...prev, wordGuessed: correct };
+    });
+  };
+
+  const skipWordGuess = () => {
+    setState(prev => ({ ...prev, screen: 'result' }));
   };
 
   return (
@@ -416,6 +462,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         playAgain,
         resetScores,
         getLeaderboard,
+        submitWordGuess,
+        skipWordGuess,
       }}
     >
       {children}
