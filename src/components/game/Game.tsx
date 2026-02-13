@@ -12,6 +12,7 @@ import PassPhoneScreen from './PassPhoneScreen';
 import ShowRoleScreen from './ShowRoleScreen';
 import DiscussionScreen from './DiscussionScreen';
 import VotingScreen from './VotingScreen';
+import WordGuessScreen from './WordGuessScreen';
 import ResultScreen from './ResultScreen';
 import OnlineGame from './online/OnlineGame';
 import ModeSelectScreen from './online/ModeSelectScreen';
@@ -59,6 +60,7 @@ const GameContent: React.FC = () => {
     showRole: ShowRoleScreen,
     discussion: DiscussionScreen,
     voting: VotingScreen,
+    wordGuess: WordGuessScreen,
     result: ResultScreen,
   };
 
