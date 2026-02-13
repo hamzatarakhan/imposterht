@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Eye, EyeOff, Check, Users } from 'lucide-react';
+import { Eye, EyeOff, Check, Users, RefreshCw } from 'lucide-react';
 import { getMySecretWord, getMyRole } from '@/services/roomService';
+import OnlineRestartButton from './OnlineRestartButton';
 
 const OnlineShowRoleScreen: React.FC = () => {
-  const { room, players, currentPlayer, markRoleSeen, moveToNextPlayer } = useOnlineGame();
+  const { room, players, currentPlayer, markRoleSeen, moveToNextPlayer, isHost, restartGame } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
   
   const [showRole, setShowRole] = useState(false);
@@ -54,6 +55,20 @@ const OnlineShowRoleScreen: React.FC = () => {
     await markRoleSeen();
     await moveToNextPlayer();
   };
+
+  const [isRestarting, setIsRestarting] = useState(false);
+
+  const handleRestartWithNewWord = useCallback(async () => {
+    if (!isHost || isRestarting) return;
+    playSound('click');
+    vibrate(50);
+    setIsRestarting(true);
+    try {
+      await restartGame();
+    } finally {
+      setIsRestarting(false);
+    }
+  }, [isHost, isRestarting, restartGame, playSound, vibrate]);
 
   const playersWhoSaw = players.filter(p => p.has_seen_role).length;
   const allPlayersSaw = playersWhoSaw === players.length;
@@ -115,6 +130,23 @@ const OnlineShowRoleScreen: React.FC = () => {
               </div>
             ))}
           </div>
+
+          {/* Host-only restart buttons */}
+          {isHost && (
+            <div className="mt-6 space-y-3">
+              <button
+                onClick={handleRestartWithNewWord}
+                disabled={isRestarting}
+                className="w-full p-4 rounded-2xl bg-secondary/80 hover:bg-secondary transition-colors flex items-center justify-center gap-2 text-muted-foreground"
+              >
+                <RefreshCw size={20} className={isRestarting ? 'animate-spin' : ''} />
+                {isRestarting ? 'جاري الإعادة...' : 'إعادة بكلمة ثانية'}
+              </button>
+              <div className="flex justify-center">
+                <OnlineRestartButton />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -196,12 +228,31 @@ const OnlineShowRoleScreen: React.FC = () => {
 
           {/* Confirm Button */}
           {showRole && (
-            <button
-              onClick={handleConfirm}
-              className="w-full btn-primary-game text-xl animate-slide-up"
-            >
-              ✅ فهمت! متابعة
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={handleConfirm}
+                className="w-full btn-primary-game text-xl animate-slide-up"
+              >
+                ✅ فهمت! متابعة
+              </button>
+              
+              {/* Host-only restart buttons */}
+              {isHost && (
+                <>
+                  <button
+                    onClick={handleRestartWithNewWord}
+                    disabled={isRestarting}
+                    className="w-full p-4 rounded-2xl bg-secondary/80 hover:bg-secondary transition-colors flex items-center justify-center gap-2 text-muted-foreground"
+                  >
+                    <RefreshCw size={20} className={isRestarting ? 'animate-spin' : ''} />
+                    {isRestarting ? 'جاري الإعادة...' : 'إعادة بكلمة ثانية'}
+                  </button>
+                  <div className="flex justify-center">
+                    <OnlineRestartButton />
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
       </div>
