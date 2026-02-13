@@ -401,6 +401,30 @@ export const updateTimer = async (
   return data || false;
 };
 
+// Rename a player (self or host can rename anyone) - only while waiting
+export const renamePlayer = async (
+  roomId: string,
+  targetPlayerId: string,
+  newName: string,
+  newAvatar?: string
+): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+
+  const { data, error } = await supabase.rpc('rename_player_secure', {
+    p_room_id: roomId,
+    p_requester_player_id: playerId,
+    p_target_player_id: targetPlayerId,
+    p_new_name: newName,
+    p_new_avatar: newAvatar || null,
+  });
+
+  if (error && import.meta.env.DEV) {
+    console.error('Rename player failed:', error.code);
+  }
+
+  return data || false;
+};
+
 // Leave room - uses secure RPC
 export const leaveRoom = async (roomId: string): Promise<void> => {
   const playerId = getOrCreatePlayerId();

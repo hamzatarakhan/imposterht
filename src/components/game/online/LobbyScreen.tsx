@@ -1,54 +1,43 @@
 import React, { useState } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { ArrowRight, Copy, Check, Users, Crown, Loader2, Share2 } from 'lucide-react';
+import { ArrowRight, Copy, Check, Users, Crown, Loader2, Share2, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { AVATAR_OPTIONS } from '@/context/GameContext';
+import * as roomService from '@/services/roomService';
 import OnlineRestartButton from './OnlineRestartButton';
 
 const LobbyScreen: React.FC = () => {
-  const { room, players, isHost, startGame, leaveRoom } = useOnlineGame();
+  const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
   
   const [copied, setCopied] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editAvatar, setEditAvatar] = useState('');
 
   const handleCopyCode = async () => {
     if (!room?.code) return;
-    
     playSound('click');
     vibrate(30);
-    
     try {
       await navigator.clipboard.writeText(room.code);
       setCopied(true);
       toast.success('تم نسخ الكود!');
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback for older browsers
       toast.error('فشل النسخ');
     }
   };
 
   const handleShare = async () => {
     if (!room?.code) return;
-    
     playSound('click');
     vibrate(30);
-    
-    // Create deep link with room code
     const joinUrl = `${window.location.origin}?join=${room.code}`;
-    
-    // Format message nicely with room code separate
-    const shareMessage = `🎭 انضم للعبة الإمبوستر!
-
-🔗 اضغط على الرابط للانضمام مباشرة:
-${joinUrl}`;
-    
-    const shareData = {
-      title: 'انضم للعبة الإمبوستر! 🎭',
-      text: shareMessage,
-    };
-
+    const shareMessage = `🎭 انضم للعبة الإمبوستر!\n\n🔗 اضغط على الرابط للانضمام مباشرة:\n${joinUrl}`;
+    const shareData = { title: 'انضم للعبة الإمبوستر! 🎭', text: shareMessage };
     try {
       if (navigator.share) {
         await navigator.share(shareData);
@@ -57,7 +46,6 @@ ${joinUrl}`;
         toast.success('تم نسخ الدعوة!');
       }
     } catch (err) {
-      // User cancelled share or error
       if ((err as Error).name !== 'AbortError') {
         await navigator.clipboard.writeText(shareMessage);
         toast.success('تم نسخ الدعوة!');
@@ -70,13 +58,10 @@ ${joinUrl}`;
       toast.error('تحتاج 3 لاعبين على الأقل للبدء');
       return;
     }
-    
     playSound('click');
     vibrate(50);
     setIsStarting(true);
-
     const success = await startGame();
-    
     if (!success) {
       setIsStarting(false);
       toast.error('فشل بدء اللعبة');
@@ -87,6 +72,38 @@ ${joinUrl}`;
     playSound('click');
     vibrate(50);
     await leaveRoom();
+  };
+
+  const handleEditPlayer = (playerId: string, name: string, avatar: string) => {
+    // Only allow self-edit or host editing anyone
+    const isSelf = playerId === currentPlayer?.player_id;
+    if (!isSelf && !isHost) return;
+    
+    playSound('click');
+    vibrate(30);
+    setEditingPlayer(playerId);
+    setEditName(name);
+    setEditAvatar(avatar);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!room?.id || !editingPlayer || !editName.trim()) return;
+    
+    playSound('click');
+    vibrate(50);
+    
+    const success = await roomService.renamePlayer(room.id, editingPlayer, editName.trim(), editAvatar);
+    if (success) {
+      toast.success('تم تحديث الاسم!');
+    } else {
+      toast.error('فشل التحديث');
+    }
+    setEditingPlayer(null);
+  };
+
+  const handleCancelEdit = () => {
+    playSound('click');
+    setEditingPlayer(null);
   };
 
   const canStart = isHost && players.length >= 3 && players.length <= (room?.player_count || 10);
@@ -155,23 +172,85 @@ ${joinUrl}`;
             </div>
 
             <div className="space-y-2 max-h-64 overflow-auto">
-              {players.map((player, index) => (
-                <div
-                  key={player.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
-                    player.is_host ? 'bg-primary/20' : 'bg-secondary'
-                  }`}
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-xl">
-                    {player.avatar}
+              {players.map((player, index) => {
+                const isSelf = player.player_id === currentPlayer?.player_id;
+                const canEdit = isSelf || isHost;
+                const isEditing = editingPlayer === player.player_id;
+
+                if (isEditing) {
+                  return (
+                    <div key={player.id} className="p-3 rounded-xl bg-primary/10 border border-primary/30 space-y-3">
+                      {/* Avatar picker */}
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {AVATAR_OPTIONS.map(avatar => (
+                          <button
+                            key={avatar}
+                            onClick={() => setEditAvatar(avatar)}
+                            className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-all ${
+                              editAvatar === avatar 
+                                ? 'bg-primary ring-2 ring-primary scale-110' 
+                                : 'bg-secondary hover:bg-secondary/80'
+                            }`}
+                          >
+                            {avatar}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Name input + actions */}
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={editName}
+                          onChange={e => setEditName(e.target.value)}
+                          className="flex-1 px-3 py-2 rounded-xl bg-secondary text-foreground text-sm font-medium outline-none focus:ring-2 ring-primary"
+                          maxLength={15}
+                          autoFocus
+                          dir="auto"
+                        />
+                        <button
+                          onClick={handleSaveEdit}
+                          disabled={!editName.trim()}
+                          className="p-2 rounded-xl bg-accent text-accent-foreground disabled:opacity-50"
+                        >
+                          <Check size={18} />
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          className="p-2 rounded-xl bg-secondary hover:bg-secondary/80"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    key={player.id}
+                    className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
+                      player.is_host ? 'bg-primary/20' : 'bg-secondary'
+                    }`}
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-xl">
+                      {player.avatar}
+                    </div>
+                    <span className="font-medium flex-1">{player.name}</span>
+                    {canEdit && (
+                      <button
+                        onClick={() => handleEditPlayer(player.player_id, player.name, player.avatar)}
+                        className="p-1.5 rounded-lg hover:bg-card/80 transition-colors text-muted-foreground hover:text-foreground"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                    )}
+                    {player.is_host && (
+                      <Crown size={18} className="text-yellow-500" />
+                    )}
                   </div>
-                  <span className="font-medium flex-1">{player.name}</span>
-                  {player.is_host && (
-                    <Crown size={18} className="text-yellow-500" />
-                  )}
-                </div>
-              ))}
+                );
+              })}
 
               {/* Empty slots */}
               {room && Array.from({ length: room.player_count - players.length }).map((_, i) => (
