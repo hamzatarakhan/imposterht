@@ -214,7 +214,7 @@ const JoinRoomScreen: React.FC = () => {
                 className={`flex-1 p-3 rounded-xl font-bold text-sm transition-all ${
                   !name.trim() || code.length !== 6 || isJoining 
                     ? 'bg-muted text-muted-foreground cursor-not-allowed' 
-                    : 'bg-card border-2 border-accent text-accent hover:bg-accent hover:text-accent-foreground shadow-[0_0_15px_hsl(var(--accent)/0.3)]'
+                    : 'bg-gradient-to-r from-primary to-orange-500 text-primary-foreground hover:brightness-110 shadow-[0_0_15px_hsl(var(--primary)/0.3)]'
                 }`}
               >
                 {isJoining ? (
@@ -229,7 +229,7 @@ const JoinRoomScreen: React.FC = () => {
               
               <button
                 onClick={handleCreateInstead}
-                className="flex-1 p-3 rounded-xl bg-gradient-to-r from-primary to-orange-500 text-primary-foreground font-bold text-sm transition-all hover:brightness-110"
+                className="flex-1 p-3 rounded-xl bg-card border-2 border-accent text-accent font-bold text-sm transition-all hover:bg-accent hover:text-accent-foreground"
               >
                 ✨ أنشئ غرفة
               </button>
