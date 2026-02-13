@@ -14,6 +14,31 @@ const ResultScreen: React.FC = () => {
   const playersWon = winner === 'players';
   const leaderboard = getLeaderboard();
 
+  // Calculate per-player round points breakdown
+  const roundBreakdown = players.map(player => {
+    let teamPoints = 0;
+    let votePoints = 0;
+    let imposterPoints = 0;
+
+    if (player.isImposter) {
+      if (!playersWon) imposterPoints = 3;
+    } else {
+      if (playersWon) teamPoints = 1;
+      if (player.votedFor !== null) {
+        const votedForPlayer = players.find(p => p.id === player.votedFor);
+        if (votedForPlayer?.isImposter) votePoints = 2;
+      }
+    }
+
+    return {
+      ...player,
+      teamPoints,
+      votePoints,
+      imposterPoints,
+      totalPoints: teamPoints + votePoints + imposterPoints,
+    };
+  }).sort((a, b) => b.totalPoints - a.totalPoints);
+
   // Play result sound on mount
   useEffect(() => {
     if (!hasPlayedSoundRef.current) {
@@ -117,15 +142,61 @@ const ResultScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Leaderboard */}
-        {leaderboard.length > 0 && (
-          <div className="card-game w-full max-w-sm mb-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        {/* Round Score Breakdown */}
+        <div className="card-game w-full max-w-sm mb-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Medal size={18} className="text-primary" />
+            <p className="font-bold">نقاط الجولة</p>
+          </div>
+          <div className="space-y-2">
+            {roundBreakdown.map((player, index) => (
+              <div 
+                key={player.id}
+                className={`flex items-center justify-between p-2 rounded-xl ${
+                  player.totalPoints > 0 ? 'bg-primary/10 border border-primary/20' : 'bg-secondary/50'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-6 text-center">{getMedalEmoji(index)}</span>
+                  <span className="text-lg">{player.avatar || '👤'}</span>
+                  <span className={`font-medium text-sm ${player.isImposter ? 'text-imposter' : ''}`}>
+                    {player.name}
+                    {player.isImposter && ' 😈'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {player.votePoints > 0 && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-accent/20 text-accent">🎯+2</span>
+                  )}
+                  {player.teamPoints > 0 && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary">🏆+1</span>
+                  )}
+                  {player.imposterPoints > 0 && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-imposter/20 text-imposter">😈+3</span>
+                  )}
+                  <span className={`font-bold ${player.totalPoints > 0 ? 'text-primary' : 'text-muted-foreground'}`}>
+                    +{player.totalPoints}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 space-y-1">
+            <p className="text-xs text-muted-foreground text-center">
+              🎯 تصويت صحيح = +2 | 🏆 فوز الفريق = +1 | 😈 إمبوستر ناجي = +3
+            </p>
+          </div>
+        </div>
+
+        {/* Cumulative Leaderboard */}
+        {leaderboard.length > 0 && roundNumber > 1 && (
+          <div className="card-game w-full max-w-sm mb-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
             <div className="flex items-center justify-center gap-2 mb-3">
               <Trophy size={18} className="text-yellow-500" />
-              <p className="font-bold">ترتيب النقاط</p>
+              <p className="font-bold">الترتيب التراكمي</p>
             </div>
             <div className="space-y-2">
-              {leaderboard.slice(0, 4).map((player, index) => (
+              {leaderboard.slice(0, 5).map((player, index) => (
                 <div 
                   key={player.playerId}
                   className={`flex items-center justify-between p-2 rounded-xl ${
@@ -144,9 +215,6 @@ const ResultScreen: React.FC = () => {
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              الإمبوستر الفائز = 3 نقاط | اللاعب الفائز = 1 نقطة
-            </p>
           </div>
         )}
         

@@ -10,6 +10,10 @@ interface PlayerWithScore {
   avatar: string;
   score: number;
   is_imposter: boolean;
+  teamPoints: number;
+  votePoints: number;
+  imposterPoints: number;
+  totalRoundPoints: number;
 }
 
 interface ImposterInfo {
@@ -48,17 +52,34 @@ const OnlineResultScreen: React.FC = () => {
   const playersWithScores = useMemo((): PlayerWithScore[] => {
     return players.map(player => {
       const isImposter = imposters.some(imp => imp.player_id === player.player_id);
-      const isPlayerWinner = room?.winner === 'players' ? !isImposter : isImposter;
-      // Imposter gets 3 points for winning, regular players get 1 point
-      const score = isPlayerWinner ? (isImposter ? 3 : 1) : 0;
+      
+      let teamPoints = 0;
+      let votePoints = 0;
+      let imposterPoints = 0;
+
+      if (isImposter) {
+        if (room?.winner === 'imposters') imposterPoints = 3;
+      } else {
+        if (room?.winner === 'players') teamPoints = 1;
+        // Check if voted for an actual imposter
+        if (player.voted_for) {
+          const votedForIsImposter = imposters.some(imp => imp.player_id === player.voted_for);
+          if (votedForIsImposter) votePoints = 2;
+        }
+      }
+
       return {
         id: player.id,
         name: player.name,
         avatar: player.avatar,
-        score,
+        score: player.score, // cumulative from DB
         is_imposter: isImposter,
+        teamPoints,
+        votePoints,
+        imposterPoints,
+        totalRoundPoints: teamPoints + votePoints + imposterPoints,
       };
-    }).sort((a, b) => b.score - a.score);
+    }).sort((a, b) => b.totalRoundPoints - a.totalRoundPoints);
   }, [players, room?.winner, imposters]);
 
   // Sound and vibration on result
@@ -181,18 +202,18 @@ const OnlineResultScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Round Scores */}
+        {/* Round Score Breakdown */}
         <div className="card-game mb-4 w-full max-w-sm">
           <div className="flex items-center justify-center gap-2 mb-3">
             <Medal size={16} className="text-primary" />
             <p className="font-bold text-sm">نقاط الجولة</p>
           </div>
           <div className="space-y-2">
-            {playersWithScores.slice(0, 4).map((player, index) => (
+            {playersWithScores.map((player, index) => (
               <div
                 key={player.id}
                 className={`flex items-center justify-between p-2 rounded-xl ${
-                  player.score > 0 ? 'bg-primary/10 border border-primary/20' : 'bg-secondary/50'
+                  player.totalRoundPoints > 0 ? 'bg-primary/10 border border-primary/20' : 'bg-secondary/50'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -203,18 +224,56 @@ const OnlineResultScreen: React.FC = () => {
                     {player.is_imposter && ' 😈'}
                   </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className={`font-bold ${player.score > 0 ? 'text-primary' : 'text-muted-foreground'}`}>
-                    +{player.score}
+                <div className="flex items-center gap-1.5">
+                  {player.votePoints > 0 && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-accent/20 text-accent">🎯+2</span>
+                  )}
+                  {player.teamPoints > 0 && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary">🏆+1</span>
+                  )}
+                  {player.imposterPoints > 0 && (
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-imposter/20 text-imposter">😈+3</span>
+                  )}
+                  <span className={`font-bold ${player.totalRoundPoints > 0 ? 'text-primary' : 'text-muted-foreground'}`}>
+                    +{player.totalRoundPoints}
                   </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 space-y-1">
+            <p className="text-xs text-muted-foreground text-center">
+              🎯 تصويت صحيح = +2 | 🏆 فوز الفريق = +1 | 😈 إمبوستر ناجي = +3
+            </p>
+          </div>
+        </div>
+
+        {/* Cumulative Leaderboard */}
+        <div className="card-game mb-4 w-full max-w-sm">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Trophy size={16} className="text-yellow-500" />
+            <p className="font-bold text-sm">الترتيب التراكمي</p>
+          </div>
+          <div className="space-y-2">
+            {[...playersWithScores].sort((a, b) => b.score - a.score).map((player, index) => (
+              <div
+                key={player.id}
+                className={`flex items-center justify-between p-2 rounded-xl ${
+                  index === 0 ? 'bg-yellow-500/20 border border-yellow-500/30' : 'bg-secondary/50'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-5 text-center text-sm">{getMedalEmoji(index)}</span>
+                  <span className="text-lg">{player.avatar}</span>
+                  <span className="text-sm">{player.name}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="font-bold text-primary">{player.score}</span>
                   <span className="text-xs text-muted-foreground">نقطة</span>
                 </div>
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            الإمبوستر الفائز = 3 نقاط | اللاعب الفائز = 1 نقطة
-          </p>
         </div>
 
         {/* Most Voted */}

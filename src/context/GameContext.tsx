@@ -22,6 +22,7 @@ export interface Player {
   isImposter: boolean;
   hasSeenRole: boolean;
   votes: number;
+  votedFor: number | null;
 }
 
 export interface PlayerScore {
@@ -31,6 +32,8 @@ export interface PlayerScore {
   score: number;
   roundsPlayed: number;
   roundsWon: number;
+  correctVotes: number;
+  imposterWins: number;
 }
 
 export const AVATAR_OPTIONS = [
@@ -189,6 +192,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isImposter: false,
         hasSeenRole: false,
         votes: 0,
+        votedFor: null,
       });
     }
     
@@ -219,6 +223,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         score: 0,
         roundsPlayed: 0,
         roundsWon: 0,
+        correctVotes: 0,
+        imposterWins: 0,
       };
     });
     
@@ -257,9 +263,17 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const voteForPlayer = (playerId: number) => {
     setState(prev => {
-      const newPlayers = prev.players.map(p => 
-        p.id === playerId ? { ...p, votes: p.votes + 1 } : p
-      );
+      const votingPlayerIndex = prev.players.filter(p => p.votedFor !== null).length;
+      
+      const newPlayers = prev.players.map((p, idx) => {
+        if (p.id === playerId) {
+          return { ...p, votes: p.votes + 1 };
+        }
+        if (idx === votingPlayerIndex) {
+          return { ...p, votedFor: playerId };
+        }
+        return p;
+      });
       return { ...prev, players: newPlayers };
     });
   };
@@ -272,21 +286,46 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const imposterCaught = mostVoted.isImposter;
     const gameWinner: 'players' | 'imposters' = imposterCaught ? 'players' : 'imposters';
     
-    // Update scores
+    // Update scores with new system
     setState(prev => {
+      const imposters = prev.players.filter(p => p.isImposter);
+      
       const updatedScores = prev.playerScores.map(score => {
         const player = prev.players.find(p => p.id === score.playerId);
         if (!player) return score;
 
-        const isWinner = gameWinner === 'players' ? !player.isImposter : player.isImposter;
-        // Imposter gets 3 points for winning, regular players get 1 point
-        const pointsEarned = isWinner ? (player.isImposter ? 3 : 1) : 0;
+        let pointsEarned = 0;
+        let correctVoteBonus = 0;
+        let imposterWinBonus = 0;
+
+        if (player.isImposter) {
+          // Imposter scoring
+          if (gameWinner === 'imposters') {
+            pointsEarned += 3; // Imposter survived
+            imposterWinBonus = 1;
+          }
+        } else {
+          // Regular player scoring
+          if (gameWinner === 'players') {
+            pointsEarned += 1; // Team win
+          }
+          // Bonus for voting correctly (voted for an actual imposter)
+          if (player.votedFor !== null) {
+            const votedForPlayer = prev.players.find(p => p.id === player.votedFor);
+            if (votedForPlayer?.isImposter) {
+              pointsEarned += 2; // Correct vote bonus
+              correctVoteBonus = 1;
+            }
+          }
+        }
 
         return {
           ...score,
           score: score.score + pointsEarned,
           roundsPlayed: score.roundsPlayed + 1,
-          roundsWon: score.roundsWon + (isWinner ? 1 : 0),
+          roundsWon: score.roundsWon + (pointsEarned > 0 ? 1 : 0),
+          correctVotes: score.correctVotes + correctVoteBonus,
+          imposterWins: score.imposterWins + imposterWinBonus,
         };
       });
 
@@ -316,6 +355,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       ...p, 
       hasSeenRole: false, 
       votes: 0, 
+      votedFor: null as number | null,
       isImposter: false 
     }));
     
