@@ -253,13 +253,15 @@ const OnlineResultScreen: React.FC = () => {
             </button>
           )}
           
-          <button
-            onClick={handleLeave}
-            className="w-full p-3 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors flex items-center justify-center gap-2"
-          >
-            <Home size={20} />
-            الرئيسية
-          </button>
+          {isHost && (
+            <button
+              onClick={handleLeave}
+              className="w-full p-3 rounded-2xl bg-secondary hover:bg-secondary/80 transition-colors flex items-center justify-center gap-2"
+            >
+              <Home size={20} />
+              الرئيسية
+            </button>
+          )}
         </div>
       </div>
     </div>
