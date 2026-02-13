@@ -96,6 +96,7 @@ export type Database = {
           timer_started_at: string | null
           updated_at: string
           winner: string | null
+          word_guess_options: string | null
           word_guess_status: string | null
           word_guessed: boolean | null
         }
@@ -117,6 +118,7 @@ export type Database = {
           timer_started_at?: string | null
           updated_at?: string
           winner?: string | null
+          word_guess_options?: string | null
           word_guess_status?: string | null
           word_guessed?: boolean | null
         }
@@ -138,6 +140,7 @@ export type Database = {
           timer_started_at?: string | null
           updated_at?: string
           winner?: string | null
+          word_guess_options?: string | null
           word_guess_status?: string | null
           word_guessed?: boolean | null
         }
@@ -226,6 +229,7 @@ export type Database = {
           timer_started_at: string | null
           updated_at: string | null
           winner: string | null
+          word_guess_options: string | null
           word_guess_status: string | null
           word_guessed: boolean | null
         }
@@ -246,6 +250,7 @@ export type Database = {
           timer_started_at?: string | null
           updated_at?: string | null
           winner?: string | null
+          word_guess_options?: string | null
           word_guess_status?: string | null
           word_guessed?: boolean | null
         }
@@ -266,6 +271,7 @@ export type Database = {
           timer_started_at?: string | null
           updated_at?: string | null
           winner?: string | null
+          word_guess_options?: string | null
           word_guess_status?: string | null
           word_guessed?: boolean | null
         }
@@ -326,6 +332,10 @@ export type Database = {
           p_room_id: string
           p_secret_word: string
         }
+        Returns: boolean
+      }
+      set_word_guess_options_secure: {
+        Args: { p_host_player_id: string; p_options: string; p_room_id: string }
         Returns: boolean
       }
       start_game_secure: {
