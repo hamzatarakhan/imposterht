@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Category, getRandomWord, getWordsByCategory } from '@/data/words';
+import { Category, getRandomWord, getSimilarWords } from '@/data/words';
 
 export type GameScreen = 
   | 'splash'
@@ -336,14 +336,8 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
       });
 
-      // Generate word guess options always (for any imposter)
-      let allWords: string[] = [];
-      for (const cat of prev.categories) {
-        allWords = [...allWords, ...getWordsByCategory(cat)];
-      }
-      allWords = [...new Set(allWords)].filter(w => w !== prev.secretWord);
-      const shuffled = allWords.sort(() => Math.random() - 0.5);
-      const fakeWords = shuffled.slice(0, 3);
+      // Generate word guess options with similar/close words for difficulty
+      const fakeWords = getSimilarWords(prev.secretWord, prev.categories, 3);
       const wordGuessOptions = [...fakeWords, prev.secretWord].sort(() => Math.random() - 0.5);
 
       return {

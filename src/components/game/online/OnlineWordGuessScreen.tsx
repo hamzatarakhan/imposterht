@@ -3,7 +3,7 @@ import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { HelpCircle, Check, X, Clock, Eye } from 'lucide-react';
 import * as roomService from '@/services/roomService';
-import { getWordsByCategory, Category } from '@/data/words';
+import { getSimilarWords, Category } from '@/data/words';
 
 const OnlineWordGuessScreen: React.FC = () => {
   const { room, players, currentPlayer, isHost, setScreen } = useOnlineGame();
@@ -43,7 +43,7 @@ const OnlineWordGuessScreen: React.FC = () => {
       const secretWord = await roomService.getFinishedGameWord(room.id);
       if (!secretWord) return;
       
-      // Get words from the same category
+      // Get categories for similar word selection
       let categories: Category[] = ['random'];
       try {
         const parsed = JSON.parse(room.categories || '["random"]');
@@ -52,19 +52,8 @@ const OnlineWordGuessScreen: React.FC = () => {
         categories = ['random'];
       }
       
-      // Gather all words from the categories
-      let allWords: string[] = [];
-      for (const cat of categories) {
-        allWords = [...allWords, ...getWordsByCategory(cat)];
-      }
-      allWords = [...new Set(allWords)].filter(w => w !== secretWord);
-      
-      // Pick 3 random fake words
-      const fakeWords: string[] = [];
-      const shuffled = allWords.sort(() => Math.random() - 0.5);
-      for (let i = 0; i < Math.min(3, shuffled.length); i++) {
-        fakeWords.push(shuffled[i]);
-      }
+      // Pick 3 similar/close words for difficulty
+      const fakeWords = getSimilarWords(secretWord, categories, 3);
       
       // Combine and shuffle
       const allOptions = [...fakeWords, secretWord].sort(() => Math.random() - 0.5);
