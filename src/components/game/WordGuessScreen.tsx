@@ -4,15 +4,16 @@ import { useSettings } from '@/context/SettingsContext';
 import { HelpCircle, Check, X, Eye } from 'lucide-react';
 
 const WordGuessScreen: React.FC = () => {
-  const { players, secretWord, wordGuessOptions, wordGuessed, submitWordGuess, skipWordGuess, setScreen } = useGame();
+  const { players, secretWord, wordGuessOptions, wordGuessed, winner, submitWordGuess, skipWordGuess, setScreen } = useGame();
   const { playSound, vibrate } = useSettings();
   
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [showPassPhone, setShowPassPhone] = useState(true);
 
-  // Find the caught imposter (most voted)
-  const sortedByVotes = [...players].sort((a, b) => b.votes - a.votes);
-  const caughtImposter = sortedByVotes[0];
+  // Find the imposter who gets to guess
+  const guessingImposter = winner === 'players'
+    ? [...players].sort((a, b) => b.votes - a.votes)[0]
+    : players.find(p => p.isImposter) || players[0];
 
   // Auto-navigate to result after guess
   useEffect(() => {
@@ -101,11 +102,11 @@ const WordGuessScreen: React.FC = () => {
           </p>
           
           <div className="w-20 h-20 mx-auto rounded-full bg-imposter/20 flex items-center justify-center mb-3">
-            <span className="text-4xl">{caughtImposter?.avatar || '😈'}</span>
+            <span className="text-4xl">{guessingImposter?.avatar || '😈'}</span>
           </div>
           <div className="card-game mb-6 inline-block">
             <span className="text-2xl font-black text-gradient-imposter">
-              {caughtImposter?.name}
+              {guessingImposter?.name}
             </span>
           </div>
           

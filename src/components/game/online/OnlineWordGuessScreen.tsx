@@ -14,15 +14,22 @@ const OnlineWordGuessScreen: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [options, setOptions] = useState<string[]>([]);
 
-  // Determine if current player is the imposter who got caught
+  // Determine the imposter who gets to guess
   const myImposterId = currentPlayer?.player_id;
-  const caughtImposter = useMemo(() => {
-    // The most voted player is the caught imposter
-    const sorted = [...players].sort((a, b) => b.votes - a.votes);
-    return sorted[0];
-  }, [players]);
+  const guessingImposter = useMemo(() => {
+    // If players won, the most voted (caught) imposter guesses
+    // If imposters won, pick any imposter (first one found)
+    if (room?.winner === 'players') {
+      const sorted = [...players].sort((a, b) => b.votes - a.votes);
+      return sorted[0];
+    }
+    // Imposters won - we need to find an imposter from the revealed data
+    // Since game is finished, is_imposter is visible
+    const imposter = players.find(p => p.is_imposter);
+    return imposter || players[0];
+  }, [players, room?.winner]);
   
-  const isTheCaughtImposter = caughtImposter?.player_id === myImposterId;
+  const isTheGuessingImposter = guessingImposter?.player_id === myImposterId;
 
   // Host generates and stores word options when entering this screen
   useEffect(() => {
@@ -94,7 +101,7 @@ const OnlineWordGuessScreen: React.FC = () => {
   }, [room?.word_guess_status, setScreen]);
 
   const handleSelectWord = useCallback(async (word: string) => {
-    if (!isTheCaughtImposter || isSubmitting || guessResult !== null) return;
+    if (!isTheGuessingImposter || isSubmitting || guessResult !== null) return;
     
     playSound('click');
     vibrate(50);
@@ -117,7 +124,7 @@ const OnlineWordGuessScreen: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [isTheCaughtImposter, isSubmitting, guessResult, room, playSound, vibrate]);
+  }, [isTheGuessingImposter, isSubmitting, guessResult, room, playSound, vibrate]);
 
   // If guess is completed (from DB), show result to everyone
   if (room?.word_guess_status === 'completed') {
@@ -169,7 +176,7 @@ const OnlineWordGuessScreen: React.FC = () => {
   }
 
   // Imposter's view - they can pick
-  if (isTheCaughtImposter) {
+  if (isTheGuessingImposter) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-background via-imposter/10 to-background" />
@@ -240,8 +247,8 @@ const OnlineWordGuessScreen: React.FC = () => {
           🤔 الإمبوستر يحزر الكلمة!
         </h1>
         <p className="text-muted-foreground mb-2">
-          <span className="text-lg">{caughtImposter?.avatar}</span>{' '}
-          <span className="font-bold text-imposter">{caughtImposter?.name}</span>{' '}
+          <span className="text-lg">{guessingImposter?.avatar}</span>{' '}
+          <span className="font-bold text-imposter">{guessingImposter?.name}</span>{' '}
           عنده فرصة يحزر الكلمة السرية
         </p>
         <p className="text-xs text-muted-foreground mb-6">
