@@ -435,6 +435,70 @@ export const getWordsByCategory = (category: Category): string[] => {
   return words[category];
 };
 
+/**
+ * Get words that are semantically similar to the target word.
+ * Uses proximity in the array (words are grouped by subcategory via comments).
+ */
+export const getSimilarWords = (targetWord: string, categories: Category[], count: number = 3): string[] => {
+  // Find which category contains the word and its index
+  const categoriesToSearch: (Exclude<Category, 'random' | 'custom'>)[] = [];
+  
+  if (categories.includes('random')) {
+    categoriesToSearch.push(...(Object.keys(words) as (Exclude<Category, 'random' | 'custom'>)[]));
+  } else {
+    for (const cat of categories) {
+      if (cat !== 'custom' && cat !== 'random') {
+        categoriesToSearch.push(cat);
+      }
+    }
+  }
+
+  // Find the word's position in its category
+  let bestCategory: string[] = [];
+  let wordIndex = -1;
+
+  for (const cat of categoriesToSearch) {
+    const catWords = words[cat];
+    const idx = catWords.indexOf(targetWord);
+    if (idx !== -1) {
+      bestCategory = catWords;
+      wordIndex = idx;
+      break;
+    }
+  }
+
+  if (wordIndex === -1 || bestCategory.length === 0) {
+    // Fallback: random words from categories
+    let all: string[] = [];
+    for (const cat of categoriesToSearch) {
+      all = [...all, ...words[cat]];
+    }
+    all = [...new Set(all)].filter(w => w !== targetWord);
+    return all.sort(() => Math.random() - 0.5).slice(0, count);
+  }
+
+  // Pick nearby words (same subcategory cluster ~15 words radius)
+  const radius = 12;
+  const start = Math.max(0, wordIndex - radius);
+  const end = Math.min(bestCategory.length, wordIndex + radius + 1);
+  
+  let nearbyWords = bestCategory.slice(start, end).filter(w => w !== targetWord);
+  
+  // Shuffle nearby and pick
+  nearbyWords = nearbyWords.sort(() => Math.random() - 0.5);
+  
+  if (nearbyWords.length >= count) {
+    return nearbyWords.slice(0, count);
+  }
+  
+  // Not enough nearby, expand to full category
+  const remaining = bestCategory
+    .filter(w => w !== targetWord && !nearbyWords.includes(w))
+    .sort(() => Math.random() - 0.5);
+  
+  return [...nearbyWords, ...remaining].slice(0, count);
+};
+
 export const getRandomWord = (category: Category | Category[], usedWords: string[] = []): string => {
   let allAvailableWords: string[] = [];
   
