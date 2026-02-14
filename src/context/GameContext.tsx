@@ -336,23 +336,20 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
       });
 
-      // Generate word guess options if players won
-      let wordGuessOptions: string[] = [];
-      if (gameWinner === 'players') {
-        let allWords: string[] = [];
-        for (const cat of prev.categories) {
-          allWords = [...allWords, ...getWordsByCategory(cat)];
-        }
-        allWords = [...new Set(allWords)].filter(w => w !== prev.secretWord);
-        const shuffled = allWords.sort(() => Math.random() - 0.5);
-        const fakeWords = shuffled.slice(0, 3);
-        wordGuessOptions = [...fakeWords, prev.secretWord].sort(() => Math.random() - 0.5);
+      // Generate word guess options always (for any imposter)
+      let allWords: string[] = [];
+      for (const cat of prev.categories) {
+        allWords = [...allWords, ...getWordsByCategory(cat)];
       }
+      allWords = [...new Set(allWords)].filter(w => w !== prev.secretWord);
+      const shuffled = allWords.sort(() => Math.random() - 0.5);
+      const fakeWords = shuffled.slice(0, 3);
+      const wordGuessOptions = [...fakeWords, prev.secretWord].sort(() => Math.random() - 0.5);
 
       return {
         ...prev,
         winner: gameWinner,
-        screen: gameWinner === 'players' ? 'wordGuess' : 'result',
+        screen: 'wordGuess',
         playerScores: updatedScores,
         wordGuessOptions,
         wordGuessed: null,
