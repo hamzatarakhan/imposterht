@@ -121,12 +121,6 @@ const WordGuessScreen: React.FC = () => {
             😈 جاهز أحزر
           </button>
           
-          <button
-            onClick={skipWordGuess}
-            className="w-full btn-secondary-game mt-3"
-          >
-            تخطي ➡️
-          </button>
         </div>
       </div>
     );
