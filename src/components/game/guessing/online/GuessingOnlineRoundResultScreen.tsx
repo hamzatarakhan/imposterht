@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
-import { getWordEmoji } from '@/data/wordEmojis';
+import WordImage from '../WordImage';
 
 const GuessingOnlineRoundResultScreen: React.FC = () => {
   const { room, players, isHost, nextRound } = useOnlineGuessing();
@@ -38,19 +38,22 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
         {words && (
           <div className="card-game">
             <h3 className="font-bold mb-3 text-center">📝 الكلمات كانت:</h3>
-            <div className="space-y-2">
-              {players.map((p, i) => (
-                <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{p.avatar}</span>
-                    <span className="font-bold text-sm">{p.name}</span>
+            <div className="space-y-3">
+              {players.map((p, i) => {
+                const w = i === 0 ? words.player1_word : words.player2_word;
+                return (
+                  <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{p.avatar}</span>
+                      <span className="font-bold text-sm">{p.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <WordImage word={w} size="sm" />
+                      <span className="font-black text-primary">{w}</span>
+                    </div>
                   </div>
-                  <span className="font-black text-primary flex items-center gap-1">
-                    <span className="text-xl">{getWordEmoji(i === 0 ? words.player1_word : words.player2_word)}</span>
-                    {i === 0 ? words.player1_word : words.player2_word}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
