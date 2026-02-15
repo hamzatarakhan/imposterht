@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGuessingGame } from '@/context/GuessingGameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { getWordEmoji } from '@/data/wordEmojis';
 
 const GuessingRoundResultScreen: React.FC = () => {
   const { roundWinner, words, players, currentRound, totalRounds, nextRound } = useGuessingGame();
@@ -32,7 +33,10 @@ const GuessingRoundResultScreen: React.FC = () => {
                   <span className="text-xl">{p.avatar}</span>
                   <span className="font-bold text-sm">{p.name}</span>
                 </div>
-                <span className="font-black text-primary">{words[i]}</span>
+                <span className="font-black text-primary flex items-center gap-1">
+                  <span className="text-xl">{getWordEmoji(words[i])}</span>
+                  {words[i]}
+                </span>
               </div>
             ))}
           </div>

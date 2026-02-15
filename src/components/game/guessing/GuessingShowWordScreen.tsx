@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGuessingGame } from '@/context/GuessingGameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { getWordEmoji } from '@/data/wordEmojis';
 
 const GuessingShowWordScreen: React.FC = () => {
   const { words, currentPlayerViewIndex, players, confirmSeen } = useGuessingGame();
@@ -20,6 +21,7 @@ const GuessingShowWordScreen: React.FC = () => {
         <div className="card-game text-center">
           <div className="text-4xl mb-3">{currentPlayer.avatar}</div>
           <p className="text-sm text-muted-foreground mb-2">{currentPlayer.name}، كلمتك هي:</p>
+          <div className="text-6xl mb-2">{getWordEmoji(myWord)}</div>
           <div className="text-4xl font-black text-primary mb-4 animate-reveal py-4 px-6 bg-primary/10 rounded-2xl">
             {myWord}
           </div>

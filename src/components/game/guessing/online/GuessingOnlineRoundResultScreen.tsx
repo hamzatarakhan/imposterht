@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
+import { getWordEmoji } from '@/data/wordEmojis';
 
 const GuessingOnlineRoundResultScreen: React.FC = () => {
   const { room, players, isHost, nextRound } = useOnlineGuessing();
@@ -44,7 +45,8 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
                     <span className="text-xl">{p.avatar}</span>
                     <span className="font-bold text-sm">{p.name}</span>
                   </div>
-                  <span className="font-black text-primary">
+                  <span className="font-black text-primary flex items-center gap-1">
+                    <span className="text-xl">{getWordEmoji(i === 0 ? words.player1_word : words.player2_word)}</span>
                     {i === 0 ? words.player1_word : words.player2_word}
                   </span>
                 </div>
