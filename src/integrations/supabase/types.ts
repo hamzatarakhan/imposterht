@@ -14,6 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      guessing_players: {
+        Row: {
+          avatar: string
+          id: string
+          is_host: boolean
+          joined_at: string
+          name: string
+          player_id: string
+          room_id: string
+          wins: number
+        }
+        Insert: {
+          avatar?: string
+          id?: string
+          is_host?: boolean
+          joined_at?: string
+          name: string
+          player_id: string
+          room_id: string
+          wins?: number
+        }
+        Update: {
+          avatar?: string
+          id?: string
+          is_host?: boolean
+          joined_at?: string
+          name?: string
+          player_id?: string
+          room_id?: string
+          wins?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guessing_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "guessing_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guessing_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "public_guessing_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guessing_rooms: {
+        Row: {
+          categories: string | null
+          code: string
+          created_at: string
+          current_round: number
+          host_id: string
+          id: string
+          player1_word: string | null
+          player2_word: string | null
+          round_winner_id: string | null
+          status: string
+          total_rounds: number
+          updated_at: string
+        }
+        Insert: {
+          categories?: string | null
+          code?: string
+          created_at?: string
+          current_round?: number
+          host_id: string
+          id?: string
+          player1_word?: string | null
+          player2_word?: string | null
+          round_winner_id?: string | null
+          status?: string
+          total_rounds?: number
+          updated_at?: string
+        }
+        Update: {
+          categories?: string | null
+          code?: string
+          created_at?: string
+          current_round?: number
+          host_id?: string
+          id?: string
+          player1_word?: string | null
+          player2_word?: string | null
+          round_winner_id?: string | null
+          status?: string
+          total_rounds?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       room_players: {
         Row: {
           avatar: string
@@ -148,6 +241,93 @@ export type Database = {
       }
     }
     Views: {
+      public_guessing_players: {
+        Row: {
+          avatar: string | null
+          id: string | null
+          is_host: boolean | null
+          joined_at: string | null
+          name: string | null
+          player_id: string | null
+          room_id: string | null
+          wins: number | null
+        }
+        Insert: {
+          avatar?: string | null
+          id?: string | null
+          is_host?: boolean | null
+          joined_at?: string | null
+          name?: string | null
+          player_id?: string | null
+          room_id?: string | null
+          wins?: number | null
+        }
+        Update: {
+          avatar?: string | null
+          id?: string | null
+          is_host?: boolean | null
+          joined_at?: string | null
+          name?: string | null
+          player_id?: string | null
+          room_id?: string | null
+          wins?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guessing_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "guessing_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guessing_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "public_guessing_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_guessing_rooms: {
+        Row: {
+          categories: string | null
+          code: string | null
+          created_at: string | null
+          current_round: number | null
+          host_id: string | null
+          id: string | null
+          round_winner_id: string | null
+          status: string | null
+          total_rounds: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          categories?: string | null
+          code?: string | null
+          created_at?: string | null
+          current_round?: number | null
+          host_id?: string | null
+          id?: string | null
+          round_winner_id?: string | null
+          status?: string | null
+          total_rounds?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          categories?: string | null
+          code?: string | null
+          created_at?: string | null
+          current_round?: number | null
+          host_id?: string | null
+          id?: string | null
+          round_winner_id?: string | null
+          status?: string | null
+          total_rounds?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       public_room_players: {
         Row: {
           avatar: string | null
@@ -285,13 +465,29 @@ export type Database = {
             Args: { p_host_player_id: string; p_room_id: string }
             Returns: string
           }
+      cleanup_old_guessing_rooms: { Args: never; Returns: undefined }
       cleanup_old_rooms: { Args: never; Returns: undefined }
+      delete_guessing_room: {
+        Args: { p_host_player_id: string; p_room_id: string }
+        Returns: boolean
+      }
       delete_room_secure: {
         Args: { p_host_player_id: string; p_room_id: string }
         Returns: boolean
       }
       generate_room_code: { Args: never; Returns: string }
       get_finished_game_word: { Args: { p_room_id: string }; Returns: string }
+      get_guessing_round_words: {
+        Args: { p_room_id: string }
+        Returns: {
+          player1_word: string
+          player2_word: string
+        }[]
+      }
+      get_guessing_word: {
+        Args: { p_player_id: string; p_room_id: string }
+        Returns: string
+      }
       get_imposters_after_finish: {
         Args: { p_room_id: string }
         Returns: {
@@ -308,12 +504,33 @@ export type Database = {
         Args: { p_player_id: string; p_room_id: string }
         Returns: string
       }
+      leave_guessing_room: {
+        Args: { p_player_id: string; p_room_id: string }
+        Returns: boolean
+      }
       leave_room_secure: {
         Args: { p_player_id: string; p_room_id: string }
         Returns: boolean
       }
+      mark_guessing_winner: {
+        Args: {
+          p_host_player_id: string
+          p_room_id: string
+          p_winner_player_id: string
+        }
+        Returns: boolean
+      }
       mark_role_seen_secure: {
         Args: { p_player_id: string; p_room_id: string }
+        Returns: boolean
+      }
+      next_guessing_round: {
+        Args: {
+          p_host_player_id: string
+          p_room_id: string
+          p_word1: string
+          p_word2: string
+        }
         Returns: boolean
       }
       rename_player_secure: {
@@ -343,6 +560,15 @@ export type Database = {
           p_host_player_id: string
           p_room_id: string
           p_secret_word: string
+        }
+        Returns: boolean
+      }
+      start_guessing_game: {
+        Args: {
+          p_host_player_id: string
+          p_room_id: string
+          p_word1: string
+          p_word2: string
         }
         Returns: boolean
       }

@@ -2,7 +2,8 @@ import React from "react";
 import { GameProvider, useGame } from '@/context/GameContext';
 import { OnlineGameProvider, useOnlineGame } from '@/context/OnlineGameContext';
 import { SettingsProvider } from '@/context/SettingsContext';
-import { GuessingGameProvider, useGuessingGame } from '@/context/GuessingGameContext';
+import { GuessingGameProvider } from '@/context/GuessingGameContext';
+import { OnlineGuessingProvider, useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import SplashScreen from './SplashScreen';
 import HubScreen from './HubScreen';
 import HomeScreen from './HomeScreen';
@@ -19,45 +20,38 @@ import ResultScreen from './ResultScreen';
 import OnlineGame from './online/OnlineGame';
 import ModeSelectScreen from './online/ModeSelectScreen';
 import GuessingGame from './guessing/GuessingGame';
+import OnlineGuessingGame from './guessing/online/OnlineGuessingGame';
 
 const GameContent: React.FC = () => {
   const { screen } = useGame();
   const { screen: onlineScreen, pendingJoinCode } = useOnlineGame();
+  const { screen: guessingOnlineScreen } = useOnlineGuessing();
 
-  // If we have a pending join code, go directly to online join screen
+  // Imposter online flow
   if (pendingJoinCode || onlineScreen === 'joinRoom') {
-    return (
-      <div className="max-w-md mx-auto min-h-screen bg-background relative">
-        <OnlineGame />
-      </div>
-    );
+    return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGame /></div>;
   }
-
-  // If in online flow (not modeSelect), show online screens
   if (onlineScreen !== 'modeSelect') {
-    return (
-      <div className="max-w-md mx-auto min-h-screen bg-background relative">
-        <OnlineGame />
-      </div>
-    );
+    return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGame /></div>;
   }
 
-  // Guessing game - render when main screen is guessingSetup OR guessing game has active state
+  // Guessing online flow
+  if (guessingOnlineScreen !== 'guessingModeSelect') {
+    return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGuessingGame /></div>;
+  }
+
+  // Guessing mode select (shows local vs online choice)
+  if (screen === 'guessingModeSelect') {
+    return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGuessingGame /></div>;
+  }
+
+  // Guessing local flow
   if (screen === 'guessingSetup') {
-    return (
-      <div className="max-w-md mx-auto min-h-screen bg-background relative">
-        <GuessingGame />
-      </div>
-    );
+    return <div className="max-w-md mx-auto min-h-screen bg-background relative"><GuessingGame /></div>;
   }
 
-  // If user selected modeSelect from home, show mode selection
   if (screen === 'modeSelect') {
-    return (
-      <div className="max-w-md mx-auto min-h-screen bg-background relative">
-        <ModeSelectScreen />
-      </div>
-    );
+    return <div className="max-w-md mx-auto min-h-screen bg-background relative"><ModeSelectScreen /></div>;
   }
 
   const screens = {
@@ -79,12 +73,7 @@ const GameContent: React.FC = () => {
   };
 
   const CurrentScreen = screens[screen];
-
-  return (
-    <div className="max-w-md mx-auto min-h-screen bg-background relative">
-      <CurrentScreen />
-    </div>
-  );
+  return <div className="max-w-md mx-auto min-h-screen bg-background relative"><CurrentScreen /></div>;
 };
 
 const Game: React.FC = () => (
@@ -92,7 +81,9 @@ const Game: React.FC = () => (
     <GameProvider>
       <OnlineGameProvider>
         <GuessingGameProvider>
-          <GameContent />
+          <OnlineGuessingProvider>
+            <GameContent />
+          </OnlineGuessingProvider>
         </GuessingGameProvider>
       </OnlineGameProvider>
     </GameProvider>
