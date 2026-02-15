@@ -52,7 +52,7 @@ const SettingsScreen: React.FC = () => {
             onClick={() => {
               playSound('click');
               vibrate(30);
-              setScreen('home');
+              setScreen('hub');
             }}
             className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
           >

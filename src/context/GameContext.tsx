@@ -3,6 +3,7 @@ import { Category, getRandomWord, getSimilarWords } from '@/data/words';
 
 export type GameScreen = 
   | 'splash'
+  | 'hub'
   | 'home'
   | 'settings'
   | 'howToPlay'
@@ -14,7 +15,8 @@ export type GameScreen =
   | 'discussion'
   | 'voting'
   | 'wordGuess'
-  | 'result';
+  | 'result'
+  | 'guessingSetup';
 
 export interface Player {
   id: number;
@@ -355,7 +357,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setState(prev => ({
       ...initialState,
       usedWords: prev.usedWords,
-      screen: 'modeSelect',
+      screen: 'hub',
     }));
   };
 

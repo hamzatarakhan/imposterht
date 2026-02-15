@@ -38,7 +38,7 @@ const HowToPlayScreen: React.FC = () => {
   const handleBack = () => {
     playSound('click');
     vibrate(30);
-    setScreen('home');
+    setScreen('hub');
   };
 
   const handleStartGame = () => {

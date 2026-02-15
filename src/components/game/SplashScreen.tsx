@@ -9,7 +9,7 @@ const SplashScreen: React.FC = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setScreen('home');
+      setScreen('hub');
     }, 3000);
     return () => clearTimeout(timer);
   }, [setScreen]);
@@ -23,7 +23,7 @@ const SplashScreen: React.FC = () => {
       vibrate([50, 30, 50]);
     }
     // Skip to home after tap
-    setTimeout(() => setScreen('home'), 500);
+    setTimeout(() => setScreen('hub'), 500);
   };
 
   return (
@@ -44,11 +44,11 @@ const SplashScreen: React.FC = () => {
         </div>
         
         <h1 className="text-6xl font-black mb-4 text-gradient tracking-tight animate-reveal">
-          IMPOSTER
+          فعاليات
         </h1>
         
         <p className="text-xl text-muted-foreground font-medium mb-8 animate-slide-up">
-          لعبة الإمبوستر
+          ألعاب جماعية ممتعة 🎮
         </p>
         
         <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
