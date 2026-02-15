@@ -43,10 +43,10 @@ const games = [
     id: 'guessing',
     name: 'التخمين',
     icon: '🤔',
-    description: 'وصّف الكلمة وخلّيهم يحزروا!',
+    description: 'احزر كلمة خصمك قبل ما يحزر كلمتك!',
     gradient: 'from-blue-500/20 to-cyan-500/20',
     border: 'border-blue-500/30',
-    screen: 'guessingSetup' as const,
+    screen: 'guessingModeSelect' as const,
   },
 ];
 
