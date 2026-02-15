@@ -8,8 +8,11 @@ const GuessingFinalResultScreen: React.FC = () => {
   const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
 
-  const sorted = [...players].sort((a, b) => b.score - a.score);
-  const winner = sorted[0];
+  if (players.length < 2) return null;
+
+  const winner = players[0].wins >= players[1].wins ? players[0] : players[1];
+  const loser = players[0].id === winner.id ? players[1] : players[0];
+  const isDraw = players[0].wins === players[1].wins;
 
   const handleBackToHub = () => {
     playSound('click');
@@ -28,28 +31,28 @@ const GuessingFinalResultScreen: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
 
-      <div className="relative z-10 w-full max-w-sm space-y-6">
+      <div className="relative z-10 w-full max-w-sm space-y-5">
         {/* Winner */}
         <div className="card-game text-center">
-          <div className="text-6xl mb-2 animate-float">🏆</div>
-          <h2 className="text-2xl font-black mb-1">الفائز!</h2>
-          <div className="text-5xl mb-2">{winner?.avatar}</div>
-          <p className="text-xl font-bold text-primary">{winner?.name}</p>
-          <p className="text-muted-foreground">{winner?.score} نقطة</p>
+          <div className="text-6xl mb-2 animate-float">{isDraw ? '🤝' : '🏆'}</div>
+          <h2 className="text-2xl font-black mb-3">
+            {isDraw ? 'تعادل!' : `${winner.name} بطل المواجهة!`}
+          </h2>
+          {!isDraw && <div className="text-5xl mb-2">{winner.avatar}</div>}
         </div>
 
-        {/* Leaderboard */}
+        {/* Final Score */}
         <div className="card-game">
-          <h3 className="font-bold mb-3">📊 الترتيب النهائي</h3>
-          <div className="space-y-2">
-            {sorted.map((p, i) => (
-              <div key={p.id} className={`flex items-center justify-between p-3 rounded-xl ${i === 0 ? 'bg-primary/20' : 'bg-secondary/50'}`}>
-                <div className="flex items-center gap-3">
-                  <span className="text-lg font-black text-muted-foreground w-6">{i + 1}</span>
-                  <span className="text-xl">{p.avatar}</span>
-                  <span className="font-bold">{p.name}</span>
-                </div>
-                <span className="text-lg font-black text-primary">{p.score}</span>
+          <h3 className="font-bold mb-4 text-center">📊 النتيجة النهائية</h3>
+          <div className="flex items-center justify-center gap-6">
+            {players.map(p => (
+              <div key={p.id} className={`text-center p-4 rounded-2xl flex-1 ${
+                !isDraw && p.id === winner.id ? 'bg-primary/20 ring-2 ring-primary/40' : 'bg-secondary/50'
+              }`}>
+                <div className="text-3xl mb-2">{p.avatar}</div>
+                <p className="font-bold">{p.name}</p>
+                <p className="text-3xl font-black text-primary mt-1">{p.wins}</p>
+                <p className="text-xs text-muted-foreground">فوز</p>
               </div>
             ))}
           </div>
@@ -58,7 +61,7 @@ const GuessingFinalResultScreen: React.FC = () => {
         {/* Buttons */}
         <div className="space-y-3">
           <button onClick={handlePlayAgain} className="w-full btn-primary-game text-lg">
-            🔄 العب مرة ثانية
+            🔄 ريفانش!
           </button>
           <button onClick={handleBackToHub} className="w-full btn-secondary-game">
             🏠 الرئيسية
