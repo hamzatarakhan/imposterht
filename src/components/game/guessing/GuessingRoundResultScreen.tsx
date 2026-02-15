@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGuessingGame } from '@/context/GuessingGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { getWordEmoji } from '@/data/wordEmojis';
+import WordImage from './WordImage';
 
 const GuessingRoundResultScreen: React.FC = () => {
   const { roundWinner, words, players, currentRound, totalRounds, nextRound } = useGuessingGame();
@@ -10,7 +10,6 @@ const GuessingRoundResultScreen: React.FC = () => {
   if (players.length < 2 || words.length < 2) return null;
 
   const winner = players.find(p => p.id === roundWinner) || players[0];
-  const loser = players.find(p => p.id !== roundWinner) || players[1];
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
@@ -26,17 +25,17 @@ const GuessingRoundResultScreen: React.FC = () => {
         {/* Words Reveal */}
         <div className="card-game">
           <h3 className="font-bold mb-3 text-center">📝 الكلمات كانت:</h3>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {players.map((p, i) => (
               <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{p.avatar}</span>
                   <span className="font-bold text-sm">{p.name}</span>
                 </div>
-                <span className="font-black text-primary flex items-center gap-1">
-                  <span className="text-xl">{getWordEmoji(words[i])}</span>
-                  {words[i]}
-                </span>
+                <div className="flex items-center gap-2">
+                  <WordImage word={words[i]} size="sm" />
+                  <span className="font-black text-primary">{words[i]}</span>
+                </div>
               </div>
             ))}
           </div>

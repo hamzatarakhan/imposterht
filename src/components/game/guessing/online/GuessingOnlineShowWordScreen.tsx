@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
-import { getWordEmoji } from '@/data/wordEmojis';
+import WordImage from '../WordImage';
 
 const GuessingOnlineShowWordScreen: React.FC = () => {
   const { room, currentPlayer, setScreen } = useOnlineGuessing();
@@ -45,7 +45,7 @@ const GuessingOnlineShowWordScreen: React.FC = () => {
       <div className="relative z-10 w-full max-w-sm">
         <div className="card-game text-center">
           <p className="text-sm text-muted-foreground mb-2">كلمتك هي:</p>
-          <div className="text-6xl mb-2">{myWord ? getWordEmoji(myWord) : '🔮'}</div>
+          {myWord && <WordImage word={myWord} size="lg" />}
           <div className="text-4xl font-black text-primary mb-4 animate-reveal py-4 px-6 bg-primary/10 rounded-2xl">
             {myWord || '...'}
           </div>
