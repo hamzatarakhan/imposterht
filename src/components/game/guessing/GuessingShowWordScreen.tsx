@@ -3,8 +3,14 @@ import { useGuessingGame } from '@/context/GuessingGameContext';
 import { useSettings } from '@/context/SettingsContext';
 
 const GuessingShowWordScreen: React.FC = () => {
-  const { currentWord, setScreen } = useGuessingGame();
+  const { words, currentPlayerViewIndex, players, confirmSeen } = useGuessingGame();
   const { playSound, vibrate } = useSettings();
+
+  if (players.length < 2 || words.length < 2) return null;
+
+  const currentPlayer = players[currentPlayerViewIndex];
+  const myWord = words[currentPlayerViewIndex];
+  const isFirst = currentPlayerViewIndex === 0;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
@@ -12,20 +18,22 @@ const GuessingShowWordScreen: React.FC = () => {
 
       <div className="relative z-10 w-full max-w-sm">
         <div className="card-game text-center">
-          <p className="text-muted-foreground mb-4 text-sm">الكلمة المطلوبة هي:</p>
-          <div className="text-5xl font-black text-primary mb-6 animate-reveal">
-            {currentWord}
+          <div className="text-4xl mb-3">{currentPlayer.avatar}</div>
+          <p className="text-sm text-muted-foreground mb-2">{currentPlayer.name}، كلمتك هي:</p>
+          <div className="text-4xl font-black text-primary mb-4 animate-reveal py-4 px-6 bg-primary/10 rounded-2xl">
+            {myWord}
           </div>
-          <p className="text-muted-foreground mb-6 text-sm leading-relaxed">
-            وصّف هاي الكلمة لباقي اللاعبين<br />
-            <span className="text-destructive font-bold">بدون ما تقولها أو تقول حرف منها!</span>
+          <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+            احفظ كلمتك! الخصم لازم يحزرها 🤫
+            <br />
+            <span className="text-destructive font-bold">لا تخلي حد يشوفها!</span>
           </p>
 
           <button
-            onClick={() => { playSound('click'); vibrate(50); setScreen('guessingPlay'); }}
+            onClick={() => { playSound('click'); vibrate(50); confirmSeen(); }}
             className="w-full btn-primary-game text-lg"
           >
-            ⏱️ يلا نبدأ!
+            {isFirst ? '✅ حفظتها، مرّر للخصم' : '✅ حفظتها، يلا نبدأ!'}
           </button>
         </div>
       </div>

@@ -9,7 +9,6 @@ import GuessingFinalResultScreen from './GuessingFinalResultScreen';
 
 const screens = {
   guessingSetup: GuessingSetupScreen,
-  guessingPlayerNames: GuessingSetupScreen, // handled in setup
   guessingPassPhone: GuessingPassPhoneScreen,
   guessingShowWord: GuessingShowWordScreen,
   guessingPlay: GuessingPlayScreen,

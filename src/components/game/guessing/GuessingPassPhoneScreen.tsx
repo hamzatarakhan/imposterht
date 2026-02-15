@@ -3,10 +3,11 @@ import { useGuessingGame } from '@/context/GuessingGameContext';
 import { useSettings } from '@/context/SettingsContext';
 
 const GuessingPassPhoneScreen: React.FC = () => {
-  const { players, currentDescriberIndex, currentRound, totalRounds, showWord } = useGuessingGame();
+  const { players, currentPlayerViewIndex, currentRound, totalRounds, setScreen } = useGuessingGame();
   const { playSound, vibrate } = useSettings();
 
-  const describer = players[currentDescriberIndex];
+  if (players.length < 2) return null;
+  const currentPlayer = players[currentPlayerViewIndex];
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
@@ -14,21 +15,23 @@ const GuessingPassPhoneScreen: React.FC = () => {
 
       <div className="relative z-10 w-full max-w-sm">
         <div className="mb-4 text-sm text-muted-foreground font-bold">
-          الجولة {currentRound} / {totalRounds}
+          المواجهة {currentRound} / {totalRounds}
         </div>
 
         <div className="card-game text-center">
-          <div className="text-6xl mb-4">{describer?.avatar}</div>
-          <h2 className="text-2xl font-black mb-2">{describer?.name}</h2>
+          <div className="text-6xl mb-4">{currentPlayer.avatar}</div>
+          <h2 className="text-2xl font-black mb-2">{currentPlayer.name}</h2>
           <p className="text-muted-foreground mb-6">
-            أعطِ الجوال لـ <span className="text-primary font-bold">{describer?.name}</span>
+            أعطِ الجوال لـ <span className="text-primary font-bold">{currentPlayer.name}</span>
+            <br />
+            <span className="text-sm">عشان يشوف كلمته</span>
           </p>
 
           <button
-            onClick={() => { playSound('click'); vibrate(50); showWord(); }}
+            onClick={() => { playSound('click'); vibrate(50); setScreen('guessingShowWord'); }}
             className="w-full btn-primary-game text-lg"
           >
-            👀 أنا جاهز، وريني الكلمة
+            👀 أنا {currentPlayer.name}، وريني كلمتي
           </button>
         </div>
       </div>
