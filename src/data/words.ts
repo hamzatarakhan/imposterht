@@ -13,6 +13,18 @@ export const categoryNames: Record<Category, string> = {
   custom: 'كلمات مخصصة ✏️',
 };
 
+export const CATEGORIES: { id: Category; label: string; icon: string }[] = [
+  { id: 'random', label: 'عشوائي', icon: '🎲' },
+  { id: 'things', label: 'أشياء', icon: '📦' },
+  { id: 'places', label: 'أماكن', icon: '🏠' },
+  { id: 'food', label: 'أكل', icon: '🍕' },
+  { id: 'jobs', label: 'وظائف', icon: '💼' },
+  { id: 'animals', label: 'حيوانات', icon: '🐾' },
+  { id: 'sports', label: 'رياضة', icon: '⚽' },
+  { id: 'celebrities', label: 'مشاهير', icon: '⭐' },
+  { id: 'movies', label: 'أفلام', icon: '🎬' },
+];
+
 export const words: Record<Exclude<Category, 'random' | 'custom'>, string[]> = {
   things: [
     // أشياء البيت - كلها معروفة

@@ -2,7 +2,9 @@ import React from "react";
 import { GameProvider, useGame } from '@/context/GameContext';
 import { OnlineGameProvider, useOnlineGame } from '@/context/OnlineGameContext';
 import { SettingsProvider } from '@/context/SettingsContext';
+import { GuessingGameProvider, useGuessingGame } from '@/context/GuessingGameContext';
 import SplashScreen from './SplashScreen';
+import HubScreen from './HubScreen';
 import HomeScreen from './HomeScreen';
 import SettingsScreen from './SettingsScreen';
 import HowToPlayScreen from './HowToPlayScreen';
@@ -16,6 +18,7 @@ import WordGuessScreen from './WordGuessScreen';
 import ResultScreen from './ResultScreen';
 import OnlineGame from './online/OnlineGame';
 import ModeSelectScreen from './online/ModeSelectScreen';
+import GuessingGame from './guessing/GuessingGame';
 
 const GameContent: React.FC = () => {
   const { screen } = useGame();
@@ -39,6 +42,15 @@ const GameContent: React.FC = () => {
     );
   }
 
+  // Guessing game - render when main screen is guessingSetup OR guessing game has active state
+  if (screen === 'guessingSetup') {
+    return (
+      <div className="max-w-md mx-auto min-h-screen bg-background relative">
+        <GuessingGame />
+      </div>
+    );
+  }
+
   // If user selected modeSelect from home, show mode selection
   if (screen === 'modeSelect') {
     return (
@@ -50,10 +62,12 @@ const GameContent: React.FC = () => {
 
   const screens = {
     splash: SplashScreen,
+    hub: HubScreen,
     home: HomeScreen,
     settings: SettingsScreen,
     howToPlay: HowToPlayScreen,
     modeSelect: ModeSelectScreen,
+    guessingSetup: GuessingGame,
     setup: SetupScreen,
     playerNames: PlayerNamesScreen,
     passPhone: PassPhoneScreen,
@@ -77,7 +91,9 @@ const Game: React.FC = () => (
   <SettingsProvider>
     <GameProvider>
       <OnlineGameProvider>
-        <GameContent />
+        <GuessingGameProvider>
+          <GameContent />
+        </GuessingGameProvider>
       </OnlineGameProvider>
     </GameProvider>
   </SettingsProvider>
