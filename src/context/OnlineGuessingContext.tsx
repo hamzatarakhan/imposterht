@@ -50,10 +50,24 @@ const OnlineGuessingContext = createContext<OnlineGuessingContextType | undefine
 export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, setState] = useState<OnlineGuessingState>(initialState);
 
-  // Init player ID
+  // Init player ID and check for join code in URL
   useEffect(() => {
     import('@/services/roomService').then(mod => {
-      setState(prev => ({ ...prev, myPlayerId: mod.getOrCreatePlayerId() }));
+      const playerId = mod.getOrCreatePlayerId();
+      const urlParams = new URLSearchParams(window.location.search);
+      const joinCode = urlParams.get('guessing_join');
+      
+      if (joinCode && joinCode.length === 6) {
+        window.history.replaceState({}, '', window.location.pathname);
+        setState(prev => ({
+          ...prev,
+          myPlayerId: playerId,
+          pendingJoinCode: joinCode.toUpperCase(),
+          screen: 'guessingJoinRoom',
+        }));
+      } else {
+        setState(prev => ({ ...prev, myPlayerId: playerId }));
+      }
     });
   }, []);
 
