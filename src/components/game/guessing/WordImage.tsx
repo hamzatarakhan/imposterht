@@ -8,9 +8,9 @@ interface WordImageProps {
 }
 
 const sizeMap = {
-  sm: 'w-16 h-16',
-  md: 'w-28 h-28',
-  lg: 'w-36 h-36',
+  sm: 'w-20 h-20',
+  md: 'w-32 h-32',
+  lg: 'w-44 h-44',
 };
 
 const WordImage: React.FC<WordImageProps> = ({ word, size = 'lg' }) => {
