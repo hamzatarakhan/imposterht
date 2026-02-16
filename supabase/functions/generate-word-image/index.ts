@@ -36,7 +36,7 @@ serve(async (req) => {
         messages: [
           {
             role: "user",
-            content: `Generate a simple, clear, colorful cartoon-style illustration of "${word}" on a plain white background. The image should be easily recognizable and kid-friendly. No text in the image.`,
+            content: `Generate a photorealistic, ultra high resolution 4K image of "${word}". The image should be a stunning, detailed photograph with professional lighting and sharp focus. Clean background, no text or watermarks.`,
           },
         ],
         modalities: ["image", "text"],
