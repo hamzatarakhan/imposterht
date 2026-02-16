@@ -35,7 +35,7 @@ const GameContent: React.FC = () => {
     return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGame /></div>;
   }
 
-  // Guessing online flow
+  // Guessing online flow (including deep link join)
   if (guessingOnlineScreen !== 'guessingModeSelect') {
     return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGuessingGame /></div>;
   }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useGame, AVATAR_OPTIONS } from "@/context/GameContext";
 import { useSettings } from "@/context/SettingsContext";
-import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone, Video, FolderOpen } from "lucide-react";
+import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone, Video, FolderOpen, ArrowRight } from "lucide-react";
 import { useSavedPlayers } from "@/hooks/useSavedPlayers";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useSavedGroups } from "@/hooks/useSavedGroups";
@@ -136,6 +136,12 @@ const HomeScreen: React.FC = () => {
       {/* Header Icons */}
       <div className="relative z-10 flex justify-between">
         <div className="flex gap-2">
+          <button
+            onClick={() => { playSound('click'); vibrate(30); setScreen('hub'); }}
+            className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowRight size={24} />
+          </button>
           <button
             onClick={() => {
               playSound('click');
