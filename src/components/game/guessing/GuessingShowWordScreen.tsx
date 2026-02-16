@@ -1,10 +1,13 @@
 import React from 'react';
 import { useGuessingGame } from '@/context/GuessingGameContext';
+import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { ArrowRight } from 'lucide-react';
 import WordImage from './WordImage';
 
 const GuessingShowWordScreen: React.FC = () => {
-  const { words, currentPlayerViewIndex, players, confirmSeen } = useGuessingGame();
+  const { words, currentPlayerViewIndex, players, confirmSeen, resetGame } = useGuessingGame();
+  const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
 
   if (players.length < 2 || words.length < 2) return null;
@@ -16,6 +19,11 @@ const GuessingShowWordScreen: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
+
+      <button onClick={() => { playSound('click'); vibrate(30); resetGame(); setMainScreen('hub'); }}
+        className="absolute top-4 right-4 z-20 p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowRight size={20} />
+      </button>
 
       <div className="relative z-10 w-full max-w-sm">
         <div className="card-game text-center">
