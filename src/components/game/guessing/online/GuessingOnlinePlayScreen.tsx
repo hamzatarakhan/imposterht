@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
+import * as guessingService from '@/services/guessingRoomService';
 
 const GuessingOnlinePlayScreen: React.FC = () => {
   const { room, players, isHost, markWinner } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
+  const [myWord, setMyWord] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!room) return;
+    guessingService.getMyGuessingWord(room.id).then(w => setMyWord(w));
+  }, [room?.id, room?.current_round]);
 
   if (!room || players.length < 2) return null;
 
@@ -35,6 +42,14 @@ const GuessingOnlinePlayScreen: React.FC = () => {
           </div>
           <div className="text-3xl font-black text-primary text-center my-2">⚔️</div>
         </div>
+
+        {/* My Word Reminder */}
+        {myWord && (
+          <div className="card-game text-center">
+            <p className="text-xs text-muted-foreground mb-1">كلمتك:</p>
+            <p className="text-2xl font-black text-primary">{myWord}</p>
+          </div>
+        )}
 
         {/* Instructions */}
         <div className="card-game text-center">
