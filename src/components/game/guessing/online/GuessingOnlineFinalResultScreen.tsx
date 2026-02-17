@@ -49,9 +49,16 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
           </div>
         </div>
 
-        <button onClick={handleBackToHub} className="w-full btn-secondary-game">
-          🏠 الرئيسية
-        </button>
+        {isHost && (
+          <button onClick={handleBackToHub} className="w-full btn-secondary-game">
+            🏠 الرئيسية
+          </button>
+        )}
+        {!isHost && (
+          <div className="text-center py-4">
+            <p className="text-muted-foreground animate-pulse">⏳ بانتظار المضيف...</p>
+          </div>
+        )}
       </div>
     </div>
   );
