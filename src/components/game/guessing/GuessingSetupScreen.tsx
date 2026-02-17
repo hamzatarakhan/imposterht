@@ -4,7 +4,7 @@ import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import { ArrowRight, Shuffle, Swords } from 'lucide-react';
-import { CATEGORIES } from '@/data/words';
+import { GUESSING_CATEGORIES } from '@/data/guessingWords';
 
 const GuessingSetupScreen: React.FC = () => {
   const { categories, toggleCategory, totalRounds, setTotalRounds, startGame } = useGuessingGame();
@@ -102,7 +102,7 @@ const GuessingSetupScreen: React.FC = () => {
             <h2 className="font-bold">الفئات</h2>
           </div>
           <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((cat) => (
+            {GUESSING_CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => { playSound('click'); toggleCategory(cat.id); }}

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import * as guessingService from '@/services/guessingRoomService';
 import { GuessingRoom, GuessingPlayer } from '@/services/guessingRoomService';
-import { Category } from '@/data/words';
+import { GuessingCategory } from '@/data/guessingWords';
 
 export type OnlineGuessingScreen =
   | 'guessingModeSelect'
@@ -25,7 +25,7 @@ interface OnlineGuessingState {
 
 interface OnlineGuessingContextType extends OnlineGuessingState {
   setScreen: (s: OnlineGuessingScreen) => void;
-  createRoom: (name: string, avatar: string, settings: { categories: Category[]; totalRounds: number }) => Promise<boolean>;
+  createRoom: (name: string, avatar: string, settings: { categories: GuessingCategory[]; totalRounds: number }) => Promise<boolean>;
   joinRoom: (code: string, name: string, avatar: string) => Promise<{ success: boolean; error?: string }>;
   startGame: () => Promise<boolean>;
   markWinner: (winnerPlayerId: string) => Promise<boolean>;
@@ -146,7 +146,7 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
 
   const setScreen = useCallback((s: OnlineGuessingScreen) => setState(prev => ({ ...prev, screen: s })), []);
 
-  const createRoom = useCallback(async (name: string, avatar: string, settings: { categories: Category[]; totalRounds: number }) => {
+  const createRoom = useCallback(async (name: string, avatar: string, settings: { categories: GuessingCategory[]; totalRounds: number }) => {
     const result = await guessingService.createGuessingRoom(name, avatar, settings);
     if (!result) return false;
     setState(prev => ({
@@ -169,7 +169,7 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
 
   const startGame = useCallback(async () => {
     if (!state.room || !state.isHost) return false;
-    let categories: Category[] = ['random'];
+    let categories: GuessingCategory[] = ['random'];
     try { categories = JSON.parse(state.room.categories || '["random"]'); } catch {}
     return guessingService.startGuessingGame(state.room.id, categories);
   }, [state.room, state.isHost]);
@@ -181,7 +181,7 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
 
   const nextRound = useCallback(async () => {
     if (!state.room || !state.isHost) return false;
-    let categories: Category[] = ['random'];
+    let categories: GuessingCategory[] = ['random'];
     try { categories = JSON.parse(state.room.categories || '["random"]'); } catch {}
     return guessingService.nextGuessingRound(state.room.id, categories);
   }, [state.room, state.isHost]);
