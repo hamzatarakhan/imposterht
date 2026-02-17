@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Category, getRandomWord } from '@/data/words';
+import { GuessingCategory, getGuessingRandomWord } from '@/data/guessingWords';
 
 export type GuessingScreen =
   | 'guessingSetup'
@@ -18,7 +18,7 @@ export interface GuessingPlayer {
 
 interface GuessingState {
   screen: GuessingScreen;
-  categories: Category[];
+  categories: GuessingCategory[];
   totalRounds: number;
   players: GuessingPlayer[];
   words: string[];
@@ -31,8 +31,8 @@ interface GuessingState {
 
 interface GuessingContextType extends GuessingState {
   setScreen: (screen: GuessingScreen) => void;
-  setCategories: (categories: Category[]) => void;
-  toggleCategory: (category: Category) => void;
+  setCategories: (categories: GuessingCategory[]) => void;
+  toggleCategory: (category: GuessingCategory) => void;
   setTotalRounds: (rounds: number) => void;
   startGame: (p1: { name: string; avatar: string }, p2: { name: string; avatar: string }) => void;
   confirmSeen: () => void;
@@ -61,9 +61,9 @@ export const GuessingGameProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const setScreen = (screen: GuessingScreen) => setState(prev => ({ ...prev, screen }));
 
-  const setCategories = (categories: Category[]) => setState(prev => ({ ...prev, categories }));
+  const setCategories = (categories: GuessingCategory[]) => setState(prev => ({ ...prev, categories }));
 
-  const toggleCategory = (category: Category) => {
+  const toggleCategory = (category: GuessingCategory) => {
     setState(prev => {
       if (category === 'random') return { ...prev, categories: ['random'] };
       if (prev.categories.includes('random')) return { ...prev, categories: [category] };
@@ -78,8 +78,8 @@ export const GuessingGameProvider: React.FC<{ children: ReactNode }> = ({ childr
   const setTotalRounds = (rounds: number) => setState(prev => ({ ...prev, totalRounds: rounds }));
 
   const startGame = (p1: { name: string; avatar: string }, p2: { name: string; avatar: string }) => {
-    const word1 = getRandomWord(state.categories, state.usedWords);
-    const word2 = getRandomWord(state.categories, [...state.usedWords, word1]);
+    const word1 = getGuessingRandomWord(state.categories, state.usedWords);
+    const word2 = getGuessingRandomWord(state.categories, [...state.usedWords, word1]);
 
     const players: GuessingPlayer[] = [
       { id: 1, name: p1.name, avatar: p1.avatar, wins: 0 },
@@ -130,8 +130,8 @@ export const GuessingGameProvider: React.FC<{ children: ReactNode }> = ({ childr
         return { ...prev, screen: 'guessingFinalResult' };
       }
 
-      const w1 = getRandomWord(prev.categories, prev.usedWords);
-      const w2 = getRandomWord(prev.categories, [...prev.usedWords, w1]);
+      const w1 = getGuessingRandomWord(prev.categories, prev.usedWords);
+      const w2 = getGuessingRandomWord(prev.categories, [...prev.usedWords, w1]);
 
       return {
         ...prev,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
-import { CATEGORIES, Category } from '@/data/words';
+import { GUESSING_CATEGORIES, GuessingCategory } from '@/data/guessingWords';
 import { ArrowRight, Shuffle } from 'lucide-react';
 
 const GuessingCreateRoomScreen: React.FC = () => {
@@ -11,11 +11,11 @@ const GuessingCreateRoomScreen: React.FC = () => {
 
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState('👤');
-  const [categories, setCategories] = useState<Category[]>(['random']);
+  const [categories, setCategories] = useState<GuessingCategory[]>(['random']);
   const [totalRounds, setTotalRounds] = useState(5);
   const [loading, setLoading] = useState(false);
 
-  const toggleCategory = (cat: Category) => {
+  const toggleCategory = (cat: GuessingCategory) => {
     if (cat === 'random') { setCategories(['random']); return; }
     if (categories.includes('random')) { setCategories([cat]); return; }
     if (categories.includes(cat)) {
@@ -87,7 +87,7 @@ const GuessingCreateRoomScreen: React.FC = () => {
             <h2 className="font-bold">الفئات</h2>
           </div>
           <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map(cat => (
+            {GUESSING_CATEGORIES.map(cat => (
               <button key={cat.id} onClick={() => { playSound('click'); toggleCategory(cat.id); }}
                 className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${categories.includes(cat.id) ? 'bg-primary text-primary-foreground shadow-md' : 'bg-secondary text-muted-foreground'}`}>
                 {cat.icon} {cat.label}

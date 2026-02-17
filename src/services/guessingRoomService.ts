@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getOrCreatePlayerId } from './roomService';
-import { getRandomWord, Category } from '@/data/words';
+import { getGuessingRandomWord, GuessingCategory } from '@/data/guessingWords';
 
 export interface GuessingRoom {
   id: string;
@@ -30,7 +30,7 @@ export interface GuessingPlayer {
 export const createGuessingRoom = async (
   hostName: string,
   hostAvatar: string,
-  settings: { categories: Category[]; totalRounds: number }
+  settings: { categories: GuessingCategory[]; totalRounds: number }
 ): Promise<{ room: GuessingRoom; player: GuessingPlayer } | null> => {
   const playerId = getOrCreatePlayerId();
 
@@ -132,11 +132,11 @@ export const getGuessingPlayers = async (roomId: string): Promise<GuessingPlayer
 };
 
 // Start game (host only)
-export const startGuessingGame = async (roomId: string, categories: Category[]): Promise<boolean> => {
+export const startGuessingGame = async (roomId: string, categories: GuessingCategory[]): Promise<boolean> => {
   const playerId = getOrCreatePlayerId();
   const usedWords: string[] = [];
-  const w1 = getRandomWord(categories, usedWords);
-  const w2 = getRandomWord(categories, [...usedWords, w1]);
+  const w1 = getGuessingRandomWord(categories, usedWords);
+  const w2 = getGuessingRandomWord(categories, [...usedWords, w1]);
 
   const { data, error } = await supabase.rpc('start_guessing_game', {
     p_room_id: roomId, p_host_player_id: playerId, p_word1: w1, p_word2: w2,
@@ -173,10 +173,10 @@ export const markGuessingWinner = async (roomId: string, winnerPlayerId: string)
 };
 
 // Next round (host only)
-export const nextGuessingRound = async (roomId: string, categories: Category[]): Promise<boolean> => {
+export const nextGuessingRound = async (roomId: string, categories: GuessingCategory[]): Promise<boolean> => {
   const playerId = getOrCreatePlayerId();
-  const w1 = getRandomWord(categories, []);
-  const w2 = getRandomWord(categories, [w1]);
+  const w1 = getGuessingRandomWord(categories, []);
+  const w2 = getGuessingRandomWord(categories, [w1]);
 
   const { data, error } = await supabase.rpc('next_guessing_round', {
     p_room_id: roomId, p_host_player_id: playerId, p_word1: w1, p_word2: w2,
