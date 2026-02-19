@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
+import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { GUESSING_CATEGORIES, GuessingCategory } from '@/data/guessingWords';
 import { ArrowRight, Shuffle } from 'lucide-react';
 
 const GuessingCreateRoomScreen: React.FC = () => {
-  const { createRoom, setScreen } = useOnlineGuessing();
+  const { createRoom } = useOnlineGuessing();
+  const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
 
   const [name, setName] = useState('');
@@ -37,7 +39,7 @@ const GuessingCreateRoomScreen: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col relative">
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
-        <button onClick={() => { playSound('click'); setScreen('guessingModeSelect'); }}
+        <button onClick={() => { playSound('click'); setMainScreen('hub'); }}
           className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowRight size={20} />
         </button>

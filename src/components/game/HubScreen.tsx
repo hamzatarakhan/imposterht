@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useGame } from '@/context/GameContext';
+import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Settings, QrCode, Users, FolderOpen, Download, Plus, X, Trash2, Smartphone } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
@@ -37,7 +38,6 @@ const games = [
     description: 'اكشف المندس بينكم!',
     gradient: 'from-red-500/20 to-orange-500/20',
     border: 'border-red-500/30',
-    screen: 'home' as const,
   },
   {
     id: 'guessing',
@@ -46,12 +46,12 @@ const games = [
     description: 'احزر كلمة خصمك قبل ما يحزر كلمتك!',
     gradient: 'from-blue-500/20 to-cyan-500/20',
     border: 'border-blue-500/30',
-    screen: 'guessingModeSelect' as const,
   },
 ];
 
 const HubScreen: React.FC = () => {
   const { setScreen } = useGame();
+  const { setScreen: setOnlineGuessingScreen } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
   const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
   const { isInstallable, installApp } = usePWAInstall();
@@ -328,7 +328,11 @@ const HubScreen: React.FC = () => {
               onClick={() => {
                 playSound('click');
                 vibrate(50);
-                setScreen(game.screen);
+                if (game.id === 'guessing') {
+                  setOnlineGuessingScreen('guessingCreateRoom');
+                } else {
+                  setScreen('home');
+                }
               }}
               className={`flex flex-col items-center gap-3 p-6 rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg`}
             >
