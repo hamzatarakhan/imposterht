@@ -46,6 +46,18 @@ serve(async (req) => {
     if (!response.ok) {
       const errText = await response.text();
       console.error("AI Gateway error:", errText);
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "no_credits", imageUrl: null }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: "rate_limited", imageUrl: null }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       throw new Error(`AI Gateway returned ${response.status}`);
     }
 
