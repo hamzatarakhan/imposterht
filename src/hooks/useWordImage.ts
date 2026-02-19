@@ -28,10 +28,16 @@ export const useWordImage = (word: string | null | undefined) => {
           setLoading(false);
           return;
         }
-        if (data?.imageUrl) {
-          imageCache.set(word, data.imageUrl);
-          setImageUrl(data.imageUrl);
+        // Handle no_credits / rate_limited gracefully - fall back to emoji
+        if (data?.error || !data?.imageUrl) {
+          setLoading(false);
+          return;
         }
+        imageCache.set(word, data.imageUrl);
+        setImageUrl(data.imageUrl);
+        setLoading(false);
+      })
+      .catch(() => {
         setLoading(false);
       });
   }, [word]);
