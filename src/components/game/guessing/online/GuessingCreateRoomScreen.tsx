@@ -39,7 +39,7 @@ const GuessingCreateRoomScreen: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col relative">
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
-        <button onClick={() => { playSound('click'); setMainScreen('hub'); }}
+        <button onClick={(e) => { e.stopPropagation(); playSound('click'); setMainScreen('hub'); }}
           className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowRight size={20} />
         </button>

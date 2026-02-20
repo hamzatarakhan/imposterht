@@ -190,7 +190,6 @@
 html:not(.dark) * {
   box-shadow: none !important;
   text-shadow: none !important;
-  filter: none !important;
 }
 
 /* Hide scrollbar but keep scrolling */
