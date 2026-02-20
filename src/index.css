@@ -186,6 +186,13 @@
   100% { transform: translateY(0); opacity: 1; }
 }
 
+/* Light mode: remove all shadows, keep only borders */
+html:not(.dark) * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
 /* Hide scrollbar but keep scrolling */
 * {
   -ms-overflow-style: none;
