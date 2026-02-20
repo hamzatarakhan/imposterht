@@ -35,13 +35,9 @@ const GameContent: React.FC = () => {
     return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGame /></div>;
   }
 
-  // Guessing online flow (including deep link join)
-  if (guessingOnlineScreen !== 'guessingModeSelect') {
-    return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGuessingGame /></div>;
-  }
-
-  // Guessing mode select (shows local vs online choice)
-  if (screen === 'guessingModeSelect') {
+  // Guessing online flow (only when actively in a guessing online screen beyond mode select)
+  const activeGuessingScreens = ['guessingCreateRoom', 'guessingJoinRoom', 'guessingLobby', 'guessingOnlineShowWord', 'guessingOnlinePlay', 'guessingOnlineRoundResult', 'guessingOnlineFinalResult'];
+  if (activeGuessingScreens.includes(guessingOnlineScreen)) {
     return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGuessingGame /></div>;
   }
 
