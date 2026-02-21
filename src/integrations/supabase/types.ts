@@ -75,6 +75,7 @@ export type Database = {
           round_winner_id: string | null
           status: string
           total_rounds: number
+          turn_time: number
           updated_at: string
         }
         Insert: {
@@ -89,6 +90,7 @@ export type Database = {
           round_winner_id?: string | null
           status?: string
           total_rounds?: number
+          turn_time?: number
           updated_at?: string
         }
         Update: {
@@ -103,6 +105,7 @@ export type Database = {
           round_winner_id?: string | null
           status?: string
           total_rounds?: number
+          turn_time?: number
           updated_at?: string
         }
         Relationships: []
@@ -300,6 +303,7 @@ export type Database = {
           round_winner_id: string | null
           status: string | null
           total_rounds: number | null
+          turn_time: number | null
           updated_at: string | null
         }
         Insert: {
@@ -312,6 +316,7 @@ export type Database = {
           round_winner_id?: string | null
           status?: string | null
           total_rounds?: number | null
+          turn_time?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -324,6 +329,7 @@ export type Database = {
           round_winner_id?: string | null
           status?: string | null
           total_rounds?: number | null
+          turn_time?: number | null
           updated_at?: string | null
         }
         Relationships: []
