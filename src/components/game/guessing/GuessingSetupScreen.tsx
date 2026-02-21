@@ -3,11 +3,11 @@ import { useGuessingGame } from '@/context/GuessingGameContext';
 import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
-import { ArrowRight, Shuffle, Swords, Timer } from 'lucide-react';
+import { ArrowRight, Shuffle, Swords } from 'lucide-react';
 import { GUESSING_CATEGORIES } from '@/data/guessingWords';
 
 const GuessingSetupScreen: React.FC = () => {
-  const { categories, toggleCategory, totalRounds, setTotalRounds, turnTime, setTurnTime, startGame } = useGuessingGame();
+  const { categories, toggleCategory, totalRounds, setTotalRounds, startGame } = useGuessingGame();
   const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
   const { savedPlayers } = useSavedPlayers();
@@ -90,26 +90,6 @@ const GuessingSetupScreen: React.FC = () => {
                   totalRounds === n ? 'bg-primary text-primary-foreground shadow-md' : 'bg-secondary text-muted-foreground'
                 }`}>
                 {n}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Turn Timer */}
-        <div className="card-game">
-          <div className="flex items-center gap-2 mb-3">
-            <Timer size={20} className="text-primary" />
-            <h2 className="font-bold">وقت الدور</h2>
-            <span className="mr-auto text-2xl font-black text-primary">{turnTime}ث</span>
-          </div>
-          <p className="text-xs text-muted-foreground mb-3">الوقت المسموح لكل لاعب عشان يسأل سؤاله</p>
-          <div className="flex gap-2">
-            {[15, 30, 45, 60].map(t => (
-              <button key={t} onClick={() => { playSound('click'); setTurnTime(t); }}
-                className={`flex-1 py-3 rounded-xl font-bold transition-all ${
-                  turnTime === t ? 'bg-primary text-primary-foreground shadow-md' : 'bg-secondary text-muted-foreground'
-                }`}>
-                {t}ث
               </button>
             ))}
           </div>

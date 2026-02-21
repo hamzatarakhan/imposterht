@@ -3,7 +3,7 @@ import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { GUESSING_CATEGORIES, GuessingCategory } from '@/data/guessingWords';
-import { ArrowRight, Shuffle, Timer } from 'lucide-react';
+import { ArrowRight, Shuffle } from 'lucide-react';
 
 const GuessingCreateRoomScreen: React.FC = () => {
   const { createRoom, setScreen } = useOnlineGuessing();
@@ -13,7 +13,6 @@ const GuessingCreateRoomScreen: React.FC = () => {
   const [avatar, setAvatar] = useState('👤');
   const [categories, setCategories] = useState<GuessingCategory[]>(['random']);
   const [totalRounds, setTotalRounds] = useState(5);
-  const [turnTime, setTurnTime] = useState(30);
   const [loading, setLoading] = useState(false);
 
   const toggleCategory = (cat: GuessingCategory) => {
@@ -31,7 +30,7 @@ const GuessingCreateRoomScreen: React.FC = () => {
     if (!name.trim() || loading) return;
     setLoading(true);
     playSound('click'); vibrate(50);
-    const success = await createRoom(name.trim(), avatar, { categories, totalRounds, turnTime });
+    const success = await createRoom(name.trim(), avatar, { categories, totalRounds });
     if (!success) setLoading(false);
   };
 
@@ -76,24 +75,6 @@ const GuessingCreateRoomScreen: React.FC = () => {
               <button key={n} onClick={() => { playSound('click'); setTotalRounds(n); }}
                 className={`flex-1 py-3 rounded-xl font-bold transition-all ${totalRounds === n ? 'bg-primary text-primary-foreground shadow-md' : 'bg-secondary text-muted-foreground'}`}>
                 {n}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Turn Timer */}
-        <div className="card-game">
-          <div className="flex items-center gap-2 mb-3">
-            <Timer size={20} className="text-primary" />
-            <h2 className="font-bold">وقت الدور</h2>
-            <span className="mr-auto text-2xl font-black text-primary">{turnTime}ث</span>
-          </div>
-          <p className="text-xs text-muted-foreground mb-3">الوقت المسموح لكل لاعب عشان يسأل سؤاله</p>
-          <div className="flex gap-2">
-            {[15, 30, 45, 60].map(t => (
-              <button key={t} onClick={() => { playSound('click'); setTurnTime(t); }}
-                className={`flex-1 py-3 rounded-xl font-bold transition-all ${turnTime === t ? 'bg-primary text-primary-foreground shadow-md' : 'bg-secondary text-muted-foreground'}`}>
-                {t}ث
               </button>
             ))}
           </div>

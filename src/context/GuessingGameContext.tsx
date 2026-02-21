@@ -20,7 +20,6 @@ interface GuessingState {
   screen: GuessingScreen;
   categories: GuessingCategory[];
   totalRounds: number;
-  turnTime: number;
   players: GuessingPlayer[];
   words: string[];
   usedWords: string[];
@@ -35,7 +34,6 @@ interface GuessingContextType extends GuessingState {
   setCategories: (categories: GuessingCategory[]) => void;
   toggleCategory: (category: GuessingCategory) => void;
   setTotalRounds: (rounds: number) => void;
-  setTurnTime: (time: number) => void;
   startGame: (p1: { name: string; avatar: string }, p2: { name: string; avatar: string }) => void;
   confirmSeen: () => void;
   markWinner: (playerId: number) => void;
@@ -47,7 +45,6 @@ const initialState: GuessingState = {
   screen: 'guessingSetup',
   categories: ['random'],
   totalRounds: 5,
-  turnTime: 30,
   players: [],
   words: [],
   usedWords: [],
@@ -77,8 +74,6 @@ export const GuessingGameProvider: React.FC<{ children: ReactNode }> = ({ childr
       return { ...prev, categories: [...prev.categories, category] };
     });
   };
-
-  const setTurnTime = (time: number) => setState(prev => ({ ...prev, turnTime: time }));
 
   const setTotalRounds = (rounds: number) => setState(prev => ({ ...prev, totalRounds: rounds }));
 
@@ -156,7 +151,7 @@ export const GuessingGameProvider: React.FC<{ children: ReactNode }> = ({ childr
   return (
     <GuessingGameContext.Provider value={{
       ...state, setScreen, setCategories, toggleCategory,
-      setTotalRounds, setTurnTime, startGame, confirmSeen, markWinner, nextRound, resetGame,
+      setTotalRounds, startGame, confirmSeen, markWinner, nextRound, resetGame,
     }}>
       {children}
     </GuessingGameContext.Provider>
