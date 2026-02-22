@@ -1,28 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
-import * as guessingService from '@/services/guessingRoomService';
 
 const GuessingOnlinePlayScreen: React.FC = () => {
-  const { room, players, isHost, markWinner } = useOnlineGuessing();
+  const { room, players, isHost, markWinner, myWord } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
-  const [myWord, setMyWord] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!room?.id) return;
-    const fetchWord = async () => {
-      const w = await guessingService.getMyGuessingWord(room.id);
-      setMyWord(w);
-      // Retry once if null (race condition with room status)
-      if (!w) {
-        setTimeout(async () => {
-          const retry = await guessingService.getMyGuessingWord(room.id);
-          if (retry) setMyWord(retry);
-        }, 1000);
-      }
-    };
-    fetchWord();
-  }, [room?.id, room?.current_round]);
 
   if (!room || players.length < 2) return null;
 
