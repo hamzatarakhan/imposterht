@@ -159,61 +159,7 @@ const HubScreen: React.FC = () => {
           >
             <QrCode size={24} />
           </button>
-          <button
-            onClick={() => { playSound('click'); vibrate(30); setShowGroupsModal(true); }}
-            className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors relative"
-          >
-            <FolderOpen size={24} />
-            {groups.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-foreground text-xs rounded-full flex items-center justify-center font-bold">
-                {groups.length}
-              </span>
-            )}
-          </button>
         </div>
-
-        {/* Saved Players Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors relative">
-              <Users size={24} />
-              {savedPlayers.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold">
-                  {savedPlayers.length}
-                </span>
-              )}
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="min-w-[220px] bg-card/95 backdrop-blur-md border-border/50 rounded-xl">
-            <DropdownMenuLabel className="text-muted-foreground flex items-center gap-2">👥 اللاعبين المحفوظين</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer flex items-center gap-2 text-primary" onSelect={() => setShowAddPlayerDialog(true)}>
-              <Plus size={16} /> إضافة لاعب جديد
-            </DropdownMenuItem>
-            {savedPlayers.length > 0 && (
-              <>
-                <DropdownMenuSeparator />
-                <div className="max-h-[200px] overflow-y-auto">
-                  {savedPlayers.map((player) => (
-                    <DropdownMenuItem key={player.name} className="flex items-center justify-between cursor-default" onSelect={(e) => e.preventDefault()}>
-                      <span className="flex items-center gap-2">
-                        <span>{player.avatar}</span>
-                        <span>{player.name}</span>
-                      </span>
-                      <button onClick={(e) => handleRemovePlayer(e, player.name)} className="p-1 rounded-full hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors">
-                        <X size={16} />
-                      </button>
-                    </DropdownMenuItem>
-                  ))}
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive cursor-pointer flex items-center gap-2" onSelect={() => setShowDeleteAllDialog(true)}>
-                  <Trash2 size={16} /> مسح الكل
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       {/* Modals */}
