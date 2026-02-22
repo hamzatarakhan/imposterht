@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
+import * as guessingService from '@/services/guessingRoomService';
 import WordImage from '../WordImage';
 
 const GuessingOnlineShowWordScreen: React.FC = () => {
-  const { room, currentPlayer, setScreen, myWord } = useOnlineGuessing();
+  const { room, currentPlayer, setScreen } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
+  const [myWord, setMyWord] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    if (!room) return;
+    guessingService.getMyGuessingWord(room.id).then(w => setMyWord(w));
+  }, [room?.id, room?.current_round]);
 
   if (!room || !currentPlayer) return null;
 

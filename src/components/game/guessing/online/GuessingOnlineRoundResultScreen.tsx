@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
+import * as guessingService from '@/services/guessingRoomService';
 import WordImage from '../WordImage';
 
 const GuessingOnlineRoundResultScreen: React.FC = () => {
-  const { room, players, isHost, nextRound, roundWords } = useOnlineGuessing();
+  const { room, players, isHost, nextRound } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
+  const [words, setWords] = useState<{ player1_word: string; player2_word: string } | null>(null);
+
+  useEffect(() => {
+    if (!room) return;
+    guessingService.getGuessingRoundWords(room.id).then(w => setWords(w));
+  }, [room?.id, room?.current_round]);
 
   if (!room || players.length < 2) return null;
 
@@ -28,12 +35,12 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
         </div>
 
         {/* Words Reveal */}
-        {roundWords && (
+        {words && (
           <div className="card-game">
             <h3 className="font-bold mb-3 text-center">📝 الكلمات كانت:</h3>
             <div className="space-y-3">
               {players.map((p, i) => {
-                const w = i === 0 ? roundWords.player1_word : roundWords.player2_word;
+                const w = i === 0 ? words.player1_word : words.player2_word;
                 return (
                   <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
                     <div className="flex items-center gap-2">
@@ -53,7 +60,7 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
 
         {/* Score */}
         <div className="card-game">
-          <div className="flex items-center justify-center gap-6">
+          <div className="flex items-center justify-center gap-8">
             {players.map(p => (
               <div key={p.id} className="text-center">
                 <span className="text-2xl">{p.avatar}</span>
