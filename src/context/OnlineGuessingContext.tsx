@@ -21,6 +21,8 @@ interface OnlineGuessingState {
   isHost: boolean;
   myPlayerId: string;
   pendingJoinCode: string | null;
+  myWord: string | null;
+  roundWords: { player1_word: string; player2_word: string } | null;
 }
 
 interface OnlineGuessingContextType extends OnlineGuessingState {
@@ -43,6 +45,8 @@ const initialState: OnlineGuessingState = {
   isHost: false,
   myPlayerId: '',
   pendingJoinCode: null,
+  myWord: null,
+  roundWords: null,
 };
 
 const OnlineGuessingContext = createContext<OnlineGuessingContextType | undefined>(undefined);
@@ -122,27 +126,52 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     };
   }, [state.room?.id, state.myPlayerId]);
 
-  // Auto-navigate based on room status
+  // Auto-navigate based on room status and fetch words
   useEffect(() => {
     if (!state.room) return;
     switch (state.room.status) {
       case 'playing':
         if (state.screen !== 'guessingOnlineShowWord' && state.screen !== 'guessingOnlinePlay') {
-          setState(prev => ({ ...prev, screen: 'guessingOnlineShowWord' }));
+          setState(prev => ({ ...prev, screen: 'guessingOnlineShowWord', roundWords: null }));
+        }
+        // Fetch my word when round starts (only if not already fetched for this round)
+        if (!state.myWord) {
+          guessingService.getMyGuessingWord(state.room.id).then(w => {
+            if (w) setState(prev => ({ ...prev, myWord: w }));
+            else {
+              // Retry once after a short delay for race condition
+              setTimeout(async () => {
+                const retry = await guessingService.getMyGuessingWord(state.room!.id);
+                if (retry) setState(prev => ({ ...prev, myWord: retry }));
+              }, 1000);
+            }
+          });
         }
         break;
       case 'round_result':
         if (state.screen !== 'guessingOnlineRoundResult') {
           setState(prev => ({ ...prev, screen: 'guessingOnlineRoundResult' }));
         }
+        // Fetch round words when round ends (only if not already fetched)
+        if (!state.roundWords) {
+          guessingService.getGuessingRoundWords(state.room.id).then(w => {
+            if (w) setState(prev => ({ ...prev, roundWords: w }));
+          });
+        }
         break;
       case 'finished':
         if (state.screen !== 'guessingOnlineFinalResult') {
           setState(prev => ({ ...prev, screen: 'guessingOnlineFinalResult' }));
         }
+        // Also fetch round words for the final round if not cached
+        if (!state.roundWords) {
+          guessingService.getGuessingRoundWords(state.room.id).then(w => {
+            if (w) setState(prev => ({ ...prev, roundWords: w }));
+          });
+        }
         break;
     }
-  }, [state.room?.status]);
+  }, [state.room?.status, state.room?.current_round]);
 
   const setScreen = useCallback((s: OnlineGuessingScreen) => setState(prev => ({ ...prev, screen: s })), []);
 
@@ -181,6 +210,8 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
 
   const nextRound = useCallback(async () => {
     if (!state.room || !state.isHost) return false;
+    // Clear cached words before starting next round
+    setState(prev => ({ ...prev, myWord: null, roundWords: null }));
     let categories: GuessingCategory[] = ['random'];
     try { categories = JSON.parse(state.room.categories || '["random"]'); } catch {}
     return guessingService.nextGuessingRound(state.room.id, categories);
