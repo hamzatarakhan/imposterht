@@ -211,8 +211,20 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
   );
 };
 
+const defaultState: OnlineGuessingContextType = {
+  ...initialState,
+  setScreen: () => {},
+  createRoom: async () => false,
+  joinRoom: async () => ({ success: false }),
+  startGame: async () => false,
+  markWinner: async () => false,
+  nextRound: async () => false,
+  leaveRoom: async () => {},
+  resetOnlineGuessing: () => {},
+  clearPendingJoinCode: () => {},
+};
+
 export const useOnlineGuessing = () => {
   const ctx = useContext(OnlineGuessingContext);
-  if (!ctx) throw new Error('useOnlineGuessing must be used within OnlineGuessingProvider');
-  return ctx;
+  return ctx ?? defaultState;
 };
