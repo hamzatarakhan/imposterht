@@ -126,6 +126,12 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     };
   }, [state.room?.id, state.myPlayerId]);
 
+  // Clear cached words when round changes (important for non-host players)
+  useEffect(() => {
+    if (!state.room?.current_round) return;
+    setState(prev => ({ ...prev, myWord: null, roundWords: null }));
+  }, [state.room?.current_round]);
+
   // Auto-navigate based on room status and fetch words
   useEffect(() => {
     if (!state.room) return;
