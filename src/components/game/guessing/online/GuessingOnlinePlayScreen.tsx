@@ -95,6 +95,17 @@ const GuessingOnlinePlayScreen: React.FC = () => {
             {formatTime(timeLeft)}
           </div>
           <Progress value={progressPercent} className="h-2" />
+          <button
+            onClick={() => {
+              setActiveAskerIndex(i => i === 0 ? 1 : 0);
+              setTimeLeft(turnTime);
+              playSound('alarm');
+              vibrate([50, 30, 50]);
+            }}
+            className="w-full py-3 px-4 rounded-xl bg-secondary text-secondary-foreground font-bold text-sm active:scale-95 transition-all"
+          >
+            ⏭️ خلصت، دور المنافس
+          </button>
         </div>
 
         {/* VS - highlight active asker */}
