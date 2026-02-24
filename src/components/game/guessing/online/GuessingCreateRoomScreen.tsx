@@ -13,6 +13,7 @@ const GuessingCreateRoomScreen: React.FC = () => {
   const [avatar, setAvatar] = useState('👤');
   const [categories, setCategories] = useState<GuessingCategory[]>(['random']);
   const [totalRounds, setTotalRounds] = useState(5);
+  const [turnTime, setTurnTime] = useState(60);
   const [loading, setLoading] = useState(false);
 
   const toggleCategory = (cat: GuessingCategory) => {
@@ -30,7 +31,7 @@ const GuessingCreateRoomScreen: React.FC = () => {
     if (!name.trim() || loading) return;
     setLoading(true);
     playSound('click'); vibrate(50);
-    const success = await createRoom(name.trim(), avatar, { categories, totalRounds });
+    const success = await createRoom(name.trim(), avatar, { categories, totalRounds, turnTime });
     if (!success) setLoading(false);
   };
 
@@ -75,6 +76,23 @@ const GuessingCreateRoomScreen: React.FC = () => {
               <button key={n} onClick={() => { playSound('click'); setTotalRounds(n); }}
                 className={`flex-1 py-3 rounded-xl font-bold transition-all ${totalRounds === n ? 'bg-primary text-primary-foreground shadow-md' : 'bg-secondary text-muted-foreground'}`}>
                 {n}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Turn Time */}
+        <div className="card-game">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xl">⏱️</span>
+            <h2 className="font-bold">وقت الدور</h2>
+            <span className="mr-auto text-2xl font-black text-primary">{turnTime >= 60 ? `${turnTime / 60} د` : `${turnTime} ث`}</span>
+          </div>
+          <div className="flex gap-2">
+            {[30, 45, 60, 90, 120, 180].map(t => (
+              <button key={t} onClick={() => { playSound('click'); setTurnTime(t); }}
+                className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${turnTime === t ? 'bg-primary text-primary-foreground shadow-md' : 'bg-secondary text-muted-foreground'}`}>
+                {t >= 60 ? `${t / 60}د` : `${t}ث`}
               </button>
             ))}
           </div>
