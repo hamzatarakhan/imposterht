@@ -372,7 +372,7 @@ export const words: Record<Exclude<Category, 'random' | 'custom'>, string[]> = {
   "ديناصور",
   "ماموث",
 
-]
+],
   
   sports: [
     // رياضات شعبية
