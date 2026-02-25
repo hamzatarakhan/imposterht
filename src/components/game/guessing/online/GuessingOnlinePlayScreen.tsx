@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
+import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
 
 const GuessingOnlinePlayScreen: React.FC = () => {
@@ -9,14 +10,51 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   const { playSound, vibrate } = useSettings();
   const [myWord, setMyWord] = useState<string | null>(null);
 
-  // Turn system: alternate who starts based on round number
-  // Round 1: player index 0 starts, Round 2: player index 1 starts, etc.
   const roundNumber = room?.current_round || 1;
   const startingIndex = (roundNumber - 1) % 2;
   const [activeAskerIndex, setActiveAskerIndex] = useState(startingIndex);
   const turnTime = room?.turn_time || 60;
   const [timeLeft, setTimeLeft] = useState(turnTime);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
+  // Setup broadcast channel for turn sync
+  useEffect(() => {
+    if (!room?.id) return;
+
+    const channel = supabase.channel(`guessing-turn-${room.id}`);
+    
+    channel.on('broadcast', { event: 'turn_switch' }, (payload) => {
+      const { newAskerIndex, resetTime } = payload.payload;
+      setActiveAskerIndex(newAskerIndex);
+      setTimeLeft(resetTime);
+      playSound('alarm');
+      vibrate([100, 50, 100]);
+    });
+
+    channel.subscribe();
+    channelRef.current = channel;
+
+    return () => {
+      channel.unsubscribe();
+      channelRef.current = null;
+    };
+  }, [room?.id, playSound, vibrate]);
+
+  const broadcastTurnSwitch = useCallback((newIndex: number) => {
+    if (channelRef.current) {
+      channelRef.current.send({
+        type: 'broadcast',
+        event: 'turn_switch',
+        payload: { newAskerIndex: newIndex, resetTime: turnTime },
+      });
+    }
+    // Also apply locally
+    setActiveAskerIndex(newIndex);
+    setTimeLeft(turnTime);
+    playSound('alarm');
+    vibrate([50, 30, 50]);
+  }, [turnTime, playSound, vibrate]);
 
   // Reset turn state when round changes
   useEffect(() => {
@@ -25,15 +63,16 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     setTimeLeft(turnTime);
   }, [roundNumber, turnTime]);
 
-  // Countdown timer
+  // Countdown timer - only the active asker runs it and broadcasts
   useEffect(() => {
+    const isMyTurn = currentPlayer?.player_id === players[activeAskerIndex]?.player_id;
+    if (!isMyTurn) return;
+
     intervalRef.current = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
-          // Switch turn
-          setActiveAskerIndex(i => i === 0 ? 1 : 0);
-          playSound('alarm');
-          vibrate([100, 50, 100]);
+          const newIndex = activeAskerIndex === 0 ? 1 : 0;
+          broadcastTurnSwitch(newIndex);
           return turnTime;
         }
         return prev - 1;
@@ -43,7 +82,38 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [turnTime, playSound, vibrate]);
+  }, [activeAskerIndex, turnTime, currentPlayer?.player_id, players, broadcastTurnSwitch]);
+
+  // Sync timer for non-active player via broadcast (they just display)
+  useEffect(() => {
+    if (!room?.id) return;
+    const channel = supabase.channel(`guessing-timer-${room.id}`);
+
+    const isMyTurn = currentPlayer?.player_id === players[activeAskerIndex]?.player_id;
+
+    if (isMyTurn) {
+      // Active player broadcasts time every second
+      const syncInterval = setInterval(() => {
+        channel.send({
+          type: 'broadcast',
+          event: 'timer_tick',
+          payload: { timeLeft: timeLeft },
+        });
+      }, 1000);
+      channel.subscribe();
+      return () => {
+        clearInterval(syncInterval);
+        channel.unsubscribe();
+      };
+    } else {
+      // Passive player listens
+      channel.on('broadcast', { event: 'timer_tick' }, (payload) => {
+        setTimeLeft(payload.payload.timeLeft);
+      });
+      channel.subscribe();
+      return () => { channel.unsubscribe(); };
+    }
+  }, [room?.id, activeAskerIndex, currentPlayer?.player_id, players, timeLeft]);
 
   useEffect(() => {
     if (!room?.id) return;
@@ -65,6 +135,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   const activeAsker = players[activeAskerIndex];
   const activeTarget = players[activeAskerIndex === 0 ? 1 : 0];
   const progressPercent = (timeLeft / turnTime) * 100;
+  const isMyTurn = currentPlayer?.player_id === activeAsker?.player_id;
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -75,6 +146,11 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   const handleWinner = async (playerId: string) => {
     playSound('win'); vibrate([50, 30, 50]);
     await markWinner(playerId);
+  };
+
+  const handleSkipTurn = () => {
+    const newIndex = activeAskerIndex === 0 ? 1 : 0;
+    broadcastTurnSwitch(newIndex);
   };
 
   return (
@@ -91,24 +167,20 @@ const GuessingOnlinePlayScreen: React.FC = () => {
           <p className="text-lg font-black">
             🎯 {activeAsker.name} اسأل {activeTarget.name}!
           </p>
-          <div className="text-4xl font-black text-primary tabular-nums">
+          <div className={`text-4xl font-black tabular-nums ${timeLeft <= 10 ? 'text-destructive animate-pulse' : 'text-primary'}`}>
             {formatTime(timeLeft)}
           </div>
           <Progress value={progressPercent} className="h-2" />
-          {currentPlayer?.player_id === activeAsker.player_id ? (
+
+          {isMyTurn ? (
             <button
-              onClick={() => {
-                setActiveAskerIndex(i => i === 0 ? 1 : 0);
-                setTimeLeft(turnTime);
-                playSound('alarm');
-                vibrate([50, 30, 50]);
-              }}
-              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-primary/80 to-primary font-bold text-sm text-primary-foreground active:scale-95 transition-all shadow-lg shadow-primary/25 animate-pulse hover:animate-none"
+              onClick={handleSkipTurn}
+              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-primary to-primary/80 font-bold text-base text-primary-foreground active:scale-95 transition-all shadow-lg shadow-primary/30 border-2 border-primary/50"
             >
               ⏭️ خلصت، دور المنافس
             </button>
           ) : (
-            <div className="w-full py-3 px-4 rounded-2xl bg-muted/50 text-muted-foreground font-bold text-sm text-center">
+            <div className="w-full py-3 px-4 rounded-2xl bg-muted/40 text-muted-foreground font-bold text-sm text-center border border-border/50">
               🎙️ دور {activeAsker.name} بالسؤال...
             </div>
           )}
