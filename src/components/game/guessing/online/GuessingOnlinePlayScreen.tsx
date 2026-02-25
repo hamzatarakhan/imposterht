@@ -5,7 +5,7 @@ import * as guessingService from '@/services/guessingRoomService';
 import { Progress } from '@/components/ui/progress';
 
 const GuessingOnlinePlayScreen: React.FC = () => {
-  const { room, players, isHost, markWinner } = useOnlineGuessing();
+  const { room, players, isHost, markWinner, currentPlayer } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
   const [myWord, setMyWord] = useState<string | null>(null);
 
@@ -95,17 +95,23 @@ const GuessingOnlinePlayScreen: React.FC = () => {
             {formatTime(timeLeft)}
           </div>
           <Progress value={progressPercent} className="h-2" />
-          <button
-            onClick={() => {
-              setActiveAskerIndex(i => i === 0 ? 1 : 0);
-              setTimeLeft(turnTime);
-              playSound('alarm');
-              vibrate([50, 30, 50]);
-            }}
-            className="w-full py-3 px-4 rounded-xl bg-secondary text-secondary-foreground font-bold text-sm active:scale-95 transition-all"
-          >
-            ⏭️ خلصت، دور المنافس
-          </button>
+          {currentPlayer?.player_id === activeAsker.player_id ? (
+            <button
+              onClick={() => {
+                setActiveAskerIndex(i => i === 0 ? 1 : 0);
+                setTimeLeft(turnTime);
+                playSound('alarm');
+                vibrate([50, 30, 50]);
+              }}
+              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-primary/80 to-primary font-bold text-sm text-primary-foreground active:scale-95 transition-all shadow-lg shadow-primary/25 animate-pulse hover:animate-none"
+            >
+              ⏭️ خلصت، دور المنافس
+            </button>
+          ) : (
+            <div className="w-full py-3 px-4 rounded-2xl bg-muted/50 text-muted-foreground font-bold text-sm text-center">
+              🎙️ دور {activeAsker.name} بالسؤال...
+            </div>
+          )}
         </div>
 
         {/* VS - highlight active asker */}
