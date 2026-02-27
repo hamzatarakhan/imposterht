@@ -16,7 +16,8 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
 
   if (!room || players.length < 2) return null;
 
-  const winner = players.find(p => p.player_id === room.round_winner_id);
+  const winner = room.round_winner_id ? players.find(p => p.player_id === room.round_winner_id) : null;
+  const isDraw = !room.round_winner_id;
 
   const handleNext = async () => {
     playSound('click'); vibrate(50);
