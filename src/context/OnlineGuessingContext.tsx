@@ -29,6 +29,7 @@ interface OnlineGuessingContextType extends OnlineGuessingState {
   joinRoom: (code: string, name: string, avatar: string) => Promise<{ success: boolean; error?: string }>;
   startGame: () => Promise<boolean>;
   markWinner: (winnerPlayerId: string) => Promise<boolean>;
+  markDraw: () => Promise<boolean>;
   nextRound: () => Promise<boolean>;
   leaveRoom: () => Promise<void>;
   resetOnlineGuessing: () => void;
