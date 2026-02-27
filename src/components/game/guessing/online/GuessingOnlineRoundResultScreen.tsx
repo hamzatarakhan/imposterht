@@ -30,9 +30,19 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
 
       <div className="relative z-10 w-full max-w-sm space-y-5">
         <div className="card-game text-center">
-          <div className="text-6xl mb-3">🎉</div>
-          <h2 className="text-2xl font-black mb-1">{winner?.name} فاز!</h2>
-          <div className="text-4xl mb-3">{winner?.avatar}</div>
+          {isDraw ? (
+            <>
+              <div className="text-6xl mb-3">🤝</div>
+              <h2 className="text-2xl font-black mb-1">تعادل!</h2>
+              <p className="text-muted-foreground">ما حدا حزر هالمرة</p>
+            </>
+          ) : (
+            <>
+              <div className="text-6xl mb-3">🎉</div>
+              <h2 className="text-2xl font-black mb-1">{winner?.name} فاز!</h2>
+              <div className="text-4xl mb-3">{winner?.avatar}</div>
+            </>
+          )}
         </div>
 
         {/* Words Reveal */}
