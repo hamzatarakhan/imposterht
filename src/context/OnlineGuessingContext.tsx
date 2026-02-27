@@ -193,6 +193,13 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     return guessingService.nextGuessingRound(state.room.id, categories);
   }, [state.room, state.isHost]);
 
+  const changeWords = useCallback(async () => {
+    if (!state.room || !state.isHost) return false;
+    let categories: GuessingCategory[] = ['random'];
+    try { categories = JSON.parse(state.room.categories || '["random"]'); } catch {}
+    return guessingService.changeGuessingWords(state.room.id, categories);
+  }, [state.room, state.isHost]);
+
   const leaveRoom = useCallback(async () => {
     if (!state.room) return;
     if (state.isHost) await guessingService.deleteGuessingRoom(state.room.id);
