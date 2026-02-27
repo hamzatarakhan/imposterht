@@ -471,6 +471,15 @@ export type Database = {
             Args: { p_host_player_id: string; p_room_id: string }
             Returns: string
           }
+      change_guessing_words: {
+        Args: {
+          p_host_player_id: string
+          p_room_id: string
+          p_word1: string
+          p_word2: string
+        }
+        Returns: boolean
+      }
       cleanup_old_guessing_rooms: { Args: never; Returns: undefined }
       cleanup_old_rooms: { Args: never; Returns: undefined }
       delete_guessing_room: {
