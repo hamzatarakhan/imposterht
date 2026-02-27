@@ -518,10 +518,15 @@ export type Database = {
         Args: { p_player_id: string; p_room_id: string }
         Returns: boolean
       }
-      mark_guessing_draw: {
-        Args: { p_host_player_id: string; p_room_id: string }
-        Returns: boolean
-      }
+      mark_guessing_draw:
+        | {
+            Args: { p_host_player_id: string; p_room_id: string }
+            Returns: boolean
+          }
+        | {
+            Args: { p_host_player_id: string; p_room_id: string }
+            Returns: boolean
+          }
       mark_guessing_winner: {
         Args: {
           p_host_player_id: string
