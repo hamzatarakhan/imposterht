@@ -180,6 +180,11 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     return guessingService.markGuessingWinner(state.room.id, winnerPlayerId);
   }, [state.room, state.isHost]);
 
+  const markDraw = useCallback(async () => {
+    if (!state.room || !state.isHost) return false;
+    return guessingService.markGuessingDraw(state.room.id);
+  }, [state.room, state.isHost]);
+
   const nextRound = useCallback(async () => {
     if (!state.room || !state.isHost) return false;
     let categories: GuessingCategory[] = ['random'];
