@@ -203,6 +203,19 @@ export const leaveGuessingRoom = async (roomId: string): Promise<void> => {
   await supabase.rpc('leave_guessing_room', { p_room_id: roomId, p_player_id: playerId });
 };
 
+// Change words (host only, same round)
+export const changeGuessingWords = async (roomId: string, categories: GuessingCategory[]): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  const w1 = getGuessingRandomWord(categories, []);
+  const w2 = getGuessingRandomWord(categories, [w1]);
+
+  const { data, error } = await supabase.rpc('change_guessing_words', {
+    p_room_id: roomId, p_host_player_id: playerId, p_word1: w1, p_word2: w2,
+  });
+  if (error) { console.error('Change words failed:', error); return false; }
+  return data || false;
+};
+
 // Delete room (host)
 export const deleteGuessingRoom = async (roomId: string): Promise<void> => {
   const playerId = getOrCreatePlayerId();

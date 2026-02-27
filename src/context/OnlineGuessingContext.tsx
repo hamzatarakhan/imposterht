@@ -31,6 +31,7 @@ interface OnlineGuessingContextType extends OnlineGuessingState {
   markWinner: (winnerPlayerId: string) => Promise<boolean>;
   markDraw: () => Promise<boolean>;
   nextRound: () => Promise<boolean>;
+  changeWords: () => Promise<boolean>;
   leaveRoom: () => Promise<void>;
   resetOnlineGuessing: () => void;
   clearPendingJoinCode: () => void;
