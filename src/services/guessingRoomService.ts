@@ -187,6 +187,16 @@ export const nextGuessingRound = async (roomId: string, categories: GuessingCate
   return data || false;
 };
 
+// Mark draw (host only)
+export const markGuessingDraw = async (roomId: string): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  const { data, error } = await supabase.rpc('mark_guessing_draw', {
+    p_room_id: roomId, p_host_player_id: playerId,
+  });
+  if (error) { console.error('Mark draw failed:', error); return false; }
+  return data || false;
+};
+
 // Leave room
 export const leaveGuessingRoom = async (roomId: string): Promise<void> => {
   const playerId = getOrCreatePlayerId();

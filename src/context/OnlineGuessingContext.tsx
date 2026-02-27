@@ -29,6 +29,7 @@ interface OnlineGuessingContextType extends OnlineGuessingState {
   joinRoom: (code: string, name: string, avatar: string) => Promise<{ success: boolean; error?: string }>;
   startGame: () => Promise<boolean>;
   markWinner: (winnerPlayerId: string) => Promise<boolean>;
+  markDraw: () => Promise<boolean>;
   nextRound: () => Promise<boolean>;
   leaveRoom: () => Promise<void>;
   resetOnlineGuessing: () => void;
@@ -179,6 +180,11 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     return guessingService.markGuessingWinner(state.room.id, winnerPlayerId);
   }, [state.room, state.isHost]);
 
+  const markDraw = useCallback(async () => {
+    if (!state.room || !state.isHost) return false;
+    return guessingService.markGuessingDraw(state.room.id);
+  }, [state.room, state.isHost]);
+
   const nextRound = useCallback(async () => {
     if (!state.room || !state.isHost) return false;
     let categories: GuessingCategory[] = ['random'];
@@ -204,7 +210,7 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
   return (
     <OnlineGuessingContext.Provider value={{
       ...state, setScreen, createRoom, joinRoom, startGame,
-      markWinner, nextRound, leaveRoom, resetOnlineGuessing, clearPendingJoinCode,
+      markWinner, markDraw, nextRound, leaveRoom, resetOnlineGuessing, clearPendingJoinCode,
     }}>
       {children}
     </OnlineGuessingContext.Provider>
@@ -218,6 +224,7 @@ const defaultState: OnlineGuessingContextType = {
   joinRoom: async () => ({ success: false }),
   startGame: async () => false,
   markWinner: async () => false,
+  markDraw: async () => false,
   nextRound: async () => false,
   leaveRoom: async () => {},
   resetOnlineGuessing: () => {},
