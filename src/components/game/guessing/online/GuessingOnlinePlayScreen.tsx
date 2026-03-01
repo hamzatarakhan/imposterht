@@ -222,6 +222,27 @@ const GuessingOnlinePlayScreen: React.FC = () => {
 
   if (!room || !activeAsker || !activeTarget) return null;
 
+  if (!bothReady) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
+        <div className="relative z-10 w-full max-w-sm space-y-5">
+          <div className="card-game text-center space-y-4">
+            <div className="text-5xl animate-bounce">⏳</div>
+            <p className="text-lg font-black">بانتظار الخصم...</p>
+            <p className="text-sm text-muted-foreground">المواجهة تبدأ لما تكونوا الاثنين جاهزين</p>
+          </div>
+          {myWord && (
+            <div className="card-game text-center">
+              <p className="text-xs text-muted-foreground mb-1">كلمتك:</p>
+              <p className="text-2xl font-black text-primary">{myWord}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
