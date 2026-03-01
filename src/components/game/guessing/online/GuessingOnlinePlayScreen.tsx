@@ -10,6 +10,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   const { playSound, vibrate } = useSettings();
   const [myWord, setMyWord] = useState<string | null>(null);
   const [changingWords, setChangingWords] = useState(false);
+  const [bothReady, setBothReady] = useState(false);
 
   const roundNumber = room?.current_round || 1;
   const turnTime = room?.turn_time || 60;
@@ -22,6 +23,8 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   const isChannelReadyRef = useRef(false);
   const activeAskerIndexRef = useRef(activeAskerIndex);
   const isMyTurnRef = useRef(false);
+  const readySetRef = useRef<Set<string>>(new Set());
+  const readyIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const hasTwoPlayers = !!room && players.length >= 2;
   const activeAsker = hasTwoPlayers ? players[activeAskerIndex] : null;
@@ -33,7 +36,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
 
   const progressPercent = (timeLeft / turnTime) * 100;
 
-  // Setup ONE stable broadcast channel
+  // Setup ONE stable broadcast channel with readiness
   useEffect(() => {
     if (!room?.id) return;
 
@@ -56,9 +59,38 @@ const GuessingOnlinePlayScreen: React.FC = () => {
       }
     });
 
+    channel.on('broadcast', { event: 'player_ready' }, ({ payload }) => {
+      const pid = payload?.playerId;
+      if (pid) {
+        readySetRef.current.add(pid);
+        if (readySetRef.current.size >= 2) {
+          setBothReady(true);
+          if (readyIntervalRef.current) {
+            clearInterval(readyIntervalRef.current);
+            readyIntervalRef.current = null;
+          }
+        }
+      }
+    });
+
     channel.subscribe((status) => {
       if (status === 'SUBSCRIBED') {
         isChannelReadyRef.current = true;
+        // Add self to ready set
+        if (currentPlayer?.player_id) {
+          readySetRef.current.add(currentPlayer.player_id);
+        }
+        // Send ready signal repeatedly until both are ready
+        const sendReady = () => {
+          if (readySetRef.current.size >= 2) return;
+          channel.send({
+            type: 'broadcast',
+            event: 'player_ready',
+            payload: { playerId: currentPlayer?.player_id },
+          });
+        };
+        sendReady();
+        readyIntervalRef.current = setInterval(sendReady, 1000);
       }
     });
 
@@ -66,16 +98,23 @@ const GuessingOnlinePlayScreen: React.FC = () => {
 
     return () => {
       isChannelReadyRef.current = false;
+      if (readyIntervalRef.current) {
+        clearInterval(readyIntervalRef.current);
+        readyIntervalRef.current = null;
+      }
       supabase.removeChannel(channel);
       if (channelRef.current === channel) channelRef.current = null;
     };
-  }, [room?.id, roundNumber, turnTime, playSound, vibrate]);
+  }, [room?.id, roundNumber, turnTime, playSound, vibrate, currentPlayer?.player_id]);
 
   // Reset turn state when round changes
   useEffect(() => {
     const idx = (roundNumber - 1) % 2;
     setActiveAskerIndex(idx);
     setTimeLeft(turnTime);
+    // Reset readiness for new round
+    readySetRef.current.clear();
+    setBothReady(false);
   }, [roundNumber, turnTime]);
 
   const switchTurn = useCallback(() => {
@@ -94,9 +133,9 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     }
   }, [turnTime, playSound, vibrate]);
 
-  // Timer starts when both players are in the room
+  // Timer starts ONLY when both players are on this screen (bothReady)
   useEffect(() => {
-    if (!hasTwoPlayers) return;
+    if (!bothReady) return;
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
@@ -111,7 +150,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [hasTwoPlayers, switchTurn]);
+  }, [bothReady, switchTurn]);
 
   // Fetch my word
   useEffect(() => {
@@ -182,6 +221,27 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   };
 
   if (!room || !activeAsker || !activeTarget) return null;
+
+  if (!bothReady) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
+        <div className="relative z-10 w-full max-w-sm space-y-5">
+          <div className="card-game text-center space-y-4">
+            <div className="text-5xl animate-bounce">⏳</div>
+            <p className="text-lg font-black">بانتظار الخصم...</p>
+            <p className="text-sm text-muted-foreground">المواجهة تبدأ لما تكونوا الاثنين جاهزين</p>
+          </div>
+          {myWord && (
+            <div className="card-game text-center">
+              <p className="text-xs text-muted-foreground mb-1">كلمتك:</p>
+              <p className="text-2xl font-black text-primary">{myWord}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
