@@ -17,13 +17,11 @@ const GuessingOnlinePlayScreen: React.FC = () => {
 
   const [activeAskerIndex, setActiveAskerIndex] = useState(startingIndex);
   const [timeLeft, setTimeLeft] = useState(turnTime);
-  const [bothReady, setBothReady] = useState(false);
 
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const isChannelReadyRef = useRef(false);
   const activeAskerIndexRef = useRef(activeAskerIndex);
   const isMyTurnRef = useRef(false);
-  const readySetRef = useRef<Set<string>>(new Set());
 
   const hasTwoPlayers = !!room && players.length >= 2;
   const activeAsker = hasTwoPlayers ? players[activeAskerIndex] : null;
