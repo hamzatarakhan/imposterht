@@ -23,8 +23,6 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   const isChannelReadyRef = useRef(false);
   const activeAskerIndexRef = useRef(activeAskerIndex);
   const isMyTurnRef = useRef(false);
-  const readySetRef = useRef<Set<string>>(new Set());
-  const readyIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const hasTwoPlayers = !!room && players.length >= 2;
   const activeAsker = hasTwoPlayers ? players[activeAskerIndex] : null;
@@ -36,12 +34,15 @@ const GuessingOnlinePlayScreen: React.FC = () => {
 
   const progressPercent = (timeLeft / turnTime) * 100;
 
-  // Setup ONE stable broadcast channel with readiness
+  // Use Presence to track who's on the play screen
   useEffect(() => {
-    if (!room?.id) return;
+    if (!room?.id || !currentPlayer?.player_id) return;
 
-    const channel = supabase.channel(`guessing-turn-${room.id}-r${roundNumber}`);
+    const channel = supabase.channel(`guessing-play-${room.id}-r${roundNumber}`, {
+      config: { presence: { key: currentPlayer.player_id } },
+    });
 
+    // Listen for turn switches via broadcast
     channel.on('broadcast', { event: 'turn_switch' }, ({ payload }) => {
       const nextIndex = Number(payload?.newAskerIndex);
       if (!Number.isFinite(nextIndex)) return;
@@ -59,38 +60,19 @@ const GuessingOnlinePlayScreen: React.FC = () => {
       }
     });
 
-    channel.on('broadcast', { event: 'player_ready' }, ({ payload }) => {
-      const pid = payload?.playerId;
-      if (pid) {
-        readySetRef.current.add(pid);
-        if (readySetRef.current.size >= 2) {
-          setBothReady(true);
-          if (readyIntervalRef.current) {
-            clearInterval(readyIntervalRef.current);
-            readyIntervalRef.current = null;
-          }
-        }
+    // Track presence to know when both players are on this screen
+    channel.on('presence', { event: 'sync' }, () => {
+      const state = channel.presenceState();
+      const presentCount = Object.keys(state).length;
+      if (presentCount >= 2) {
+        setBothReady(true);
       }
     });
 
-    channel.subscribe((status) => {
+    channel.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
         isChannelReadyRef.current = true;
-        // Add self to ready set
-        if (currentPlayer?.player_id) {
-          readySetRef.current.add(currentPlayer.player_id);
-        }
-        // Send ready signal repeatedly until both are ready
-        const sendReady = () => {
-          if (readySetRef.current.size >= 2) return;
-          channel.send({
-            type: 'broadcast',
-            event: 'player_ready',
-            payload: { playerId: currentPlayer?.player_id },
-          });
-        };
-        sendReady();
-        readyIntervalRef.current = setInterval(sendReady, 1000);
+        await channel.track({ player_id: currentPlayer.player_id });
       }
     });
 
@@ -98,10 +80,6 @@ const GuessingOnlinePlayScreen: React.FC = () => {
 
     return () => {
       isChannelReadyRef.current = false;
-      if (readyIntervalRef.current) {
-        clearInterval(readyIntervalRef.current);
-        readyIntervalRef.current = null;
-      }
       supabase.removeChannel(channel);
       if (channelRef.current === channel) channelRef.current = null;
     };
@@ -112,8 +90,6 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     const idx = (roundNumber - 1) % 2;
     setActiveAskerIndex(idx);
     setTimeLeft(turnTime);
-    // Reset readiness for new round
-    readySetRef.current.clear();
     setBothReady(false);
   }, [roundNumber, turnTime]);
 
