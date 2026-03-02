@@ -4,9 +4,10 @@ import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
+import { ArrowRight } from 'lucide-react';
 
 const GuessingOnlinePlayScreen: React.FC = () => {
-  const { room, players, isHost, markWinner, markDraw, changeWords, currentPlayer } = useOnlineGuessing();
+  const { room, players, isHost, markWinner, markDraw, changeWords, currentPlayer, leaveRoom } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
   const [myWord, setMyWord] = useState<string | null>(null);
   const [changingWords, setChangingWords] = useState(false);
