@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import WordImage from '../WordImage';
 
 const GuessingOnlineShowWordScreen: React.FC = () => {
-  const { room, currentPlayer, setScreen } = useOnlineGuessing();
+  const { room, currentPlayer, setScreen, leaveRoom } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
   const [myWord, setMyWord] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
