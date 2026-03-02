@@ -314,14 +314,14 @@ const GuessingOnlinePlayScreen: React.FC = () => {
             <div className="flex gap-2">
               <button
                 onClick={handleDraw}
-                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-muted/60 border-2 border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-secondary border-2 border-border text-foreground hover:border-primary/50"
               >
                 🤝 تعادل
               </button>
               <button
                 onClick={handleChangeWords}
                 disabled={changingWords}
-                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-muted/60 border-2 border-border text-muted-foreground hover:border-primary/50 hover:text-foreground disabled:opacity-50"
+                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-secondary border-2 border-border text-foreground hover:border-primary/50 disabled:opacity-50"
               >
                 🔄 {changingWords ? 'جاري...' : 'غيّر الكلمات'}
               </button>
