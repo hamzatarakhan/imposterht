@@ -69,6 +69,7 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
           </div>
         )}
       </div>
+      </div>
     </div>
   );
 };

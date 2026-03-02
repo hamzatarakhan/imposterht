@@ -101,6 +101,7 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
           </div>
         )}
       </div>
+      </div>
     </div>
   );
 };
