@@ -296,15 +296,15 @@ const GuessingOnlinePlayScreen: React.FC = () => {
 
         {isHost ? (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground font-bold text-center">مين حزر أول؟</p>
+            <p className="text-sm text-foreground font-bold text-center">مين حزر أول؟</p>
             {players.map(player => (
               <button
                 key={player.id}
                 onClick={() => handleWinner(player.player_id)}
                 className={`w-full py-4 px-6 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 ${
                   player.is_host
-                    ? 'bg-gradient-to-r from-blue-500/20 to-blue-600/20 border-2 border-blue-500/40 text-foreground hover:border-blue-500'
-                    : 'bg-gradient-to-r from-red-500/20 to-red-600/20 border-2 border-red-500/40 text-foreground hover:border-red-500'
+                    ? 'bg-gradient-to-r from-blue-500/30 to-blue-600/30 border-2 border-blue-400 text-foreground hover:border-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+                    : 'bg-gradient-to-r from-red-500/30 to-red-600/30 border-2 border-red-400 text-foreground hover:border-red-300 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
                 }`}
               >
                 <span className="text-2xl">{player.avatar}</span>
@@ -314,14 +314,14 @@ const GuessingOnlinePlayScreen: React.FC = () => {
             <div className="flex gap-2">
               <button
                 onClick={handleDraw}
-                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-secondary border-2 border-border text-foreground hover:border-primary/50"
+                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-secondary border-2 border-border/80 text-foreground hover:border-primary/60"
               >
                 🤝 تعادل
               </button>
               <button
                 onClick={handleChangeWords}
                 disabled={changingWords}
-                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-secondary border-2 border-border text-foreground hover:border-primary/50 disabled:opacity-50"
+                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-secondary border-2 border-border/80 text-foreground hover:border-primary/60 disabled:opacity-50"
               >
                 🔄 {changingWords ? 'جاري...' : 'غيّر الكلمات'}
               </button>
