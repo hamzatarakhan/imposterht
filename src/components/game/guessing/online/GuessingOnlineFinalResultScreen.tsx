@@ -2,6 +2,7 @@ import React from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { ArrowRight } from 'lucide-react';
 
 const GuessingOnlineFinalResultScreen: React.FC = () => {
   const { players, isHost, leaveRoom, resetOnlineGuessing } = useOnlineGuessing();
