@@ -3,9 +3,10 @@ import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
 import WordImage from '../WordImage';
+import { ArrowRight } from 'lucide-react';
 
 const GuessingOnlineRoundResultScreen: React.FC = () => {
-  const { room, players, isHost, nextRound } = useOnlineGuessing();
+  const { room, players, isHost, nextRound, leaveRoom } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
   const [words, setWords] = useState<{ player1_word: string; player2_word: string } | null>(null);
 
