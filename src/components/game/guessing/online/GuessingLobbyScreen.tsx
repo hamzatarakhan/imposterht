@@ -1,7 +1,7 @@
 import React from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Copy, Share2, LogOut } from 'lucide-react';
+import { Copy, Share2, LogOut, ArrowRight } from 'lucide-react';
 
 const GuessingLobbyScreen: React.FC = () => {
   const { room, players, isHost, startGame, leaveRoom } = useOnlineGuessing();
