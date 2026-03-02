@@ -2,6 +2,7 @@ import React from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { ArrowRight } from 'lucide-react';
 
 const GuessingOnlineFinalResultScreen: React.FC = () => {
   const { players, isHost, leaveRoom, resetOnlineGuessing } = useOnlineGuessing();
@@ -21,10 +22,18 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+    <div className="min-h-screen flex flex-col relative">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
+        <button onClick={handleBackToHub}
+          className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowRight size={20} />
+        </button>
+        <h1 className="text-xl font-black">🏆 النتيجة النهائية</h1>
+      </div>
 
-      <div className="relative z-10 w-full max-w-sm space-y-5">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+      <div className="w-full max-w-sm space-y-5">
         <div className="card-game text-center">
           <div className="text-6xl mb-2 animate-float">{isDraw ? '🤝' : '🏆'}</div>
           <h2 className="text-2xl font-black mb-3">
@@ -59,6 +68,7 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
             <p className="text-muted-foreground animate-pulse">⏳ بانتظار المضيف...</p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Copy, Share2, LogOut } from 'lucide-react';
+import { Copy, Share2, LogOut, ArrowRight } from 'lucide-react';
 
 const GuessingLobbyScreen: React.FC = () => {
   const { room, players, isHost, startGame, leaveRoom } = useOnlineGuessing();
@@ -37,10 +37,18 @@ const GuessingLobbyScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-6 relative">
+    <div className="min-h-screen flex flex-col relative">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
 
-      <div className="relative z-10 flex-1 flex flex-col">
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
+        <button onClick={async () => { playSound('click'); await leaveRoom(); }}
+          className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowRight size={20} />
+        </button>
+        <h1 className="text-xl font-black">⚔️ غرفة التخمين</h1>
+      </div>
+
+      <div className="relative z-10 flex-1 flex flex-col p-6 pt-2">
         {/* Room Code */}
         <div className="card-game text-center mb-6">
           <p className="text-sm text-muted-foreground mb-2">كود الغرفة</p>

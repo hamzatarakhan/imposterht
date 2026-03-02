@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
+import { ArrowRight } from 'lucide-react';
 import WordImage from '../WordImage';
 
 const GuessingOnlineShowWordScreen: React.FC = () => {
-  const { room, currentPlayer, setScreen } = useOnlineGuessing();
+  const { room, currentPlayer, setScreen, leaveRoom } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
   const [myWord, setMyWord] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -19,9 +20,17 @@ const GuessingOnlineShowWordScreen: React.FC = () => {
 
   if (!revealed) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen flex flex-col relative">
         <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
-        <div className="relative z-10 w-full max-w-sm">
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
+          <button onClick={async () => { playSound('click'); await leaveRoom(); }}
+            className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowRight size={20} />
+          </button>
+          <h1 className="text-xl font-black">🤔 كلمتك</h1>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-full max-w-sm">
           <div className="text-sm text-muted-foreground font-bold mb-4">
             المواجهة {room.current_round} / {room.total_rounds}
           </div>
@@ -35,14 +44,23 @@ const GuessingOnlineShowWordScreen: React.FC = () => {
             </button>
           </div>
         </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+    <div className="min-h-screen flex flex-col relative">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
-      <div className="relative z-10 w-full max-w-sm">
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
+        <button onClick={async () => { playSound('click'); await leaveRoom(); }}
+          className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowRight size={20} />
+        </button>
+        <h1 className="text-xl font-black">🤔 كلمتك</h1>
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+      <div className="w-full max-w-sm">
         <div className="card-game text-center">
           <p className="text-sm text-muted-foreground mb-2">كلمتك هي:</p>
           {myWord && <WordImage word={myWord} size="lg" />}
@@ -59,6 +77,7 @@ const GuessingOnlineShowWordScreen: React.FC = () => {
             ✅ حفظتها، يلا نبدأ!
           </button>
         </div>
+      </div>
       </div>
     </div>
   );
