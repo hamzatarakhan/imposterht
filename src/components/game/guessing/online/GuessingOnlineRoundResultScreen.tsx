@@ -26,10 +26,18 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+    <div className="min-h-screen flex flex-col relative">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
+        <button onClick={async () => { playSound('click'); await leaveRoom(); }}
+          className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowRight size={20} />
+        </button>
+        <h1 className="text-xl font-black">📊 نتيجة الجولة</h1>
+      </div>
 
-      <div className="relative z-10 w-full max-w-sm space-y-5">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+      <div className="w-full max-w-sm space-y-5">
         <div className="card-game text-center">
           {isDraw ? (
             <>
