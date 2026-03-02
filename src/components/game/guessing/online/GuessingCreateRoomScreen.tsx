@@ -115,10 +115,14 @@ const GuessingCreateRoomScreen: React.FC = () => {
         </div>
       </div>
 
-      <div className="sticky bottom-0 p-4 bg-gradient-to-t from-background via-background to-transparent">
+      <div className="sticky bottom-0 p-4 bg-gradient-to-t from-background via-background to-transparent space-y-3">
         <button onClick={handleCreate} disabled={!name.trim() || loading}
           className="w-full btn-primary-game text-xl disabled:opacity-50 disabled:cursor-not-allowed">
           {loading ? '⏳ جاري الإنشاء...' : '🏠 إنشاء الغرفة'}
+        </button>
+        <button onClick={() => { playSound('click'); setScreen('guessingJoinRoom'); }}
+          className="w-full py-4 rounded-2xl font-bold text-lg bg-accent/20 border-2 border-accent/50 text-foreground hover:border-accent active:scale-95 transition-all shadow-[0_0_15px_hsl(var(--accent)/0.3)]">
+          🔗 انضمام لغرفة
         </button>
       </div>
     </div>
