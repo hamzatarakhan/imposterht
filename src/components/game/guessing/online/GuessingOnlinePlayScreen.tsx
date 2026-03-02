@@ -90,8 +90,6 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     const idx = (roundNumber - 1) % 2;
     setActiveAskerIndex(idx);
     setTimeLeft(turnTime);
-    // Reset readiness for new round
-    readySetRef.current.clear();
     setBothReady(false);
   }, [roundNumber, turnTime]);
 
