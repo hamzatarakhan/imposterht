@@ -224,6 +224,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
             </div>
           )}
         </div>
+        </div>
       </div>
     );
   }
