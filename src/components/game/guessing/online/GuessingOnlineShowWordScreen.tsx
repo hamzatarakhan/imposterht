@@ -44,6 +44,7 @@ const GuessingOnlineShowWordScreen: React.FC = () => {
             </button>
           </div>
         </div>
+        </div>
       </div>
     );
   }
