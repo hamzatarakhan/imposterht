@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
+import { ArrowRight } from 'lucide-react';
 import WordImage from '../WordImage';
 
 const GuessingOnlineShowWordScreen: React.FC = () => {
