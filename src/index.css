@@ -108,7 +108,7 @@
   }
 
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50 shadow-lg;
+    @apply bg-card backdrop-blur-xl border border-border/50 shadow-lg;
   }
 
   .dark .glass-card {

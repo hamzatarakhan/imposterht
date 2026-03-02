@@ -303,8 +303,8 @@ const GuessingOnlinePlayScreen: React.FC = () => {
                 onClick={() => handleWinner(player.player_id)}
                 className={`w-full py-4 px-6 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 ${
                   player.is_host
-                    ? 'bg-gradient-to-r from-blue-500/30 to-blue-600/30 border-2 border-blue-400 text-foreground hover:border-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
-                    : 'bg-gradient-to-r from-red-500/30 to-red-600/30 border-2 border-red-400 text-foreground hover:border-red-300 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+                    ? 'bg-blue-500 border-2 border-blue-400 text-white hover:bg-blue-600 shadow-lg'
+                    : 'bg-red-500 border-2 border-red-400 text-white hover:bg-red-600 shadow-lg'
                 }`}
               >
                 <span className="text-2xl">{player.avatar}</span>
