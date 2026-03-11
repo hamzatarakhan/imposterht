@@ -42,7 +42,8 @@ const GameContent: React.FC = () => {
   }
 
   // Guessing local flow
-  if (screen === 'guessingSetup') {
+  const activeGuessingLocalScreens = ['guessingSetup', 'guessingPassPhone', 'guessingShowWord', 'guessingPlay', 'guessingRoundResult', 'guessingFinalResult'];
+  if (activeGuessingLocalScreens.includes(screen)) {
     return <div className="max-w-md mx-auto min-h-screen bg-background relative"><GuessingGame /></div>;
   }
 
