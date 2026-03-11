@@ -27,7 +27,7 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
     playSound('click'); vibrate(50);
     await leaveRoom();
     resetOnlineGuessing();
-    setMainScreen('guessingModeSelect');
+    setScreen('guessingCreateRoom');
   };
 
   const handleBackToHub = async () => {
