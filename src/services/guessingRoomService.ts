@@ -216,6 +216,24 @@ export const changeGuessingWords = async (roomId: string, categories: GuessingCa
   return data || false;
 };
 
+// Replay room (host only) — reset wins, round, set new words
+export const replayGuessingRoom = async (roomId: string, categories: GuessingCategory[], newCategories?: string): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  const cats = newCategories ? JSON.parse(newCategories) as GuessingCategory[] : categories;
+  const w1 = getGuessingRandomWord(cats, []);
+  const w2 = getGuessingRandomWord(cats, [w1]);
+
+  const { data, error } = await supabase.rpc('replay_guessing_room', {
+    p_room_id: roomId,
+    p_host_player_id: playerId,
+    p_word1: w1,
+    p_word2: w2,
+    p_categories: newCategories || null,
+  });
+  if (error) { console.error('Replay guessing room failed:', error); return false; }
+  return data || false;
+};
+
 // Delete room (host)
 export const deleteGuessingRoom = async (roomId: string): Promise<void> => {
   const playerId = getOrCreatePlayerId();

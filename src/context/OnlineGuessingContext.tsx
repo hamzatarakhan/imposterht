@@ -227,7 +227,7 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
   return (
     <OnlineGuessingContext.Provider value={{
       ...state, setScreen, createRoom, joinRoom, startGame,
-      markWinner, markDraw, nextRound, changeWords, leaveRoom, resetOnlineGuessing, clearPendingJoinCode,
+      markWinner, markDraw, nextRound, changeWords, replayRoom, leaveRoom, resetOnlineGuessing, clearPendingJoinCode,
     }}>
       {children}
     </OnlineGuessingContext.Provider>
