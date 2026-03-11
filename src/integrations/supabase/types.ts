@@ -562,6 +562,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      replay_guessing_room: {
+        Args: {
+          p_categories?: string
+          p_host_player_id: string
+          p_room_id: string
+          p_word1: string
+          p_word2: string
+        }
+        Returns: boolean
+      }
       restart_game_secure: {
         Args: {
           p_host_player_id: string
