@@ -93,7 +93,7 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
 
         {isHost ? (
           <button onClick={handleNext} className="w-full btn-primary-game text-lg">
-            ⚔️ المواجهة التالية
+            {room.current_round >= room.total_rounds ? '🏆 النتائج النهائية' : '⚔️ المواجهة التالية'}
           </button>
         ) : (
           <div className="text-center py-4">
