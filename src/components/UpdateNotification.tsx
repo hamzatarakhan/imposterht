@@ -30,7 +30,7 @@ export const UpdateNotification = () => {
         </div>
 
         {/* Text */}
-        <h3 className="text-lg font-black text-foreground mb-1">يو يو! 👋</h3>
+        <h3 className="text-lg font-black text-foreground mb-1">سلامات عالزلام 👋</h3>
         <p className="text-sm text-muted-foreground mb-5">
           حمزة طرخان بسلم عليك وبقلك في ابديت جديد، شو رأيك تعمل ابديت؟
         </p>
