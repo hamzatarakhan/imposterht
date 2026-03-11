@@ -295,16 +295,16 @@ const GuessingOnlinePlayScreen: React.FC = () => {
         )}
 
         {isHost ? (
-          <div className="space-y-3">
-            <p className="text-sm text-foreground font-bold text-center">مين حزر أول؟</p>
+          <div className="space-y-3 relative z-10">
+            <p className="text-base text-foreground font-black text-center">مين حزر أول؟</p>
             {players.map(player => (
               <button
                 key={player.id}
                 onClick={() => handleWinner(player.player_id)}
                 className={`w-full py-4 px-6 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-95 ${
                   player.is_host
-                    ? 'bg-blue-500 border-2 border-blue-400 text-white hover:bg-blue-600 shadow-lg'
-                    : 'bg-red-500 border-2 border-red-400 text-white hover:bg-red-600 shadow-lg'
+                    ? 'bg-blue-500 border-2 border-blue-400 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30'
+                    : 'bg-red-500 border-2 border-red-400 text-white hover:bg-red-600 shadow-lg shadow-red-500/30'
                 }`}
               >
                 <span className="text-2xl">{player.avatar}</span>
@@ -314,14 +314,14 @@ const GuessingOnlinePlayScreen: React.FC = () => {
             <div className="flex gap-2">
               <button
                 onClick={handleDraw}
-                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-secondary border-2 border-border/80 text-foreground hover:border-primary/60"
+                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-card border-2 border-border text-foreground hover:border-primary/60 shadow-md"
               >
                 🤝 تعادل
               </button>
               <button
                 onClick={handleChangeWords}
                 disabled={changingWords}
-                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-secondary border-2 border-border/80 text-foreground hover:border-primary/60 disabled:opacity-50"
+                className="flex-1 py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 bg-card border-2 border-border text-foreground hover:border-primary/60 shadow-md disabled:opacity-50"
               >
                 🔄 {changingWords ? 'جاري...' : 'غيّر الكلمات'}
               </button>
