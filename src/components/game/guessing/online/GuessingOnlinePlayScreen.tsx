@@ -240,7 +240,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
         <h1 className="text-xl font-black">⚔️ المواجهة</h1>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative z-10">
       <div className="w-full max-w-sm space-y-5">
         <div className="text-sm text-muted-foreground font-bold">
           المواجهة {room.current_round} / {room.total_rounds}
