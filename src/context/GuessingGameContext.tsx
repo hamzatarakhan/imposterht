@@ -120,13 +120,7 @@ export const GuessingGameProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const nextRound = () => {
     setState(prev => {
-      const isLastRound = prev.currentRound >= prev.totalRounds;
-      // Also check if someone already won majority
-      const majorityNeeded = Math.ceil(prev.totalRounds / 2);
-      const p1Wins = prev.players.length === 2 ? prev.players[0].wins : 0;
-      const p2Wins = prev.players.length === 2 ? prev.players[1].wins : 0;
-
-      if (isLastRound || p1Wins >= majorityNeeded || p2Wins >= majorityNeeded) {
+      if (prev.currentRound >= prev.totalRounds) {
         return { ...prev, screen: 'guessingFinalResult' };
       }
 
