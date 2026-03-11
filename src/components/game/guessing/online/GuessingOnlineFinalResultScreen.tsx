@@ -1,18 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 
 const GuessingOnlineFinalResultScreen: React.FC = () => {
-  const { players, isHost, leaveRoom, resetOnlineGuessing } = useOnlineGuessing();
+  const { players, isHost, leaveRoom, resetOnlineGuessing, replayRoom, setScreen } = useOnlineGuessing();
   const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
+  const [loading, setLoading] = useState(false);
 
   if (players.length < 2) return null;
 
   const winner = players[0].wins >= players[1].wins ? players[0] : players[1];
   const isDraw = players[0].wins === players[1].wins;
+
+  const handleReplay = async () => {
+    if (loading) return;
+    playSound('click'); vibrate(50);
+    setLoading(true);
+    await replayRoom();
+    setLoading(false);
+  };
+
+  const handleReplayNewCategory = async () => {
+    playSound('click'); vibrate(50);
+    await leaveRoom();
+    resetOnlineGuessing();
+    setMainScreen('hub');
+    // Small delay then navigate to create room
+    setTimeout(() => {
+      setMainScreen('guessing');
+    }, 50);
+  };
 
   const handleBackToHub = async () => {
     playSound('click'); vibrate(50);
@@ -58,12 +78,19 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
           </div>
         </div>
 
-        {isHost && (
-          <button onClick={handleBackToHub} className="w-full btn-secondary-game">
-            🏠 الرئيسية
-          </button>
-        )}
-        {!isHost && (
+        {isHost ? (
+          <div className="space-y-3">
+            <button onClick={handleReplay} disabled={loading} className="w-full btn-primary-game flex items-center justify-center gap-2">
+              {loading ? <Loader2 size={18} className="animate-spin" /> : '🔄'} العب كمان مرة
+            </button>
+            <button onClick={handleReplayNewCategory} className="w-full btn-secondary-game">
+              🔀 العب بفئة ثانية
+            </button>
+            <button onClick={handleBackToHub} className="w-full btn-secondary-game">
+              🏠 الرئيسية
+            </button>
+          </div>
+        ) : (
           <div className="text-center py-4">
             <p className="text-muted-foreground animate-pulse">⏳ بانتظار المضيف...</p>
           </div>

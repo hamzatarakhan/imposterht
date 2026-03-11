@@ -244,6 +244,7 @@ const defaultState: OnlineGuessingContextType = {
   markDraw: async () => false,
   nextRound: async () => false,
   changeWords: async () => false,
+  replayRoom: async () => false,
   leaveRoom: async () => {},
   resetOnlineGuessing: () => {},
   clearPendingJoinCode: () => {},
