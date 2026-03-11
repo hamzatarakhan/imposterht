@@ -3,8 +3,9 @@ import { RefreshCw } from 'lucide-react';
 
 export const UpdateNotification = () => {
   const { updateAvailable, applyUpdate } = useServiceWorkerUpdate();
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
 
-  if (!updateAvailable) return null;
+  if (!updateAvailable || !isStandalone) return null;
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-[100] flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-card p-4 shadow-2xl animate-in slide-in-from-bottom-5 duration-300">
