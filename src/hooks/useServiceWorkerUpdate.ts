@@ -6,23 +6,22 @@ const VERSION_KEY = 'app_build_version';
 export const useServiceWorkerUpdate = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false);
 
-  const applyUpdate = useCallback(() => {
+  const applyUpdate = useCallback(async () => {
     // Store the latest version so we don't show again until next publish
-    fetch('/version.json?t=' + Date.now())
-      .then(r => r.json())
-      .then(data => {
-        localStorage.setItem(VERSION_KEY, data.version);
-      })
-      .catch(() => {});
+    try {
+      const r = await fetch('/version.json?t=' + Date.now());
+      const data = await r.json();
+      localStorage.setItem(VERSION_KEY, data.version);
+    } catch {}
 
-    // Tell SW to skip waiting and reload
+    // Tell SW to skip waiting
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistration().then((reg) => {
-        if (reg?.waiting) {
-          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-        }
-      });
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg?.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
     }
+
     window.location.reload();
   }, []);
 
