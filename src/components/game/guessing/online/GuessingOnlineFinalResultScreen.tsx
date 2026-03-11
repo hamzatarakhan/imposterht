@@ -27,11 +27,7 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
     playSound('click'); vibrate(50);
     await leaveRoom();
     resetOnlineGuessing();
-    setMainScreen('hub');
-    // Small delay then navigate to create room
-    setTimeout(() => {
-      setMainScreen('guessing');
-    }, 50);
+    setMainScreen('guessingModeSelect');
   };
 
   const handleBackToHub = async () => {
