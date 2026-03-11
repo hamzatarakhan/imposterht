@@ -1,42 +1,55 @@
 import { useServiceWorkerUpdate } from '@/hooks/useServiceWorkerUpdate';
 import { RefreshCw, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export const UpdateNotification = () => {
   const { updateAvailable, applyUpdate } = useServiceWorkerUpdate();
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
   const [dismissed, setDismissed] = useState(false);
 
-  // Auto-dismiss after 8 seconds
-  useEffect(() => {
-    if (!updateAvailable || dismissed) return;
-    const timer = setTimeout(() => setDismissed(true), 8000);
-    return () => clearTimeout(timer);
-  }, [updateAvailable, dismissed]);
-
   if (!updateAvailable || !isStandalone || dismissed) return null;
 
+  const handleDismiss = () => {
+    setDismissed(true);
+  };
+
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-[100] flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-card p-4 shadow-2xl animate-in slide-in-from-bottom-5 duration-300">
-      <div className="flex items-center gap-3">
-        <RefreshCw className="h-5 w-5 text-primary animate-spin" style={{ animationDuration: '3s' }} />
-        <span className="text-sm font-medium text-foreground">
-          يوجد تحديث جديد متاح!
-        </span>
-      </div>
-      <div className="flex items-center gap-2">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative w-[85%] max-w-xs rounded-2xl bg-card border border-border shadow-2xl p-6 text-center animate-in zoom-in-95 duration-300">
+        {/* Close button */}
         <button
-          onClick={applyUpdate}
-          className="shrink-0 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors"
-        >
-          تحديث الآن
-        </button>
-        <button
-          onClick={() => setDismissed(true)}
-          className="shrink-0 rounded-full p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          onClick={handleDismiss}
+          className="absolute top-3 left-3 rounded-full p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         >
           <X className="h-4 w-4" />
         </button>
+
+        {/* Icon */}
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+          <RefreshCw className="h-7 w-7 text-primary" />
+        </div>
+
+        {/* Text */}
+        <h3 className="text-lg font-black text-foreground mb-1">تحديث جديد 🎉</h3>
+        <p className="text-sm text-muted-foreground mb-5">
+          يوجد إصدار جديد من فعاليات!
+        </p>
+
+        {/* Buttons */}
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={applyUpdate}
+            className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            تحديث الآن
+          </button>
+          <button
+            onClick={handleDismiss}
+            className="w-full rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+          >
+            لاحقاً
+          </button>
+        </div>
       </div>
     </div>
   );
