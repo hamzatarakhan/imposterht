@@ -61,7 +61,9 @@ const GuessingFinalResultScreen: React.FC = () => {
         {/* Buttons */}
         <div className="space-y-3">
           <button onClick={handlePlayAgain} className="w-full btn-primary-game text-lg">
-            🔄 ريفانش!
+          <button onClick={handlePlayAgain} className="w-full btn-primary-game text-lg">
+            🔄 العب كمان مرة
+          </button>
           </button>
           <button onClick={handleBackToHub} className="w-full btn-secondary-game">
             🏠 الرئيسية
