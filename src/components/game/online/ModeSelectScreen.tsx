@@ -24,7 +24,7 @@ const ModeSelectScreen: React.FC = () => {
   const handleBack = () => {
     playSound('click');
     vibrate(30);
-    setGameScreen('hub');
+    setGameScreen('home');
   };
 
   return (
