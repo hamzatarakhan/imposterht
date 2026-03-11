@@ -30,9 +30,9 @@ export const UpdateNotification = () => {
         </div>
 
         {/* Text */}
-        <h3 className="text-lg font-black text-foreground mb-1">تحديث جديد 🎉</h3>
+        <h3 className="text-lg font-black text-foreground mb-1">يو يو! 👋</h3>
         <p className="text-sm text-muted-foreground mb-5">
-          يوجد إصدار جديد من فعاليات!
+          حمزة طرخان بسلم عليك وبقلك في ابديت جديد، شو رأيك تعمل ابديت؟
         </p>
 
         {/* Buttons */}
@@ -41,13 +41,13 @@ export const UpdateNotification = () => {
             onClick={() => { setDismissed(true); applyUpdate(); }}
             className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            تحديث الآن
+            هات الابديت دلعني 🚀
           </button>
           <button
             onClick={handleDismiss}
             className="w-full rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
           >
-            لاحقاً
+            مش وقته خلص بعدين 😴
           </button>
         </div>
       </div>
