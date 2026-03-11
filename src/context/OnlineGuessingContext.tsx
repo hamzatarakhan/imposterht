@@ -201,6 +201,14 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     return guessingService.changeGuessingWords(state.room.id, categories);
   }, [state.room, state.isHost]);
 
+  const replayRoom = useCallback(async (newCategories?: GuessingCategory[]) => {
+    if (!state.room || !state.isHost) return false;
+    let categories: GuessingCategory[] = ['random'];
+    try { categories = JSON.parse(state.room.categories || '["random"]'); } catch {}
+    const newCatsStr = newCategories ? JSON.stringify(newCategories) : undefined;
+    return guessingService.replayGuessingRoom(state.room.id, categories, newCatsStr);
+  }, [state.room, state.isHost]);
+
   const leaveRoom = useCallback(async () => {
     if (!state.room) return;
     if (state.isHost) await guessingService.deleteGuessingRoom(state.room.id);
