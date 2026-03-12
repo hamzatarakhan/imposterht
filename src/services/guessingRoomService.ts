@@ -234,6 +234,16 @@ export const replayGuessingRoom = async (roomId: string, categories: GuessingCat
   return data || false;
 };
 
+// Rename a guessing player (host can rename anyone, players can rename self)
+export const renameGuessingPlayer = async (roomId: string, targetPlayerId: string, newName: string): Promise<boolean> => {
+  const playerId = getOrCreatePlayerId();
+  const { data, error } = await supabase.rpc('rename_guessing_player', {
+    p_room_id: roomId, p_requester_player_id: playerId, p_target_player_id: targetPlayerId, p_new_name: newName,
+  });
+  if (error) { console.error('Rename guessing player failed:', error); return false; }
+  return data || false;
+};
+
 // Delete room (host)
 export const deleteGuessingRoom = async (roomId: string): Promise<void> => {
   const playerId = getOrCreatePlayerId();

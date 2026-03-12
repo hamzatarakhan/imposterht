@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Copy, Share2, LogOut, ArrowRight } from 'lucide-react';
+import { Copy, Share2, LogOut, ArrowRight, Pencil, Check, X } from 'lucide-react';
+import { toast } from 'sonner';
+import * as guessingService from '@/services/guessingRoomService';
 
 const GuessingLobbyScreen: React.FC = () => {
-  const { room, players, isHost, startGame, leaveRoom } = useOnlineGuessing();
+  const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
+
+  const [editingPlayer, setEditingPlayer] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
 
   if (!room) return null;
 
@@ -15,6 +20,7 @@ const GuessingLobbyScreen: React.FC = () => {
   const handleCopy = () => {
     navigator.clipboard.writeText(room.code);
     playSound('click'); vibrate(30);
+    toast.success('تم نسخ الكود!');
   };
 
   const handleShare = async () => {
@@ -23,6 +29,7 @@ const GuessingLobbyScreen: React.FC = () => {
       await navigator.share({ title: '🤔 لعبة التخمين - فعاليات', text: 'تعال نلعب تخمين!', url: shareUrl });
     } catch {
       navigator.clipboard.writeText(shareUrl);
+      toast.success('تم نسخ الرابط!');
     }
   };
 
@@ -34,6 +41,31 @@ const GuessingLobbyScreen: React.FC = () => {
   const handleLeave = async () => {
     playSound('click'); vibrate(30);
     await leaveRoom();
+  };
+
+  const handleEditPlayer = (playerId: string, name: string) => {
+    const isSelf = playerId === currentPlayer?.player_id;
+    if (!isSelf && !isHost) return;
+    playSound('click'); vibrate(30);
+    setEditingPlayer(playerId);
+    setEditName(name);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!room?.id || !editingPlayer || !editName.trim()) return;
+    playSound('click'); vibrate(50);
+    const success = await guessingService.renameGuessingPlayer(room.id, editingPlayer, editName.trim());
+    if (success) {
+      toast.success('تم تحديث الاسم!');
+    } else {
+      toast.error('فشل التحديث');
+    }
+    setEditingPlayer(null);
+  };
+
+  const handleCancelEdit = () => {
+    playSound('click');
+    setEditingPlayer(null);
   };
 
   return (
@@ -68,13 +100,58 @@ const GuessingLobbyScreen: React.FC = () => {
         <div className="card-game mb-6">
           <h2 className="font-bold mb-3">⚔️ اللاعبين ({players.length}/2)</h2>
           <div className="space-y-3">
-            {players.map(p => (
-              <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
-                <span className="text-2xl">{p.avatar}</span>
-                <span className="font-bold flex-1">{p.name}</span>
-                {p.is_host && <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full font-bold">المضيف</span>}
-              </div>
-            ))}
+            {players.map(p => {
+              const isSelf = p.player_id === currentPlayer?.player_id;
+              const canEdit = isSelf || isHost;
+              const isEditing = editingPlayer === p.player_id;
+
+              if (isEditing) {
+                return (
+                  <div key={p.id} className="p-3 rounded-xl bg-primary/10 border border-primary/30">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={e => setEditName(e.target.value)}
+                        className="flex-1 px-3 py-2 rounded-xl bg-secondary text-foreground text-sm font-medium outline-none focus:ring-2 ring-primary"
+                        maxLength={20}
+                        autoFocus
+                        dir="auto"
+                      />
+                      <button
+                        onClick={handleSaveEdit}
+                        disabled={!editName.trim()}
+                        className="p-2 rounded-xl bg-accent text-accent-foreground disabled:opacity-50"
+                      >
+                        <Check size={18} />
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="p-2 rounded-xl bg-secondary hover:bg-secondary/80"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
+                  <span className="text-2xl">{p.avatar}</span>
+                  <span className="font-bold flex-1">{p.name}</span>
+                  {canEdit && (
+                    <button
+                      onClick={() => handleEditPlayer(p.player_id, p.name)}
+                      className="p-1.5 rounded-lg hover:bg-card/80 transition-colors text-muted-foreground hover:text-foreground"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                  )}
+                  {p.is_host && <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full font-bold">المضيف</span>}
+                </div>
+              );
+            })}
             {players.length < 2 && (
               <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border-2 border-dashed border-border">
                 <span className="text-2xl opacity-30">👤</span>
