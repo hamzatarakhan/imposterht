@@ -552,6 +552,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      rename_guessing_player: {
+        Args: {
+          p_new_name: string
+          p_requester_player_id: string
+          p_room_id: string
+          p_target_player_id: string
+        }
+        Returns: boolean
+      }
       rename_player_secure: {
         Args: {
           p_new_avatar?: string
