@@ -20,7 +20,7 @@ const GuessingLobbyScreen: React.FC = () => {
   const handleShare = async () => {
     playSound('click'); vibrate(30);
     try {
-      await navigator.share({ title: '🤔 لعبة التخمين - فعاليات', text: `تعال نلعب تخمين!\n${shareUrl}` });
+      await navigator.share({ title: '🤔 لعبة التخمين - فعاليات', text: 'تعال نلعب تخمين!', url: shareUrl });
     } catch {
       navigator.clipboard.writeText(shareUrl);
     }
