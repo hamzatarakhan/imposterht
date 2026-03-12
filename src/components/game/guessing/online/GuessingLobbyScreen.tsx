@@ -10,7 +10,7 @@ const GuessingLobbyScreen: React.FC = () => {
   if (!room) return null;
 
   const canStart = isHost && players.length === 2;
-  const shareUrl = `https://imposterht.lovable.app?guessing_join=${room.code}`;
+  const shareUrl = `${window.location.origin}?guessing_join=${room.code}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(room.code);

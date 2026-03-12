@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import * as guessingService from '@/services/guessingRoomService';
+import { getOrCreatePlayerId } from '@/services/roomService';
 import { GuessingRoom, GuessingPlayer } from '@/services/guessingRoomService';
 import { GuessingCategory } from '@/data/guessingWords';
 
