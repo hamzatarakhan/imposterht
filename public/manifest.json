@@ -1,6 +1,6 @@
 {
-  "name": "Activities",
-  "short_name": "Activities",
+  "name": "فعاليات",
+  "short_name": "فعاليات",
   "description": "فعاليات وألعاب جماعية - خلينا نغير جو!",
   "start_url": "/",
   "display": "standalone",
