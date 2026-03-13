@@ -144,9 +144,11 @@ const LobbyScreen: React.FC = () => {
               isConnecting={voiceChat.isConnecting}
               isMuted={voiceChat.isMuted}
               isSpeaking={voiceChat.activeSpeakers.includes(currentPlayer?.player_id || '')}
-              onToggleMute={() => { playSound('click'); voiceChat.toggleMute(); }}
-              onConnect={() => { playSound('click'); setVoiceEnabled(true); }}
+              onToggleMute={() => { playSound('click'); vibrate(30); voiceChat.toggleMute(); }}
+              onConnect={() => { playSound('click'); vibrate(30); setVoiceEnabled(true); }}
+              onDisconnect={() => { playSound('click'); vibrate(30); setVoiceEnabled(false); voiceChat.disconnect(); }}
               error={voiceChat.error}
+              compact
             />
           </div>
         </div>
