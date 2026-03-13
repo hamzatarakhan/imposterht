@@ -10,6 +10,7 @@ import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
 const LobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
+  const { activeSpeakers } = useActiveSpeakers();
   
   const [copied, setCopied] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
