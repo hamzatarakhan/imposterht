@@ -21,6 +21,7 @@ interface VoiceChatState {
   isConnected: boolean;
   isConnecting: boolean;
   isMuted: boolean;
+  isDeafened: boolean;
   activeSpeakers: string[];
   error: string | null;
 }
@@ -29,13 +30,15 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
   const [state, setState] = useState<VoiceChatState>({
     isConnected: false,
     isConnecting: false,
-    isMuted: true,
+    isMuted: false,
+    isDeafened: false,
     activeSpeakers: [],
     error: null,
   });
 
   const roomRef = useRef<Room | null>(null);
   const cleanupRef = useRef(false);
+  const audioElementsRef = useRef<Map<string, HTMLAudioElement>>(new Map());
 
   const connect = useCallback(async () => {
     if (!roomId || !playerId || !playerName || roomRef.current) return;
@@ -71,11 +74,13 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
           const el = track.attach();
           el.id = `audio-${participant.identity}`;
           document.body.appendChild(el);
+          audioElementsRef.current.set(participant.identity, el);
         }
       });
 
       livekitRoom.on(RoomEvent.TrackUnsubscribed, (track, pub, participant) => {
         track.detach().forEach(el => el.remove());
+        audioElementsRef.current.delete(participant.identity);
       });
 
       livekitRoom.on(RoomEvent.Disconnected, () => {
@@ -94,7 +99,7 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
       await livekitRoom.localParticipant.setMicrophoneEnabled(true);
 
       roomRef.current = livekitRoom;
-      setState(prev => ({ ...prev, isConnected: true, isConnecting: false, isMuted: false }));
+      setState(prev => ({ ...prev, isConnected: true, isConnecting: false, isMuted: false, isDeafened: false }));
     } catch (err) {
       console.error('Voice chat connection error:', err);
       setState(prev => ({
@@ -110,7 +115,9 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
       await roomRef.current.disconnect();
       roomRef.current = null;
     }
-    setState(prev => ({ ...prev, isConnected: false, isMuted: true, activeSpeakers: [] }));
+    audioElementsRef.current.forEach(el => el.remove());
+    audioElementsRef.current.clear();
+    setState(prev => ({ ...prev, isConnected: false, isMuted: false, isDeafened: false, activeSpeakers: [] }));
   }, []);
 
   const toggleMute = useCallback(async () => {
@@ -119,6 +126,15 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
     await roomRef.current.localParticipant.setMicrophoneEnabled(!newMuted);
     setState(prev => ({ ...prev, isMuted: newMuted }));
   }, [state.isMuted]);
+
+  const toggleDeafen = useCallback(() => {
+    const newDeafened = !state.isDeafened;
+    // Mute/unmute all remote audio elements
+    audioElementsRef.current.forEach(el => {
+      el.muted = newDeafened;
+    });
+    setState(prev => ({ ...prev, isDeafened: newDeafened }));
+  }, [state.isDeafened]);
 
   // Auto-connect when enabled
   useEffect(() => {
@@ -132,6 +148,8 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
         roomRef.current.disconnect();
         roomRef.current = null;
       }
+      audioElementsRef.current.forEach(el => el.remove());
+      audioElementsRef.current.clear();
     };
   }, [enabled, roomId, playerId, playerName]);
 
@@ -140,5 +158,6 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
     connect,
     disconnect,
     toggleMute,
+    toggleDeafen,
   };
 };
