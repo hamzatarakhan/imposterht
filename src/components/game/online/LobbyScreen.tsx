@@ -5,10 +5,20 @@ import { ArrowRight, Copy, Check, Users, Crown, Loader2, Share2, Pencil, X } fro
 import { toast } from 'sonner';
 import * as roomService from '@/services/roomService';
 import OnlineRestartButton from './OnlineRestartButton';
+import { useVoiceChat } from '@/hooks/useVoiceChat';
+import VoiceChatButton from '@/components/game/VoiceChatButton';
 
 const LobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+
+  const voiceChat = useVoiceChat({
+    roomId: room?.id,
+    playerName: currentPlayer?.name || '',
+    playerId: currentPlayer?.player_id || '',
+    enabled: voiceEnabled,
+  });
   
   const [copied, setCopied] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
