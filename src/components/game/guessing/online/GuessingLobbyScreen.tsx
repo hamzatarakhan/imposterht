@@ -82,20 +82,24 @@ const GuessingLobbyScreen: React.FC = () => {
     <div className="min-h-screen flex flex-col relative">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
 
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
-        <button onClick={async () => { playSound('click'); await leaveRoom(); }}
-          className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowRight size={20} />
-        </button>
-        <h1 className="text-xl font-black flex-1">⚔️ غرفة التخمين</h1>
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 space-y-3">
+        <div className="flex items-center gap-3">
+          <button onClick={async () => { playSound('click'); await leaveRoom(); }}
+            className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowRight size={20} />
+          </button>
+          <h1 className="text-xl font-black flex-1">⚔️ غرفة التخمين</h1>
+        </div>
         <VoiceChatButton
           isConnected={voiceChat.isConnected}
           isConnecting={voiceChat.isConnecting}
           isMuted={voiceChat.isMuted}
           isSpeaking={voiceChat.activeSpeakers.includes(currentPlayer?.player_id || '')}
-          onToggleMute={() => { playSound('click'); voiceChat.toggleMute(); }}
-          onConnect={() => { playSound('click'); setVoiceEnabled(true); }}
+          onToggleMute={() => { playSound('click'); vibrate(30); voiceChat.toggleMute(); }}
+          onConnect={() => { playSound('click'); vibrate(30); setVoiceEnabled(true); }}
+          onDisconnect={() => { playSound('click'); vibrate(30); setVoiceEnabled(false); voiceChat.disconnect(); }}
           error={voiceChat.error}
+          compact
         />
       </div>
 
