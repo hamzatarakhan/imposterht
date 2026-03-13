@@ -3,10 +3,12 @@ import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Check, Loader2, Users } from 'lucide-react';
 import OnlineRestartButton from './OnlineRestartButton';
+import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
 
 const OnlineVotingScreen: React.FC = () => {
   const { room, players, currentPlayer, submitVote, calculateWinner, setScreen } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
+  const { activeSpeakers } = useActiveSpeakers();
   
   // Use room.imposter_count instead of counting from players (is_imposter is hidden for non-imposters)
   const impostorCount = room?.imposter_count || 1;
@@ -104,9 +106,9 @@ const OnlineVotingScreen: React.FC = () => {
             {players.map((player) => (
               <div
                 key={player.id}
-                className={`flex items-center gap-3 p-2 rounded-lg ${
+                className={`flex items-center gap-3 p-2 rounded-lg transition-all ${
                   player.voted_for ? 'bg-accent/20' : 'bg-secondary/50'
-                }`}
+                } ${activeSpeakers.includes(player.player_id) ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}
               >
                 <span className="text-lg">{player.avatar}</span>
                 <span className="flex-1 text-sm">{player.name}</span>
@@ -174,7 +176,7 @@ const OnlineVotingScreen: React.FC = () => {
                   : selectedPlayer === player.player_id
                   ? 'bg-imposter/20 border-2 border-imposter glow-imposter'
                   : 'bg-secondary hover:bg-secondary/80 border-2 border-transparent'
-              }`}
+              } ${activeSpeakers.includes(player.player_id) ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}
             >
               <div className="flex items-center gap-3">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${

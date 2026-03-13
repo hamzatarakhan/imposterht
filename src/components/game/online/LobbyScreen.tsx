@@ -5,10 +5,12 @@ import { ArrowRight, Copy, Check, Users, Crown, Loader2, Share2, Pencil, X } fro
 import { toast } from 'sonner';
 import * as roomService from '@/services/roomService';
 import OnlineRestartButton from './OnlineRestartButton';
+import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
 
 const LobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
+  const { activeSpeakers } = useActiveSpeakers();
   
   const [copied, setCopied] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
@@ -209,12 +211,13 @@ const LobbyScreen: React.FC = () => {
                   );
                 }
 
+                const isSpeaking = activeSpeakers.includes(player.player_id);
                 return (
                   <div
                     key={player.id}
                     className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
                       player.is_host ? 'bg-primary/20' : 'bg-secondary'
-                    }`}
+                    } ${isSpeaking ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-xl">

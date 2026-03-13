@@ -4,10 +4,12 @@ import { useSettings } from '@/context/SettingsContext';
 import { Copy, Share2, LogOut, ArrowRight, Pencil, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import * as guessingService from '@/services/guessingRoomService';
+import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
 
 const GuessingLobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
+  const { activeSpeakers } = useActiveSpeakers();
 
   const [editingPlayer, setEditingPlayer] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
@@ -136,8 +138,9 @@ const GuessingLobbyScreen: React.FC = () => {
                 );
               }
 
+              const isSpeaking = activeSpeakers.includes(p.player_id);
               return (
-                <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 transition-all">
+                <div key={p.id} className={`flex items-center gap-3 p-3 rounded-xl bg-secondary/50 transition-all ${isSpeaking ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}>
                   <span className="text-2xl">{p.avatar}</span>
                   <span className="font-bold flex-1">{p.name}</span>
                   {canEdit && (

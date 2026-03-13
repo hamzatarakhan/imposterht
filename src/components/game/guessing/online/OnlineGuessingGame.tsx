@@ -26,18 +26,19 @@ const OnlineGuessingGame: React.FC = () => {
   const CurrentScreen = screens[screen];
   const showVoice = room && currentPlayer && !['guessingModeSelect', 'guessingCreateRoom', 'guessingJoinRoom'].includes(screen);
 
-  return (
-    <>
-      <CurrentScreen />
-      {showVoice && (
-        <VoiceChatOverlay
-          roomId={room.id}
-          playerName={currentPlayer.name}
-          playerId={currentPlayer.player_id}
-        />
-      )}
-    </>
-  );
+  if (showVoice) {
+    return (
+      <VoiceChatOverlay
+        roomId={room.id}
+        playerName={currentPlayer.name}
+        playerId={currentPlayer.player_id}
+      >
+        <CurrentScreen />
+      </VoiceChatOverlay>
+    );
+  }
+
+  return <CurrentScreen />;
 };
 
 export default OnlineGuessingGame;
