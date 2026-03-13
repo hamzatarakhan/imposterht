@@ -106,9 +106,9 @@ const OnlineVotingScreen: React.FC = () => {
             {players.map((player) => (
               <div
                 key={player.id}
-                className={`flex items-center gap-3 p-2 rounded-lg ${
+                className={`flex items-center gap-3 p-2 rounded-lg transition-all ${
                   player.voted_for ? 'bg-accent/20' : 'bg-secondary/50'
-                }`}
+                } ${activeSpeakers.includes(player.player_id) ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}
               >
                 <span className="text-lg">{player.avatar}</span>
                 <span className="flex-1 text-sm">{player.name}</span>
