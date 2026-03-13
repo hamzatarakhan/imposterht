@@ -4,8 +4,6 @@ import { useSettings } from '@/context/SettingsContext';
 import { Copy, Share2, LogOut, ArrowRight, Pencil, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import * as guessingService from '@/services/guessingRoomService';
-import { useVoiceChat } from '@/hooks/useVoiceChat';
-import VoiceChatButton from '@/components/game/VoiceChatButton';
 
 const GuessingLobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGuessing();
