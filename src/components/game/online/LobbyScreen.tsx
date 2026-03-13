@@ -131,17 +131,6 @@ const LobbyScreen: React.FC = () => {
                 في انتظار اللاعبين...
               </p>
             </div>
-            <VoiceChatButton
-              isConnected={voiceChat.isConnected}
-              isConnecting={voiceChat.isConnecting}
-              isMuted={voiceChat.isMuted}
-              isSpeaking={voiceChat.activeSpeakers.includes(currentPlayer?.player_id || '')}
-              onToggleMute={() => { playSound('click'); vibrate(30); voiceChat.toggleMute(); }}
-              onConnect={() => { playSound('click'); vibrate(30); setVoiceEnabled(true); }}
-              onDisconnect={() => { playSound('click'); vibrate(30); setVoiceEnabled(false); voiceChat.disconnect(); }}
-              error={voiceChat.error}
-              compact
-            />
           </div>
         </div>
 
