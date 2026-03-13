@@ -78,15 +78,6 @@ const GuessingLobbyScreen: React.FC = () => {
           <ArrowRight size={20} />
         </button>
         <h1 className="text-xl font-black flex-1">⚔️ غرفة التخمين</h1>
-        <VoiceChatButton
-          isConnected={voiceChat.isConnected}
-          isConnecting={voiceChat.isConnecting}
-          isMuted={voiceChat.isMuted}
-          isSpeaking={voiceChat.activeSpeakers.includes(currentPlayer?.player_id || '')}
-          onToggleMute={() => { playSound('click'); voiceChat.toggleMute(); }}
-          onConnect={() => { playSound('click'); setVoiceEnabled(true); }}
-          error={voiceChat.error}
-        />
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col p-6 pt-2">
