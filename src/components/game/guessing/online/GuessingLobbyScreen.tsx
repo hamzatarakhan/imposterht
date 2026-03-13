@@ -138,8 +138,9 @@ const GuessingLobbyScreen: React.FC = () => {
                 );
               }
 
+              const isSpeaking = activeSpeakers.includes(p.player_id);
               return (
-                <div key={p.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 transition-all">
+                <div key={p.id} className={`flex items-center gap-3 p-3 rounded-xl bg-secondary/50 transition-all ${isSpeaking ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}>
                   <span className="text-2xl">{p.avatar}</span>
                   <span className="font-bold flex-1">{p.name}</span>
                   {canEdit && (
