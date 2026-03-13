@@ -211,7 +211,7 @@ const LobbyScreen: React.FC = () => {
                   );
                 }
 
-                const isSpeaking = voiceChat.activeSpeakers.includes(player.player_id);
+                const isSpeaking = activeSpeakers.includes(player.player_id);
                 return (
                   <div
                     key={player.id}
