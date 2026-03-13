@@ -9,14 +9,6 @@ import OnlineRestartButton from './OnlineRestartButton';
 const LobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
-
-  const voiceChat = useVoiceChat({
-    roomId: room?.id,
-    playerName: currentPlayer?.name || '',
-    playerId: currentPlayer?.player_id || '',
-    enabled: voiceEnabled,
-  });
   
   const [copied, setCopied] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
