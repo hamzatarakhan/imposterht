@@ -176,7 +176,7 @@ const OnlineVotingScreen: React.FC = () => {
                   : selectedPlayer === player.player_id
                   ? 'bg-imposter/20 border-2 border-imposter glow-imposter'
                   : 'bg-secondary hover:bg-secondary/80 border-2 border-transparent'
-              }`}
+              } ${activeSpeakers.includes(player.player_id) ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}
             >
               <div className="flex items-center gap-3">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
