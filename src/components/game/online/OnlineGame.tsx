@@ -9,9 +9,10 @@ import OnlineDiscussionScreen from './OnlineDiscussionScreen';
 import OnlineVotingScreen from './OnlineVotingScreen';
 import OnlineWordGuessScreen from './OnlineWordGuessScreen';
 import OnlineResultScreen from './OnlineResultScreen';
+import VoiceChatOverlay from '@/components/game/VoiceChatOverlay';
 
 const OnlineGame: React.FC = () => {
-  const { screen } = useOnlineGame();
+  const { screen, room, currentPlayer } = useOnlineGame();
 
   const screens = {
     modeSelect: ModeSelectScreen,
@@ -26,8 +27,20 @@ const OnlineGame: React.FC = () => {
   };
 
   const CurrentScreen = screens[screen];
+  const showVoice = room && currentPlayer && !['modeSelect', 'createRoom', 'joinRoom'].includes(screen);
 
-  return <CurrentScreen />;
+  return (
+    <>
+      <CurrentScreen />
+      {showVoice && (
+        <VoiceChatOverlay
+          roomId={room.id}
+          playerName={currentPlayer.name}
+          playerId={currentPlayer.player_id}
+        />
+      )}
+    </>
+  );
 };
 
 export default OnlineGame;
