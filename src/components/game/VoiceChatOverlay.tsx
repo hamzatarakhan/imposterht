@@ -11,7 +11,7 @@ interface VoiceChatOverlayProps {
 
 const VoiceChatOverlay: React.FC<VoiceChatOverlayProps> = ({ roomId, playerName, playerId }) => {
   const { playSound, vibrate } = useSettings();
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
 
   const voiceChat = useVoiceChat({
     roomId,

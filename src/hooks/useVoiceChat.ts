@@ -90,11 +90,11 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
         return;
       }
 
-      // Start muted
-      await livekitRoom.localParticipant.setMicrophoneEnabled(false);
+      // Start with mic on by default
+      await livekitRoom.localParticipant.setMicrophoneEnabled(true);
 
       roomRef.current = livekitRoom;
-      setState(prev => ({ ...prev, isConnected: true, isConnecting: false, isMuted: true }));
+      setState(prev => ({ ...prev, isConnected: true, isConnecting: false, isMuted: false }));
     } catch (err) {
       console.error('Voice chat connection error:', err);
       setState(prev => ({
