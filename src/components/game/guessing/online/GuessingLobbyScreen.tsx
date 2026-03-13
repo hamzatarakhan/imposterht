@@ -1,23 +1,15 @@
 import React, { useState } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useVoiceChatContext } from '@/context/VoiceChatContext';
 import { Copy, Share2, LogOut, ArrowRight, Pencil, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import * as guessingService from '@/services/guessingRoomService';
-import { useVoiceChat } from '@/hooks/useVoiceChat';
-import VoiceChatButton from '@/components/game/VoiceChatButton';
 
 const GuessingLobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
-
-  const voiceChat = useVoiceChat({
-    roomId: room?.id,
-    playerName: currentPlayer?.name || '',
-    playerId: currentPlayer?.player_id || '',
-    enabled: voiceEnabled,
-  });
+  const { activeSpeakers } = useVoiceChatContext();
 
   const [editingPlayer, setEditingPlayer] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
@@ -82,28 +74,15 @@ const GuessingLobbyScreen: React.FC = () => {
     <div className="min-h-screen flex flex-col relative">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
 
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 space-y-3">
-        <div className="flex items-center gap-3">
-          <button onClick={async () => { playSound('click'); await leaveRoom(); }}
-            className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowRight size={20} />
-          </button>
-          <h1 className="text-xl font-black flex-1">⚔️ غرفة التخمين</h1>
-        </div>
-        <VoiceChatButton
-          isConnected={voiceChat.isConnected}
-          isConnecting={voiceChat.isConnecting}
-          isMuted={voiceChat.isMuted}
-          isSpeaking={voiceChat.activeSpeakers.includes(currentPlayer?.player_id || '')}
-          onToggleMute={() => { playSound('click'); vibrate(30); voiceChat.toggleMute(); }}
-          onConnect={() => { playSound('click'); vibrate(30); setVoiceEnabled(true); }}
-          onDisconnect={() => { playSound('click'); vibrate(30); setVoiceEnabled(false); voiceChat.disconnect(); }}
-          error={voiceChat.error}
-          compact
-        />
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
+        <button onClick={async () => { playSound('click'); await leaveRoom(); }}
+          className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowRight size={20} />
+        </button>
+        <h1 className="text-xl font-black flex-1">⚔️ غرفة التخمين</h1>
       </div>
 
-      <div className="relative z-10 flex-1 flex flex-col p-6 pt-2">
+      <div className="relative z-10 flex-1 flex flex-col p-6 pt-2 pb-24">
         {/* Room Code */}
         <div className="card-game text-center mb-6">
           <p className="text-sm text-muted-foreground mb-2">كود الغرفة</p>
@@ -159,7 +138,7 @@ const GuessingLobbyScreen: React.FC = () => {
                 );
               }
 
-              const isSpeaking = voiceChat.activeSpeakers.includes(p.player_id);
+              const isSpeaking = activeSpeakers.includes(p.player_id);
               return (
                 <div key={p.id} className={`flex items-center gap-3 p-3 rounded-xl bg-secondary/50 transition-all ${isSpeaking ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}>
                   <span className="text-2xl">{p.avatar}</span>
