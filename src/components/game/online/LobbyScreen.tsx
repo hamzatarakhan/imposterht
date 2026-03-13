@@ -228,12 +228,13 @@ const LobbyScreen: React.FC = () => {
                   );
                 }
 
+                const isSpeaking = voiceChat.activeSpeakers.includes(player.player_id);
                 return (
                   <div
                     key={player.id}
                     className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
                       player.is_host ? 'bg-primary/20' : 'bg-secondary'
-                    }`}
+                    } ${isSpeaking ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-xl">
