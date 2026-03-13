@@ -29,18 +29,19 @@ const OnlineGame: React.FC = () => {
   const CurrentScreen = screens[screen];
   const showVoice = room && currentPlayer && !['modeSelect', 'createRoom', 'joinRoom'].includes(screen);
 
-  return (
-    <>
-      <CurrentScreen />
-      {showVoice && (
-        <VoiceChatOverlay
-          roomId={room.id}
-          playerName={currentPlayer.name}
-          playerId={currentPlayer.player_id}
-        />
-      )}
-    </>
-  );
+  if (showVoice) {
+    return (
+      <VoiceChatOverlay
+        roomId={room.id}
+        playerName={currentPlayer.name}
+        playerId={currentPlayer.player_id}
+      >
+        <CurrentScreen />
+      </VoiceChatOverlay>
+    );
+  }
+
+  return <CurrentScreen />;
 };
 
 export default OnlineGame;
