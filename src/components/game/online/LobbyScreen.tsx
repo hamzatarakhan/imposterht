@@ -1,24 +1,16 @@
 import React, { useState } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useVoiceChatContext } from '@/context/VoiceChatContext';
 import { ArrowRight, Copy, Check, Users, Crown, Loader2, Share2, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
 import * as roomService from '@/services/roomService';
 import OnlineRestartButton from './OnlineRestartButton';
-import { useVoiceChat } from '@/hooks/useVoiceChat';
-import VoiceChatButton from '@/components/game/VoiceChatButton';
 
 const LobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
-
-  const voiceChat = useVoiceChat({
-    roomId: room?.id,
-    playerName: currentPlayer?.name || '',
-    playerId: currentPlayer?.player_id || '',
-    enabled: voiceEnabled,
-  });
+  const { activeSpeakers } = useVoiceChatContext();
   
   const [copied, setCopied] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
@@ -139,17 +131,6 @@ const LobbyScreen: React.FC = () => {
                 في انتظار اللاعبين...
               </p>
             </div>
-            <VoiceChatButton
-              isConnected={voiceChat.isConnected}
-              isConnecting={voiceChat.isConnecting}
-              isMuted={voiceChat.isMuted}
-              isSpeaking={voiceChat.activeSpeakers.includes(currentPlayer?.player_id || '')}
-              onToggleMute={() => { playSound('click'); vibrate(30); voiceChat.toggleMute(); }}
-              onConnect={() => { playSound('click'); vibrate(30); setVoiceEnabled(true); }}
-              onDisconnect={() => { playSound('click'); vibrate(30); setVoiceEnabled(false); voiceChat.disconnect(); }}
-              error={voiceChat.error}
-              compact
-            />
           </div>
         </div>
 
@@ -230,7 +211,7 @@ const LobbyScreen: React.FC = () => {
                   );
                 }
 
-                const isSpeaking = voiceChat.activeSpeakers.includes(player.player_id);
+                const isSpeaking = activeSpeakers.includes(player.player_id);
                 return (
                   <div
                     key={player.id}

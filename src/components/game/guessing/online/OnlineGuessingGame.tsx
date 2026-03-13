@@ -1,5 +1,7 @@
 import React from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
+import { VoiceChatProvider } from '@/context/VoiceChatContext';
+import FloatingVoiceBar from '@/components/game/FloatingVoiceBar';
 import GuessingModeSelectScreen from './GuessingModeSelectScreen';
 import GuessingCreateRoomScreen from './GuessingCreateRoomScreen';
 import GuessingJoinRoomScreen from './GuessingJoinRoomScreen';
@@ -20,10 +22,34 @@ const screens = {
   guessingOnlineFinalResult: GuessingOnlineFinalResultScreen,
 };
 
-const OnlineGuessingGame: React.FC = () => {
-  const { screen } = useOnlineGuessing();
+// Screens where voice chat should be available
+const voiceScreens = ['guessingLobby', 'guessingOnlineShowWord', 'guessingOnlinePlay', 'guessingOnlineRoundResult', 'guessingOnlineFinalResult'];
+
+const OnlineGuessingGameInner: React.FC = () => {
+  const { screen, currentPlayer } = useOnlineGuessing();
   const CurrentScreen = screens[screen];
-  return <CurrentScreen />;
+  const showVoice = voiceScreens.includes(screen);
+
+  return (
+    <>
+      <CurrentScreen />
+      {showVoice && <FloatingVoiceBar currentPlayerId={currentPlayer?.player_id} />}
+    </>
+  );
+};
+
+const OnlineGuessingGame: React.FC = () => {
+  const { room, currentPlayer } = useOnlineGuessing();
+
+  return (
+    <VoiceChatProvider
+      roomId={room?.id}
+      playerName={currentPlayer?.name || ''}
+      playerId={currentPlayer?.player_id || ''}
+    >
+      <OnlineGuessingGameInner />
+    </VoiceChatProvider>
+  );
 };
 
 export default OnlineGuessingGame;
