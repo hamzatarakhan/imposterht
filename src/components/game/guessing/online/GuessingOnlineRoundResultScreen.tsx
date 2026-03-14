@@ -4,6 +4,7 @@ import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
 import WordImage from '../WordImage';
 import { ArrowRight } from 'lucide-react';
+import PresenceDot from '@/components/game/PresenceDot';
 
 const GuessingOnlineRoundResultScreen: React.FC = () => {
   const { room, players, isHost, nextRound, leaveRoom } = useOnlineGuessing();
@@ -62,9 +63,12 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
               {players.map((p, i) => {
                 const w = i === 0 ? words.player1_word : words.player2_word;
                 return (
-                  <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
+                   <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">{p.avatar}</span>
+                      <div className="relative">
+                        <span className="text-xl">{p.avatar}</span>
+                        <PresenceDot playerId={p.player_id} size="sm" />
+                      </div>
                       <span className="font-bold text-sm">{p.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -83,7 +87,10 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
           <div className="flex items-center justify-center gap-8">
             {players.map(p => (
               <div key={p.id} className="text-center">
-                <span className="text-2xl">{p.avatar}</span>
+                <div className="relative inline-block">
+                  <span className="text-2xl">{p.avatar}</span>
+                  <PresenceDot playerId={p.player_id} size="sm" />
+                </div>
                 <p className="text-2xl font-black text-primary">{p.wins}</p>
                 <p className="text-xs text-muted-foreground">{p.name}</p>
               </div>

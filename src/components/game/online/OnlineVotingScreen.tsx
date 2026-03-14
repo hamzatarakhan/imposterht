@@ -5,6 +5,7 @@ import { ArrowRight, Check, Loader2, Users } from 'lucide-react';
 import OnlineRestartButton from './OnlineRestartButton';
 import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
 import { usePresence } from '@/context/PresenceContext';
+import PresenceDot from '@/components/game/PresenceDot';
 
 const OnlineVotingScreen: React.FC = () => {
   const { room, players, currentPlayer, submitVote, calculateWinner, setScreen } = useOnlineGame();
@@ -184,12 +185,13 @@ const OnlineVotingScreen: React.FC = () => {
               } ${activeSpeakers.includes(player.player_id) ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}
             >
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center ${
                   selectedPlayer === player.player_id ? 'bg-imposter' : 'bg-card'
                 }`}>
                   <span className="text-2xl">
                     {selectedPlayer === player.player_id ? '😈' : player.avatar}
                   </span>
+                  <PresenceDot playerId={player.player_id} size="sm" />
                 </div>
                 <span className="font-bold text-lg">{player.name}</span>
               </div>

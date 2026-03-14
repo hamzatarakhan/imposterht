@@ -5,6 +5,7 @@ import * as guessingService from '@/services/guessingRoomService';
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
 import { ArrowRight } from 'lucide-react';
+import PresenceDot from '@/components/game/PresenceDot';
 
 const GuessingOnlinePlayScreen: React.FC = () => {
   const { room, players, isHost, markWinner, markDraw, changeWords, currentPlayer, leaveRoom } = useOnlineGuessing();
@@ -202,8 +203,9 @@ const GuessingOnlinePlayScreen: React.FC = () => {
                 <div key={p.id} className={`flex items-center gap-2 flex-1 ${idx === 1 ? 'flex-row-reverse' : ''} transition-all duration-300 ${isAsking ? 'opacity-100' : 'opacity-40'}`}>
                   <div className={`relative ${isAsking ? 'scale-110' : 'scale-90'} transition-transform`}>
                     <span className="text-3xl">{p.avatar}</span>
+                    <PresenceDot playerId={p.player_id} size="sm" />
                     {isAsking && (
-                      <span className="absolute -bottom-1 -right-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full font-bold">🗣️</span>
+                      <span className="absolute -bottom-1 -left-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full font-bold">🗣️</span>
                     )}
                   </div>
                   <div className={`${idx === 1 ? 'text-right' : ''}`}>

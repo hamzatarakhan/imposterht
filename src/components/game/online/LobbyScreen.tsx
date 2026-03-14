@@ -7,6 +7,7 @@ import * as roomService from '@/services/roomService';
 import OnlineRestartButton from './OnlineRestartButton';
 import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
 import { usePresence } from '@/context/PresenceContext';
+import PresenceDot, { AwayLabel } from '@/components/game/PresenceDot';
 
 const LobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGame();
@@ -227,11 +228,11 @@ const LobbyScreen: React.FC = () => {
                       <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-xl">
                         {player.avatar}
                       </div>
-                      <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-background ${isAway ? 'bg-destructive' : 'bg-accent'}`} />
+                      <PresenceDot playerId={player.player_id} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <span className="font-medium">{player.name}</span>
-                      {isAway && <p className="text-xs text-destructive">خارج التطبيق 🚫</p>}
+                      <AwayLabel playerId={player.player_id} />
                     </div>
                     {canEdit && (
                       <button

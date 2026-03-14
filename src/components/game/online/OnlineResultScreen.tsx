@@ -3,6 +3,7 @@ import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Trophy, Skull, Home, RotateCcw, Medal } from 'lucide-react';
 import * as roomService from '@/services/roomService';
+import PresenceDot from '@/components/game/PresenceDot';
 
 interface PlayerWithScore {
   id: string;
@@ -218,7 +219,10 @@ const OnlineResultScreen: React.FC = () => {
               >
                 <div className="flex items-center gap-2">
                   <span className="w-5 text-center text-sm">{getMedalEmoji(index)}</span>
-                  <span className="text-lg">{player.avatar}</span>
+                  <div className="relative">
+                    <span className="text-lg">{player.avatar}</span>
+                    <PresenceDot playerId={player.id} size="sm" />
+                  </div>
                   <span className={`text-sm ${player.is_imposter ? 'text-imposter' : ''}`}>
                     {player.name}
                     {player.is_imposter && ' 😈'}
@@ -264,7 +268,10 @@ const OnlineResultScreen: React.FC = () => {
               >
                 <div className="flex items-center gap-2">
                   <span className="w-5 text-center text-sm">{getMedalEmoji(index)}</span>
-                  <span className="text-lg">{player.avatar}</span>
+                  <div className="relative">
+                    <span className="text-lg">{player.avatar}</span>
+                    <PresenceDot playerId={player.id} size="sm" />
+                  </div>
                   <span className="text-sm">{player.name}</span>
                 </div>
                 <div className="flex items-center gap-1">
