@@ -3,6 +3,7 @@ import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Trophy, Skull, Home, RotateCcw, Medal } from 'lucide-react';
 import * as roomService from '@/services/roomService';
+import PresenceDot from '@/components/game/PresenceDot';
 
 interface PlayerWithScore {
   id: string;
