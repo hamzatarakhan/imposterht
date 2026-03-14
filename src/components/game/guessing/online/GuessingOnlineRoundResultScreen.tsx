@@ -16,7 +16,23 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
     guessingService.getGuessingRoundWords(room.id).then(w => setWords(w));
   }, [room?.id, room?.current_round]);
 
-  if (!room || players.length < 2) return null;
+  if (!room) return null;
+
+  if (players.length < 2) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <div className="card-game text-center space-y-4">
+          <div className="text-5xl">😢</div>
+          <p className="text-lg font-black">الخصم انقطع!</p>
+          <p className="text-sm text-muted-foreground">يبدو إنه طلع من اللعبة</p>
+        </div>
+        <button onClick={async () => { playSound('click'); await leaveRoom(); }}
+          className="w-full btn-primary-game text-lg mt-4">
+          🏠 رجوع للرئيسية
+        </button>
+      </div>
+    );
+  }
 
   const winner = room.round_winner_id ? players.find(p => p.player_id === room.round_winner_id) : null;
   const isDraw = !room.round_winner_id;

@@ -106,9 +106,14 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ roomId, play
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('blur', handleBlur);
       
-      if (channelRef.current) {
-        channelRef.current.untrack();
-        supabase.removeChannel(channelRef.current);
+      try {
+        if (channelRef.current) {
+          channelRef.current.untrack();
+          supabase.removeChannel(channelRef.current);
+          channelRef.current = null;
+        }
+      } catch (e) {
+        console.warn('Presence cleanup error:', e);
         channelRef.current = null;
       }
     };
