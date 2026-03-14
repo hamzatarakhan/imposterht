@@ -10,6 +10,7 @@ import OnlineVotingScreen from './OnlineVotingScreen';
 import OnlineWordGuessScreen from './OnlineWordGuessScreen';
 import OnlineResultScreen from './OnlineResultScreen';
 import VoiceChatOverlay from '@/components/game/VoiceChatOverlay';
+import { PresenceProvider } from '@/context/PresenceContext';
 
 const OnlineGame: React.FC = () => {
   const { screen, room, currentPlayer } = useOnlineGame();
@@ -31,13 +32,15 @@ const OnlineGame: React.FC = () => {
 
   if (showVoice) {
     return (
-      <VoiceChatOverlay
-        roomId={room.id}
-        playerName={currentPlayer.name}
-        playerId={currentPlayer.player_id}
-      >
-        <CurrentScreen />
-      </VoiceChatOverlay>
+      <PresenceProvider roomId={room.id} playerId={currentPlayer.player_id}>
+        <VoiceChatOverlay
+          roomId={room.id}
+          playerName={currentPlayer.name}
+          playerId={currentPlayer.player_id}
+        >
+          <CurrentScreen />
+        </VoiceChatOverlay>
+      </PresenceProvider>
     );
   }
 

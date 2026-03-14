@@ -9,6 +9,7 @@ import GuessingOnlinePlayScreen from './GuessingOnlinePlayScreen';
 import GuessingOnlineRoundResultScreen from './GuessingOnlineRoundResultScreen';
 import GuessingOnlineFinalResultScreen from './GuessingOnlineFinalResultScreen';
 import VoiceChatOverlay from '@/components/game/VoiceChatOverlay';
+import { PresenceProvider } from '@/context/PresenceContext';
 
 const screens = {
   guessingModeSelect: GuessingModeSelectScreen,
@@ -28,13 +29,15 @@ const OnlineGuessingGame: React.FC = () => {
 
   if (showVoice) {
     return (
-      <VoiceChatOverlay
-        roomId={room.id}
-        playerName={currentPlayer.name}
-        playerId={currentPlayer.player_id}
-      >
-        <CurrentScreen />
-      </VoiceChatOverlay>
+      <PresenceProvider roomId={room.id} playerId={currentPlayer.player_id}>
+        <VoiceChatOverlay
+          roomId={room.id}
+          playerName={currentPlayer.name}
+          playerId={currentPlayer.player_id}
+        >
+          <CurrentScreen />
+        </VoiceChatOverlay>
+      </PresenceProvider>
     );
   }
 

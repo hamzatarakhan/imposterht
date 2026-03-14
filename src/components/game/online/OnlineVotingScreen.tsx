@@ -4,11 +4,13 @@ import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Check, Loader2, Users } from 'lucide-react';
 import OnlineRestartButton from './OnlineRestartButton';
 import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
+import { usePresence } from '@/context/PresenceContext';
 
 const OnlineVotingScreen: React.FC = () => {
   const { room, players, currentPlayer, submitVote, calculateWinner, setScreen } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
   const { activeSpeakers } = useActiveSpeakers();
+  const { awayPlayers } = usePresence();
   
   // Use room.imposter_count instead of counting from players (is_imposter is hidden for non-imposters)
   const impostorCount = room?.imposter_count || 1;
@@ -108,9 +110,12 @@ const OnlineVotingScreen: React.FC = () => {
                 key={player.id}
                 className={`flex items-center gap-3 p-2 rounded-lg transition-all ${
                   player.voted_for ? 'bg-accent/20' : 'bg-secondary/50'
-                } ${activeSpeakers.includes(player.player_id) ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}
+                } ${activeSpeakers.includes(player.player_id) ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''} ${awayPlayers.includes(player.player_id) ? 'opacity-50' : ''}`}
               >
-                <span className="text-lg">{player.avatar}</span>
+                <div className="relative">
+                  <span className="text-lg">{player.avatar}</span>
+                  <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background ${awayPlayers.includes(player.player_id) ? 'bg-destructive' : 'bg-accent'}`} />
+                </div>
                 <span className="flex-1 text-sm">{player.name}</span>
                 {player.voted_for ? (
                   <Check size={16} className="text-accent" />
