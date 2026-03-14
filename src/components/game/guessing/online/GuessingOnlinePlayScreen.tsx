@@ -5,6 +5,7 @@ import * as guessingService from '@/services/guessingRoomService';
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
 import { ArrowRight } from 'lucide-react';
+import PresenceDot from '@/components/game/PresenceDot';
 
 const GuessingOnlinePlayScreen: React.FC = () => {
   const { room, players, isHost, markWinner, markDraw, changeWords, currentPlayer, leaveRoom } = useOnlineGuessing();
