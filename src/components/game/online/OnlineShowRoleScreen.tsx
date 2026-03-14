@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Eye, EyeOff, Check, Users, RefreshCw } from 'lucide-react';
+import PresenceDot, { AwayLabel } from '@/components/game/PresenceDot';
 import { getMySecretWord, getMyRole } from '@/services/roomService';
 import OnlineRestartButton from './OnlineRestartButton';
 
