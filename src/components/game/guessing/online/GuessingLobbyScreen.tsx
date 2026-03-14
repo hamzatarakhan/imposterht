@@ -11,6 +11,7 @@ const GuessingLobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
   const { activeSpeakers } = useActiveSpeakers();
+  const { awayPlayers } = usePresence();
 
   const [editingPlayer, setEditingPlayer] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
