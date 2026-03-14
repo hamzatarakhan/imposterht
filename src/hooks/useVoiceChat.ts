@@ -3,10 +3,6 @@ import {
   Room,
   RoomEvent,
   Track,
-  RemoteTrackPublication,
-  RemoteParticipant,
-  LocalParticipant,
-  ConnectionState,
 } from 'livekit-client';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -100,17 +96,41 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
         return;
       }
 
-      // Request mic permission explicitly first (fixes Samsung/Android browsers)
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(t => t.stop()); // release immediately
-      } catch (permErr) {
-        console.warn('Mic permission denied:', permErr);
+      // Request mic permission explicitly first.
+      // On Samsung/Android this often needs a successful permission grant before publishing audio.
+      if (!navigator.mediaDevices?.getUserMedia) {
+        await livekitRoom.disconnect();
+        throw new Error('المتصفح لا يدعم الميكروفون على هذا الجهاز');
       }
-      await livekitRoom.localParticipant.setMicrophoneEnabled(true);
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+        });
+        stream.getTracks().forEach((t) => t.stop()); // release immediately
+      } catch (permErr) {
+        await livekitRoom.disconnect();
+        throw new Error('فعّل إذن المايكروفون ثم اضغط زر المايك مرة ثانية');
+      }
+
+      await livekitRoom.localParticipant.setMicrophoneEnabled(true, {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      });
 
       roomRef.current = livekitRoom;
-      setState(prev => ({ ...prev, isConnected: true, isConnecting: false, isMuted: false, isDeafened: false }));
+      setState(prev => ({
+        ...prev,
+        isConnected: true,
+        isConnecting: false,
+        isMuted: !livekitRoom.localParticipant.isMicrophoneEnabled,
+        isDeafened: false,
+      }));
     } catch (err) {
       console.error('Voice chat connection error:', err);
       setState(prev => ({
@@ -133,10 +153,18 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
 
   const toggleMute = useCallback(async () => {
     if (!roomRef.current) return;
-    const newMuted = !state.isMuted;
-    await roomRef.current.localParticipant.setMicrophoneEnabled(!newMuted);
-    setState(prev => ({ ...prev, isMuted: newMuted }));
-  }, [state.isMuted]);
+
+    const currentlyEnabled = roomRef.current.localParticipant.isMicrophoneEnabled;
+    const shouldEnable = !currentlyEnabled;
+
+    await roomRef.current.localParticipant.setMicrophoneEnabled(shouldEnable, {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+    });
+
+    setState(prev => ({ ...prev, isMuted: !shouldEnable, error: null }));
+  }, []);
 
   const toggleDeafen = useCallback(() => {
     const newDeafened = !state.isDeafened;
