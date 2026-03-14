@@ -5,6 +5,7 @@ import { ArrowRight, Check, Loader2, Users } from 'lucide-react';
 import OnlineRestartButton from './OnlineRestartButton';
 import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
 import { usePresence } from '@/context/PresenceContext';
+import PresenceDot from '@/components/game/PresenceDot';
 
 const OnlineVotingScreen: React.FC = () => {
   const { room, players, currentPlayer, submitVote, calculateWinner, setScreen } = useOnlineGame();
