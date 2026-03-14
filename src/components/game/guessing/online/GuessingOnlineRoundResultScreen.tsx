@@ -63,9 +63,12 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
               {players.map((p, i) => {
                 const w = i === 0 ? words.player1_word : words.player2_word;
                 return (
-                  <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
+                   <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">{p.avatar}</span>
+                      <div className="relative">
+                        <span className="text-xl">{p.avatar}</span>
+                        <PresenceDot playerId={p.player_id} size="sm" />
+                      </div>
                       <span className="font-bold text-sm">{p.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
