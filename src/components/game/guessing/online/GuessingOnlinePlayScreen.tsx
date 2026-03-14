@@ -183,12 +183,6 @@ const GuessingOnlinePlayScreen: React.FC = () => {
           <ArrowRight size={18} />
         </button>
         <h1 className="text-base font-black flex-1">⚔️ المواجهة {room.current_round}/{room.total_rounds}</h1>
-        {myWord && (
-          <div className="flex items-center gap-1.5 bg-primary/15 px-3 py-1 rounded-full">
-            <span className="text-[10px] text-muted-foreground">كلمتك</span>
-            <span className="text-sm font-black text-primary">{myWord}</span>
-          </div>
-        )}
       </div>
 
       {/* Main Content - fills remaining space */}
