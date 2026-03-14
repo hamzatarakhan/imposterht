@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import * as guessingService from '@/services/guessingRoomService';
 import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
 import { usePresence } from '@/context/PresenceContext';
+import PresenceDot, { AwayLabel } from '@/components/game/PresenceDot';
 
 const GuessingLobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGuessing();
