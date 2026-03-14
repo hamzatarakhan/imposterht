@@ -1,5 +1,6 @@
 import React from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
+import { useSettings } from '@/context/SettingsContext';
 import ModeSelectScreen from './ModeSelectScreen';
 import CreateRoomScreen from './CreateRoomScreen';
 import JoinRoomScreen from './JoinRoomScreen';
@@ -14,6 +15,7 @@ import { PresenceProvider } from '@/context/PresenceContext';
 
 const OnlineGame: React.FC = () => {
   const { screen, room, currentPlayer, players } = useOnlineGame();
+  const { voiceChatEnabled, presenceTrackingEnabled } = useSettings();
 
   const screens = {
     modeSelect: ModeSelectScreen,
@@ -28,20 +30,32 @@ const OnlineGame: React.FC = () => {
   };
 
   const CurrentScreen = screens[screen];
-  const showVoice = room && currentPlayer && !['modeSelect', 'createRoom', 'joinRoom'].includes(screen);
+  const isInRoom = room && currentPlayer && !['modeSelect', 'createRoom', 'joinRoom'].includes(screen);
 
-  if (showVoice) {
-    return (
-      <PresenceProvider roomId={room.id} playerId={currentPlayer.player_id} players={players}>
+  if (isInRoom) {
+    let content = <CurrentScreen />;
+
+    if (voiceChatEnabled) {
+      content = (
         <VoiceChatOverlay
           roomId={room.id}
           playerName={currentPlayer.name}
           playerId={currentPlayer.player_id}
         >
-          <CurrentScreen />
+          {content}
         </VoiceChatOverlay>
-      </PresenceProvider>
-    );
+      );
+    }
+
+    if (presenceTrackingEnabled) {
+      return (
+        <PresenceProvider roomId={room.id} playerId={currentPlayer.player_id} players={players}>
+          {content}
+        </PresenceProvider>
+      );
+    }
+
+    return content;
   }
 
   return <CurrentScreen />;
