@@ -133,22 +133,26 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ roomId, play
       {/* Global away banner - shows on ALL screens when someone leaves */}
       {awayPlayerInfos.length > 0 && (
         <div className="fixed top-14 left-4 right-4 z-[100] animate-in slide-in-from-top-4 duration-300">
-          <div className="bg-destructive/15 backdrop-blur-md text-foreground rounded-2xl px-4 py-3 border border-destructive/20">
+          <div className="bg-destructive/95 backdrop-blur-md text-destructive-foreground rounded-2xl px-4 py-3 shadow-lg shadow-destructive/30 border border-destructive/50">
             <div className="flex items-center gap-3">
+              <div className="text-2xl animate-pulse">🚨</div>
+              <div className="flex-1 min-w-0">
+                <p className="font-black text-sm">
+                  {awayPlayerInfos.length === 1
+                    ? `${awayPlayerInfos[0].name} طلع من التطبيق!`
+                    : `${awayPlayerInfos.map(p => p.name).join(' و ')} طلعوا من التطبيق!`
+                  }
+                </p>
+                <p className="text-xs opacity-80 mt-0.5">
+                  ممكن يكون عم يغش 👀
+                </p>
+              </div>
               <div className="flex -space-x-2 shrink-0">
                 {awayPlayerInfos.map(p => (
-                  <div key={p.player_id} className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center text-base border border-destructive/20">
+                  <div key={p.player_id} className="w-9 h-9 rounded-full bg-destructive-foreground/20 flex items-center justify-center text-lg border-2 border-destructive ring-2 ring-destructive/50">
                     {p.avatar}
                   </div>
                 ))}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-sm">
-                  {awayPlayerInfos.length === 1
-                    ? <><span className="text-destructive">{awayPlayerInfos[0].name}</span> طلع من التطبيق رايح يغش 👀</>
-                    : <><span className="text-destructive">{awayPlayerInfos.map(p => p.name).join(' و ')}</span> طلعوا من التطبيق رايحين يغشوا 👀</>
-                  }
-                </p>
               </div>
             </div>
           </div>

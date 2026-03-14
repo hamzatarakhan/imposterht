@@ -100,13 +100,7 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
         return;
       }
 
-      // Request mic permission explicitly first (fixes Samsung/Android browsers)
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(t => t.stop()); // release immediately
-      } catch (permErr) {
-        console.warn('Mic permission denied:', permErr);
-      }
+      // Start with mic on by default
       await livekitRoom.localParticipant.setMicrophoneEnabled(true);
 
       roomRef.current = livekitRoom;
