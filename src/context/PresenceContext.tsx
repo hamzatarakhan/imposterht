@@ -127,7 +127,7 @@ export const PresenceProvider: React.FC<PresenceProviderProps> = ({ roomId, play
       {children}
       {/* Global away banner - shows on ALL screens when someone leaves */}
       {awayPlayerInfos.length > 0 && (
-        <div className="fixed bottom-4 left-4 right-4 z-[100] animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed top-14 left-4 right-4 z-[100] animate-in slide-in-from-top-4 duration-300">
           <div className="bg-destructive/95 backdrop-blur-md text-destructive-foreground rounded-2xl px-4 py-3 shadow-lg shadow-destructive/30 border border-destructive/50">
             <div className="flex items-center gap-3">
               <div className="text-2xl animate-pulse">🚨</div>
