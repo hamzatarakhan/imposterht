@@ -330,6 +330,8 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         setSoundEnabled,
         setVibrationEnabled,
         setDarkMode,
+        setVoiceChatEnabled,
+        setPresenceTrackingEnabled,
         playSound,
         vibrate,
         unlockAudio,
