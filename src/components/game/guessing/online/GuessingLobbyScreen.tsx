@@ -5,6 +5,7 @@ import { Copy, Share2, LogOut, ArrowRight, Pencil, Check, X } from 'lucide-react
 import { toast } from 'sonner';
 import * as guessingService from '@/services/guessingRoomService';
 import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
+import { usePresence } from '@/context/PresenceContext';
 
 const GuessingLobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGuessing();
