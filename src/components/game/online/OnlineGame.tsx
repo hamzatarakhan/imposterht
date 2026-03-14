@@ -13,7 +13,7 @@ import VoiceChatOverlay from '@/components/game/VoiceChatOverlay';
 import { PresenceProvider } from '@/context/PresenceContext';
 
 const OnlineGame: React.FC = () => {
-  const { screen, room, currentPlayer } = useOnlineGame();
+  const { screen, room, currentPlayer, players } = useOnlineGame();
 
   const screens = {
     modeSelect: ModeSelectScreen,
