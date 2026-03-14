@@ -25,6 +25,8 @@ const defaultSettings: SettingsState = {
   soundEnabled: true,
   vibrationEnabled: true,
   darkMode: true,
+  voiceChatEnabled: false,
+  presenceTrackingEnabled: false,
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
