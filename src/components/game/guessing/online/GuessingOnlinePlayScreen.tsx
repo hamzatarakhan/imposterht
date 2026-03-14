@@ -224,7 +224,14 @@ const GuessingOnlinePlayScreen: React.FC = () => {
           <Progress value={progressPercent} className="h-1.5" />
         </div>
 
-        {/* Skip Turn */}
+        {/* My Word - sticky bottom banner */}
+        {myWord && (
+          <div className="w-full py-2.5 px-4 rounded-2xl bg-primary/10 border border-primary/30 text-center">
+            <span className="text-[11px] text-muted-foreground ml-1">كلمتك</span>
+            <span className="text-lg font-black text-primary mr-2">{myWord}</span>
+          </div>
+        )}
+
         {isMyTurn ? (
           <button
             onClick={handleSkipTurn}
