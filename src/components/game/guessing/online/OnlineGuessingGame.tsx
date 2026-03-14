@@ -1,5 +1,6 @@
 import React from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
+import { useSettings } from '@/context/SettingsContext';
 import GuessingModeSelectScreen from './GuessingModeSelectScreen';
 import GuessingCreateRoomScreen from './GuessingCreateRoomScreen';
 import GuessingJoinRoomScreen from './GuessingJoinRoomScreen';
@@ -24,21 +25,34 @@ const screens = {
 
 const OnlineGuessingGame: React.FC = () => {
   const { screen, room, currentPlayer, players } = useOnlineGuessing();
+  const { voiceChatEnabled, presenceTrackingEnabled } = useSettings();
   const CurrentScreen = screens[screen];
-  const showVoice = room && currentPlayer && !['guessingModeSelect', 'guessingCreateRoom', 'guessingJoinRoom'].includes(screen);
+  const isInRoom = room && currentPlayer && !['guessingModeSelect', 'guessingCreateRoom', 'guessingJoinRoom'].includes(screen);
 
-  if (showVoice) {
-    return (
-      <PresenceProvider roomId={room.id} playerId={currentPlayer.player_id} players={players}>
+  if (isInRoom) {
+    let content = <CurrentScreen />;
+
+    if (voiceChatEnabled) {
+      content = (
         <VoiceChatOverlay
           roomId={room.id}
           playerName={currentPlayer.name}
           playerId={currentPlayer.player_id}
         >
-          <CurrentScreen />
+          {content}
         </VoiceChatOverlay>
-      </PresenceProvider>
-    );
+      );
+    }
+
+    if (presenceTrackingEnabled) {
+      return (
+        <PresenceProvider roomId={room.id} playerId={currentPlayer.player_id} players={players}>
+          {content}
+        </PresenceProvider>
+      );
+    }
+
+    return content;
   }
 
   return <CurrentScreen />;
