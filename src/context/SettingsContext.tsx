@@ -12,6 +12,8 @@ interface SettingsContextType extends SettingsState {
   setSoundEnabled: (enabled: boolean) => void;
   setVibrationEnabled: (enabled: boolean) => void;
   setDarkMode: (enabled: boolean) => void;
+  setVoiceChatEnabled: (enabled: boolean) => void;
+  setPresenceTrackingEnabled: (enabled: boolean) => void;
   playSound: (type: 'click' | 'reveal' | 'win' | 'lose' | 'tick' | 'alarm' | 'intro' | 'welcome' | 'ready') => void;
   vibrate: (pattern?: number | number[]) => void;
   unlockAudio: () => void;
