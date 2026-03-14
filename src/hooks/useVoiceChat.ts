@@ -3,10 +3,6 @@ import {
   Room,
   RoomEvent,
   Track,
-  RemoteTrackPublication,
-  RemoteParticipant,
-  LocalParticipant,
-  ConnectionState,
 } from 'livekit-client';
 import { supabase } from '@/integrations/supabase/client';
 
