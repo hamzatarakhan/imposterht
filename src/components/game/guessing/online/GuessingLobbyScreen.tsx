@@ -141,10 +141,17 @@ const GuessingLobbyScreen: React.FC = () => {
               }
 
               const isSpeaking = activeSpeakers.includes(p.player_id);
+              const isAway = awayPlayers.includes(p.player_id);
               return (
-                <div key={p.id} className={`flex items-center gap-3 p-3 rounded-xl bg-secondary/50 transition-all ${isSpeaking ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''}`}>
-                  <span className="text-2xl">{p.avatar}</span>
-                  <span className="font-bold flex-1">{p.name}</span>
+                <div key={p.id} className={`flex items-center gap-3 p-3 rounded-xl bg-secondary/50 transition-all ${isSpeaking ? 'ring-2 ring-accent/50 shadow-md shadow-accent/10' : ''} ${isAway ? 'opacity-50' : ''}`}>
+                  <div className="relative">
+                    <span className="text-2xl">{p.avatar}</span>
+                    <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-background ${isAway ? 'bg-destructive' : 'bg-accent'}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="font-bold">{p.name}</span>
+                    {isAway && <p className="text-xs text-destructive">خارج التطبيق 🚫</p>}
+                  </div>
                   {canEdit && (
                     <button
                       onClick={() => handleEditPlayer(p.player_id, p.name)}
