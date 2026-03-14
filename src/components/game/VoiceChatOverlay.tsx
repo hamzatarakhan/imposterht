@@ -32,7 +32,7 @@ const VoiceChatOverlay: React.FC<VoiceChatOverlayProps> = ({ roomId, playerName,
       return (
         <div className="fixed top-4 left-4 z-50">
           <button
-            onClick={() => { playSound('click'); vibrate(30); setEnabled(true); }}
+            onClick={() => { playSound('click'); vibrate(30); voiceChat.connect(); }}
             className="p-2.5 rounded-xl bg-accent/20 text-accent hover:bg-accent/30 transition-all shadow-md backdrop-blur-md border border-accent/20"
             title={voiceChat.error ? `فشل الاتصال: ${voiceChat.error}` : 'انضم للمحادثة الصوتية 🎙️'}
           >

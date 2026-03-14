@@ -41,7 +41,12 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
   const audioElementsRef = useRef<Map<string, HTMLAudioElement>>(new Map());
 
   const connect = useCallback(async () => {
-    if (!roomId || !playerId || !playerName || roomRef.current) return;
+    if (!roomId || !playerId || !playerName) return;
+    if (roomRef.current) {
+      // Already connected
+      setState(prev => ({ ...prev, isConnected: true, isConnecting: false }));
+      return;
+    }
 
     setState(prev => ({ ...prev, isConnecting: true, error: null }));
 
