@@ -140,6 +140,14 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     setSettings(prev => ({ ...prev, darkMode: enabled }));
   };
 
+  const setVoiceChatEnabled = (enabled: boolean) => {
+    setSettings(prev => ({ ...prev, voiceChatEnabled: enabled }));
+  };
+
+  const setPresenceTrackingEnabled = (enabled: boolean) => {
+    setSettings(prev => ({ ...prev, presenceTrackingEnabled: enabled }));
+  };
+
   // Play sound using Web Audio API
   const playSound = (type: 'click' | 'reveal' | 'win' | 'lose' | 'tick' | 'alarm' | 'intro' | 'welcome' | 'ready') => {
     if (!settings.soundEnabled) return;
