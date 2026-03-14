@@ -140,7 +140,36 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   };
   const handleSkipTurn = () => { if (isMyTurn) switchTurn(); };
 
-  if (!room || !activeAsker || !activeTarget) return null;
+  if (!room) return null;
+
+  // Opponent disconnected - show friendly message instead of blank screen
+  if (!activeAsker || !activeTarget || players.length < 2) {
+    return (
+      <div className="min-h-[100dvh] flex flex-col">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background pointer-events-none" />
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
+          <button onClick={async () => { playSound('click'); await leaveRoom(); }}
+            className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowRight size={20} />
+          </button>
+          <h1 className="text-xl font-black">⚔️ المواجهة</h1>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative z-10">
+          <div className="w-full max-w-sm space-y-5">
+            <div className="card-game text-center space-y-4">
+              <div className="text-5xl">😢</div>
+              <p className="text-lg font-black">الخصم انقطع!</p>
+              <p className="text-sm text-muted-foreground">يبدو إنه طلع من اللعبة</p>
+            </div>
+            <button onClick={async () => { playSound('click'); await leaveRoom(); }}
+              className="w-full btn-primary-game text-lg">
+              🏠 رجوع للرئيسية
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!bothReady) {
     return (

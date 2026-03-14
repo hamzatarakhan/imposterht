@@ -11,7 +11,20 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
   const { playSound, vibrate } = useSettings();
   const [loading, setLoading] = useState(false);
 
-  if (players.length < 2) return null;
+  if (players.length < 2) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <div className="card-game text-center space-y-4">
+          <div className="text-5xl">😢</div>
+          <p className="text-lg font-black">الخصم انقطع!</p>
+        </div>
+        <button onClick={async () => { playSound('click'); vibrate(50); await leaveRoom(); resetOnlineGuessing(); setMainScreen('hub'); }}
+          className="w-full btn-primary-game text-lg mt-4">
+          🏠 رجوع للرئيسية
+        </button>
+      </div>
+    );
+  }
 
   const winner = players[0].wins >= players[1].wins ? players[0] : players[1];
   const isDraw = players[0].wins === players[1].wins;
