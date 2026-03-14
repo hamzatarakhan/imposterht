@@ -10,6 +10,7 @@ const OnlineVotingScreen: React.FC = () => {
   const { room, players, currentPlayer, submitVote, calculateWinner, setScreen } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
   const { activeSpeakers } = useActiveSpeakers();
+  const { awayPlayers } = usePresence();
   
   // Use room.imposter_count instead of counting from players (is_imposter is hidden for non-imposters)
   const impostorCount = room?.imposter_count || 1;
