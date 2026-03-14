@@ -153,10 +153,18 @@ export const useVoiceChat = ({ roomId, playerName, playerId, enabled = false }: 
 
   const toggleMute = useCallback(async () => {
     if (!roomRef.current) return;
-    const newMuted = !state.isMuted;
-    await roomRef.current.localParticipant.setMicrophoneEnabled(!newMuted);
-    setState(prev => ({ ...prev, isMuted: newMuted }));
-  }, [state.isMuted]);
+
+    const currentlyEnabled = roomRef.current.localParticipant.isMicrophoneEnabled;
+    const shouldEnable = !currentlyEnabled;
+
+    await roomRef.current.localParticipant.setMicrophoneEnabled(shouldEnable, {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+    });
+
+    setState(prev => ({ ...prev, isMuted: !shouldEnable, error: null }));
+  }, []);
 
   const toggleDeafen = useCallback(() => {
     const newDeafened = !state.isDeafened;
