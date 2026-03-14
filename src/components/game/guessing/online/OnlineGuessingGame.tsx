@@ -29,7 +29,7 @@ const OnlineGuessingGame: React.FC = () => {
 
   if (showVoice) {
     return (
-      <PresenceProvider roomId={room.id} playerId={currentPlayer.player_id}>
+      <PresenceProvider roomId={room.id} playerId={currentPlayer.player_id} players={players}>
         <VoiceChatOverlay
           roomId={room.id}
           playerName={currentPlayer.name}
