@@ -4,6 +4,8 @@ interface SettingsState {
   soundEnabled: boolean;
   vibrationEnabled: boolean;
   darkMode: boolean;
+  voiceChatEnabled: boolean;
+  presenceTrackingEnabled: boolean;
 }
 
 interface SettingsContextType extends SettingsState {
