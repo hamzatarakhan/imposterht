@@ -183,12 +183,6 @@ const GuessingOnlinePlayScreen: React.FC = () => {
           <ArrowRight size={18} />
         </button>
         <h1 className="text-base font-black flex-1">⚔️ المواجهة {room.current_round}/{room.total_rounds}</h1>
-        {myWord && (
-          <div className="flex items-center gap-1.5 bg-primary/15 px-3 py-1 rounded-full">
-            <span className="text-[10px] text-muted-foreground">كلمتك</span>
-            <span className="text-sm font-black text-primary">{myWord}</span>
-          </div>
-        )}
       </div>
 
       {/* Main Content - fills remaining space */}
@@ -230,7 +224,14 @@ const GuessingOnlinePlayScreen: React.FC = () => {
           <Progress value={progressPercent} className="h-1.5" />
         </div>
 
-        {/* Skip Turn */}
+        {/* My Word - sticky bottom banner */}
+        {myWord && (
+          <div className="w-full py-2.5 px-4 rounded-2xl bg-primary/10 border border-primary/30 text-center">
+            <span className="text-[11px] text-muted-foreground ml-1">كلمتك</span>
+            <span className="text-lg font-black text-primary mr-2">{myWord}</span>
+          </div>
+        )}
+
         {isMyTurn ? (
           <button
             onClick={handleSkipTurn}
