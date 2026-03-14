@@ -23,7 +23,7 @@ const screens = {
 };
 
 const OnlineGuessingGame: React.FC = () => {
-  const { screen, room, currentPlayer } = useOnlineGuessing();
+  const { screen, room, currentPlayer, players } = useOnlineGuessing();
   const CurrentScreen = screens[screen];
   const showVoice = room && currentPlayer && !['guessingModeSelect', 'guessingCreateRoom', 'guessingJoinRoom'].includes(screen);
 
