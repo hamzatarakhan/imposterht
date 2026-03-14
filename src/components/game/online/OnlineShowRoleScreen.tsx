@@ -121,8 +121,14 @@ const OnlineShowRoleScreen: React.FC = () => {
                   player.has_seen_role ? 'bg-accent/20' : 'bg-secondary/50'
                 }`}
               >
-                <span className="text-lg">{player.avatar}</span>
-                <span className="flex-1 text-sm">{player.name}</span>
+                <div className="relative">
+                  <span className="text-lg">{player.avatar}</span>
+                  <PresenceDot playerId={player.player_id} size="sm" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm">{player.name}</span>
+                  <AwayLabel playerId={player.player_id} />
+                </div>
                 {player.has_seen_role ? (
                   <Check size={16} className="text-accent" />
                 ) : (

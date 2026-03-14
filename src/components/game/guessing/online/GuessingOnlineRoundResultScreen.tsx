@@ -87,7 +87,10 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
           <div className="flex items-center justify-center gap-8">
             {players.map(p => (
               <div key={p.id} className="text-center">
-                <span className="text-2xl">{p.avatar}</span>
+                <div className="relative inline-block">
+                  <span className="text-2xl">{p.avatar}</span>
+                  <PresenceDot playerId={p.player_id} size="sm" />
+                </div>
                 <p className="text-2xl font-black text-primary">{p.wins}</p>
                 <p className="text-xs text-muted-foreground">{p.name}</p>
               </div>

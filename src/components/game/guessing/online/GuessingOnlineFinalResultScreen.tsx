@@ -66,7 +66,10 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
               <div key={p.id} className={`text-center p-4 rounded-2xl flex-1 ${
                 !isDraw && p.player_id === winner.player_id ? 'bg-primary/20 ring-2 ring-primary/40' : 'bg-secondary/50'
               }`}>
-                <div className="text-3xl mb-2">{p.avatar}</div>
+                <div className="relative inline-block text-3xl mb-2">
+                  {p.avatar}
+                  <PresenceDot playerId={p.player_id} size="sm" />
+                </div>
                 <p className="font-bold">{p.name}</p>
                 <p className="text-3xl font-black text-primary mt-1">{p.wins}</p>
                 <p className="text-xs text-muted-foreground">فوز</p>
