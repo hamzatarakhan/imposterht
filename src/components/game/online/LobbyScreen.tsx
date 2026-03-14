@@ -5,6 +5,7 @@ import { ArrowRight, Copy, Check, Users, Crown, Loader2, Share2, Pencil, X } fro
 import { toast } from 'sonner';
 import * as roomService from '@/services/roomService';
 import OnlineRestartButton from './OnlineRestartButton';
+import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
 import { usePresence } from '@/context/PresenceContext';
 
 const LobbyScreen: React.FC = () => {
