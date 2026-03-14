@@ -7,6 +7,7 @@ import * as roomService from '@/services/roomService';
 import OnlineRestartButton from './OnlineRestartButton';
 import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
 import { usePresence } from '@/context/PresenceContext';
+import PresenceDot, { AwayLabel } from '@/components/game/PresenceDot';
 
 const LobbyScreen: React.FC = () => {
   const { room, players, isHost, currentPlayer, startGame, leaveRoom } = useOnlineGame();
