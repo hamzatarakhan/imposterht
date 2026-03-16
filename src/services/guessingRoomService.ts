@@ -12,6 +12,8 @@ export interface GuessingRoom {
   current_round: number;
   turn_time: number;
   round_winner_id: string | null;
+  voice_chat_enabled: boolean;
+  presence_enabled: boolean;
   created_at: string;
   updated_at: string;
 }
