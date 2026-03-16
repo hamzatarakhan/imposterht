@@ -32,6 +32,8 @@ export const createRoom = async (
     categories: Category[];
     discussionTime: number;
     discussionTimeEnabled: boolean;
+    voiceChatEnabled?: boolean;
+    presenceEnabled?: boolean;
   }
 ): Promise<{ room: Room; player: RoomPlayer } | null> => {
   const playerId = getOrCreatePlayerId();
