@@ -28,7 +28,8 @@ const OnlineGame: React.FC = () => {
   };
 
   const CurrentScreen = screens[screen];
-  const showVoice = room && currentPlayer && !['modeSelect', 'createRoom', 'joinRoom'].includes(screen);
+  const showVoice = room && currentPlayer && !['modeSelect', 'createRoom', 'joinRoom'].includes(screen) && room.voice_chat_enabled;
+  const showPresence = room && currentPlayer && !['modeSelect', 'createRoom', 'joinRoom'].includes(screen) && room.presence_enabled;
 
   if (showVoice) {
     return (
