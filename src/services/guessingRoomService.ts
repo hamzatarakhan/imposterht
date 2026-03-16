@@ -33,7 +33,7 @@ export interface GuessingPlayer {
 export const createGuessingRoom = async (
   hostName: string,
   hostAvatar: string,
-  settings: { categories: GuessingCategory[]; totalRounds: number; turnTime?: number }
+  settings: { categories: GuessingCategory[]; totalRounds: number; turnTime?: number; voiceChatEnabled?: boolean; presenceEnabled?: boolean }
 ): Promise<{ room: GuessingRoom; player: GuessingPlayer } | null> => {
   const playerId = getOrCreatePlayerId();
 
