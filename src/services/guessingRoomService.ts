@@ -12,6 +12,8 @@ export interface GuessingRoom {
   current_round: number;
   turn_time: number;
   round_winner_id: string | null;
+  voice_chat_enabled: boolean;
+  presence_enabled: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -31,7 +33,7 @@ export interface GuessingPlayer {
 export const createGuessingRoom = async (
   hostName: string,
   hostAvatar: string,
-  settings: { categories: GuessingCategory[]; totalRounds: number; turnTime?: number }
+  settings: { categories: GuessingCategory[]; totalRounds: number; turnTime?: number; voiceChatEnabled?: boolean; presenceEnabled?: boolean }
 ): Promise<{ room: GuessingRoom; player: GuessingPlayer } | null> => {
   const playerId = getOrCreatePlayerId();
 
@@ -42,6 +44,8 @@ export const createGuessingRoom = async (
       categories: JSON.stringify(settings.categories),
       total_rounds: settings.totalRounds,
       turn_time: settings.turnTime || 60,
+      voice_chat_enabled: settings.voiceChatEnabled || false,
+      presence_enabled: settings.presenceEnabled || false,
       status: 'waiting',
     })
     .select()

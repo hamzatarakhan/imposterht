@@ -25,20 +25,30 @@ const screens = {
 const OnlineGuessingGame: React.FC = () => {
   const { screen, room, currentPlayer, players } = useOnlineGuessing();
   const CurrentScreen = screens[screen];
-  const showVoice = room && currentPlayer && !['guessingModeSelect', 'guessingCreateRoom', 'guessingJoinRoom'].includes(screen);
+  const showVoice = room && currentPlayer && !['guessingModeSelect', 'guessingCreateRoom', 'guessingJoinRoom'].includes(screen) && room.voice_chat_enabled;
+  const showPresence = room && currentPlayer && !['guessingModeSelect', 'guessingCreateRoom', 'guessingJoinRoom'].includes(screen) && room.presence_enabled;
+  const inRoom = room && currentPlayer && !['guessingModeSelect', 'guessingCreateRoom', 'guessingJoinRoom'].includes(screen);
 
-  if (showVoice) {
-    return (
-      <PresenceProvider roomId={room.id} playerId={currentPlayer.player_id} players={players}>
-        <VoiceChatOverlay
-          roomId={room.id}
-          playerName={currentPlayer.name}
-          playerId={currentPlayer.player_id}
-        >
-          <CurrentScreen />
+  if (inRoom) {
+    let content = <CurrentScreen />;
+    
+    if (showVoice) {
+      content = (
+        <VoiceChatOverlay roomId={room.id} playerName={currentPlayer.name} playerId={currentPlayer.player_id}>
+          {content}
         </VoiceChatOverlay>
-      </PresenceProvider>
-    );
+      );
+    }
+    
+    if (showPresence) {
+      content = (
+        <PresenceProvider roomId={room.id} playerId={currentPlayer.player_id} players={players}>
+          {content}
+        </PresenceProvider>
+      );
+    }
+    
+    return content;
   }
 
   return <CurrentScreen />;

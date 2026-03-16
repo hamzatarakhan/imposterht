@@ -72,11 +72,13 @@ export type Database = {
           id: string
           player1_word: string | null
           player2_word: string | null
+          presence_enabled: boolean
           round_winner_id: string | null
           status: string
           total_rounds: number
           turn_time: number
           updated_at: string
+          voice_chat_enabled: boolean
         }
         Insert: {
           categories?: string | null
@@ -87,11 +89,13 @@ export type Database = {
           id?: string
           player1_word?: string | null
           player2_word?: string | null
+          presence_enabled?: boolean
           round_winner_id?: string | null
           status?: string
           total_rounds?: number
           turn_time?: number
           updated_at?: string
+          voice_chat_enabled?: boolean
         }
         Update: {
           categories?: string | null
@@ -102,11 +106,13 @@ export type Database = {
           id?: string
           player1_word?: string | null
           player2_word?: string | null
+          presence_enabled?: boolean
           round_winner_id?: string | null
           status?: string
           total_rounds?: number
           turn_time?: number
           updated_at?: string
+          voice_chat_enabled?: boolean
         }
         Relationships: []
       }
@@ -186,11 +192,13 @@ export type Database = {
           id: string
           imposter_count: number
           player_count: number
+          presence_enabled: boolean
           secret_word: string | null
           status: string
           timer_remaining: number | null
           timer_started_at: string | null
           updated_at: string
+          voice_chat_enabled: boolean
           winner: string | null
           word_guess_options: string | null
           word_guess_status: string | null
@@ -208,11 +216,13 @@ export type Database = {
           id?: string
           imposter_count?: number
           player_count?: number
+          presence_enabled?: boolean
           secret_word?: string | null
           status?: string
           timer_remaining?: number | null
           timer_started_at?: string | null
           updated_at?: string
+          voice_chat_enabled?: boolean
           winner?: string | null
           word_guess_options?: string | null
           word_guess_status?: string | null
@@ -230,11 +240,13 @@ export type Database = {
           id?: string
           imposter_count?: number
           player_count?: number
+          presence_enabled?: boolean
           secret_word?: string | null
           status?: string
           timer_remaining?: number | null
           timer_started_at?: string | null
           updated_at?: string
+          voice_chat_enabled?: boolean
           winner?: string | null
           word_guess_options?: string | null
           word_guess_status?: string | null
@@ -300,11 +312,13 @@ export type Database = {
           current_round: number | null
           host_id: string | null
           id: string | null
+          presence_enabled: boolean | null
           round_winner_id: string | null
           status: string | null
           total_rounds: number | null
           turn_time: number | null
           updated_at: string | null
+          voice_chat_enabled: boolean | null
         }
         Insert: {
           categories?: string | null
@@ -313,11 +327,13 @@ export type Database = {
           current_round?: number | null
           host_id?: string | null
           id?: string | null
+          presence_enabled?: boolean | null
           round_winner_id?: string | null
           status?: string | null
           total_rounds?: number | null
           turn_time?: number | null
           updated_at?: string | null
+          voice_chat_enabled?: boolean | null
         }
         Update: {
           categories?: string | null
@@ -326,11 +342,13 @@ export type Database = {
           current_round?: number | null
           host_id?: string | null
           id?: string | null
+          presence_enabled?: boolean | null
           round_winner_id?: string | null
           status?: string | null
           total_rounds?: number | null
           turn_time?: number | null
           updated_at?: string | null
+          voice_chat_enabled?: boolean | null
         }
         Relationships: []
       }
@@ -410,10 +428,12 @@ export type Database = {
           id: string | null
           imposter_count: number | null
           player_count: number | null
+          presence_enabled: boolean | null
           status: string | null
           timer_remaining: number | null
           timer_started_at: string | null
           updated_at: string | null
+          voice_chat_enabled: boolean | null
           winner: string | null
           word_guess_options: string | null
           word_guess_status: string | null
@@ -431,10 +451,12 @@ export type Database = {
           id?: string | null
           imposter_count?: number | null
           player_count?: number | null
+          presence_enabled?: boolean | null
           status?: string | null
           timer_remaining?: number | null
           timer_started_at?: string | null
           updated_at?: string | null
+          voice_chat_enabled?: boolean | null
           winner?: string | null
           word_guess_options?: string | null
           word_guess_status?: string | null
@@ -452,10 +474,12 @@ export type Database = {
           id?: string | null
           imposter_count?: number | null
           player_count?: number | null
+          presence_enabled?: boolean | null
           status?: string | null
           timer_remaining?: number | null
           timer_started_at?: string | null
           updated_at?: string | null
+          voice_chat_enabled?: boolean | null
           winner?: string | null
           word_guess_options?: string | null
           word_guess_status?: string | null

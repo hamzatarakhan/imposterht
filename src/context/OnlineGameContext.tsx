@@ -21,6 +21,8 @@ interface OnlineGameContextType extends OnlineGameState {
     categories: Category[];
     discussionTime: number;
     discussionTimeEnabled: boolean;
+    voiceChatEnabled?: boolean;
+    presenceEnabled?: boolean;
   }) => Promise<boolean>;
   joinRoom: (code: string, name: string, avatar: string) => Promise<{ success: boolean; error?: string }>;
   startGame: () => Promise<boolean>;
