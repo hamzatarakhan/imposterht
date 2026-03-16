@@ -47,10 +47,12 @@ export const createRoom = async (
       host_id: playerId,
       player_count: settings.playerCount,
       imposter_count: settings.imposterCount,
-      category: settings.categories[0] || 'random', // Keep for backward compat
-      categories: JSON.stringify(settings.categories), // New field for multiple
+      category: settings.categories[0] || 'random',
+      categories: JSON.stringify(settings.categories),
       discussion_time: settings.discussionTime,
       discussion_time_enabled: settings.discussionTimeEnabled,
+      voice_chat_enabled: settings.voiceChatEnabled || false,
+      presence_enabled: settings.presenceEnabled || false,
       status: 'waiting',
     })
     .select()

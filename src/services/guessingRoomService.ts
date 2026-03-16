@@ -44,6 +44,8 @@ export const createGuessingRoom = async (
       categories: JSON.stringify(settings.categories),
       total_rounds: settings.totalRounds,
       turn_time: settings.turnTime || 60,
+      voice_chat_enabled: settings.voiceChatEnabled || false,
+      presence_enabled: settings.presenceEnabled || false,
       status: 'waiting',
     })
     .select()
