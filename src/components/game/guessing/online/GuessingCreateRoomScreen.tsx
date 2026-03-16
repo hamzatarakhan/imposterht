@@ -14,6 +14,8 @@ const GuessingCreateRoomScreen: React.FC = () => {
   const [categories, setCategories] = useState<GuessingCategory[]>(['random']);
   const [totalRounds, setTotalRounds] = useState(5);
   const [turnTime, setTurnTime] = useState(60);
+  const [voiceChatEnabled, setVoiceChatEnabled] = useState(false);
+  const [presenceEnabled, setPresenceEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const toggleCategory = (cat: GuessingCategory) => {
