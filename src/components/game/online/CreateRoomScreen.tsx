@@ -19,6 +19,8 @@ const CreateRoomScreen: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<Category[]>(['random']);
   const [discussionTime, setDiscussionTime] = useState(90);
   const [discussionTimeEnabled, setDiscussionTimeEnabled] = useState(true);
+  const [voiceChatEnabled, setVoiceChatEnabled] = useState(false);
+  const [presenceEnabled, setPresenceEnabled] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
   const handleCreate = async () => {
