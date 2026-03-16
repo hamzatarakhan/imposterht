@@ -26,7 +26,7 @@ interface OnlineGuessingState {
 
 interface OnlineGuessingContextType extends OnlineGuessingState {
   setScreen: (s: OnlineGuessingScreen) => void;
-  createRoom: (name: string, avatar: string, settings: { categories: GuessingCategory[]; totalRounds: number; turnTime?: number }) => Promise<boolean>;
+  createRoom: (name: string, avatar: string, settings: { categories: GuessingCategory[]; totalRounds: number; turnTime?: number; voiceChatEnabled?: boolean; presenceEnabled?: boolean }) => Promise<boolean>;
   joinRoom: (code: string, name: string, avatar: string) => Promise<{ success: boolean; error?: string }>;
   startGame: () => Promise<boolean>;
   markWinner: (winnerPlayerId: string) => Promise<boolean>;
