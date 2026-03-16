@@ -33,7 +33,7 @@ const GuessingCreateRoomScreen: React.FC = () => {
     if (!name.trim() || loading) return;
     setLoading(true);
     playSound('click'); vibrate(50);
-    const success = await createRoom(name.trim(), avatar, { categories, totalRounds, turnTime });
+    const success = await createRoom(name.trim(), avatar, { categories, totalRounds, turnTime, voiceChatEnabled, presenceEnabled });
     if (!success) setLoading(false);
   };
 
