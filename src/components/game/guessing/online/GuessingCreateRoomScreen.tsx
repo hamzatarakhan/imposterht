@@ -3,7 +3,7 @@ import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { GUESSING_CATEGORIES, GuessingCategory } from '@/data/guessingWords';
-import { ArrowRight, Shuffle } from 'lucide-react';
+import { ArrowRight, Shuffle, Mic, Eye } from 'lucide-react';
 
 const GuessingCreateRoomScreen: React.FC = () => {
   const { createRoom, setScreen } = useOnlineGuessing();
