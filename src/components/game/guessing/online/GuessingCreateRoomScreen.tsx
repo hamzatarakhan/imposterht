@@ -115,6 +115,43 @@ const GuessingCreateRoomScreen: React.FC = () => {
             ))}
           </div>
         </div>
+
+        {/* Voice Chat & Presence Toggles */}
+        <div className="card-game space-y-4">
+          <h3 className="font-medium text-sm text-muted-foreground">ميزات إضافية</h3>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Mic size={18} className={voiceChatEnabled ? 'text-primary' : 'text-muted-foreground'} />
+              <div>
+                <p className="font-medium text-sm">محادثة صوتية</p>
+                <p className="text-xs text-muted-foreground">تكلم مع اللاعبين بالصوت</p>
+              </div>
+            </div>
+            <button
+              onClick={() => { playSound('click'); setVoiceChatEnabled(!voiceChatEnabled); }}
+              className={`w-14 h-8 rounded-full transition-colors relative ${voiceChatEnabled ? 'bg-primary' : 'bg-secondary'}`}
+            >
+              <div className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow-md transition-all ${voiceChatEnabled ? 'left-1' : 'right-1'}`} />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Eye size={18} className={presenceEnabled ? 'text-primary' : 'text-muted-foreground'} />
+              <div>
+                <p className="font-medium text-sm">تتبع الخصم</p>
+                <p className="text-xs text-muted-foreground">اعرف مين طلع من التطبيق</p>
+              </div>
+            </div>
+            <button
+              onClick={() => { playSound('click'); setPresenceEnabled(!presenceEnabled); }}
+              className={`w-14 h-8 rounded-full transition-colors relative ${presenceEnabled ? 'bg-primary' : 'bg-secondary'}`}
+            >
+              <div className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow-md transition-all ${presenceEnabled ? 'left-1' : 'right-1'}`} />
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="sticky bottom-0 p-4 bg-gradient-to-t from-background via-background to-transparent space-y-3">

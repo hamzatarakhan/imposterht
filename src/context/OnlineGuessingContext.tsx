@@ -148,7 +148,7 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
 
   const setScreen = useCallback((s: OnlineGuessingScreen) => setState(prev => ({ ...prev, screen: s })), []);
 
-  const createRoom = useCallback(async (name: string, avatar: string, settings: { categories: GuessingCategory[]; totalRounds: number; turnTime?: number }) => {
+  const createRoom = useCallback(async (name: string, avatar: string, settings: { categories: GuessingCategory[]; totalRounds: number; turnTime?: number; voiceChatEnabled?: boolean; presenceEnabled?: boolean }) => {
     const result = await guessingService.createGuessingRoom(name, avatar, settings);
     if (!result) return false;
     setState(prev => ({
