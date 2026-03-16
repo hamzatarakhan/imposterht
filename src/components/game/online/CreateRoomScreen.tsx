@@ -36,6 +36,8 @@ const CreateRoomScreen: React.FC = () => {
       categories: selectedCategories,
       discussionTime,
       discussionTimeEnabled,
+      voiceChatEnabled,
+      presenceEnabled,
     });
 
     if (!success) {
