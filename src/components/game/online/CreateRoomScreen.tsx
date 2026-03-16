@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { ArrowRight, Users, Skull, Clock, Loader2 } from 'lucide-react';
+import { ArrowRight, Users, Skull, Clock, Loader2, Mic, Eye } from 'lucide-react';
 import { categoryNames, Category } from '@/data/words';
 import OnlineRestartButton from './OnlineRestartButton';
 const categoryOptions = Object.entries(categoryNames)
