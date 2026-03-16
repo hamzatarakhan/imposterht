@@ -4,16 +4,12 @@ interface SettingsState {
   soundEnabled: boolean;
   vibrationEnabled: boolean;
   darkMode: boolean;
-  voiceChatEnabled: boolean;
-  presenceTrackingEnabled: boolean;
 }
 
 interface SettingsContextType extends SettingsState {
   setSoundEnabled: (enabled: boolean) => void;
   setVibrationEnabled: (enabled: boolean) => void;
   setDarkMode: (enabled: boolean) => void;
-  setVoiceChatEnabled: (enabled: boolean) => void;
-  setPresenceTrackingEnabled: (enabled: boolean) => void;
   playSound: (type: 'click' | 'reveal' | 'win' | 'lose' | 'tick' | 'alarm' | 'intro' | 'welcome' | 'ready') => void;
   vibrate: (pattern?: number | number[]) => void;
   unlockAudio: () => void;
@@ -25,8 +21,6 @@ const defaultSettings: SettingsState = {
   soundEnabled: true,
   vibrationEnabled: true,
   darkMode: true,
-  voiceChatEnabled: false,
-  presenceTrackingEnabled: false,
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -138,14 +132,6 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const setDarkMode = (enabled: boolean) => {
     setSettings(prev => ({ ...prev, darkMode: enabled }));
-  };
-
-  const setVoiceChatEnabled = (enabled: boolean) => {
-    setSettings(prev => ({ ...prev, voiceChatEnabled: enabled }));
-  };
-
-  const setPresenceTrackingEnabled = (enabled: boolean) => {
-    setSettings(prev => ({ ...prev, presenceTrackingEnabled: enabled }));
   };
 
   // Play sound using Web Audio API
@@ -330,8 +316,6 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         setSoundEnabled,
         setVibrationEnabled,
         setDarkMode,
-        setVoiceChatEnabled,
-        setPresenceTrackingEnabled,
         playSound,
         vibrate,
         unlockAudio,
