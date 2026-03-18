@@ -3,7 +3,6 @@ import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
 import { supabase } from '@/integrations/supabase/client';
-import { Progress } from '@/components/ui/progress';
 import { ArrowRight } from 'lucide-react';
 import PresenceDot from '@/components/game/PresenceDot';
 

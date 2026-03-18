@@ -83,22 +83,6 @@ const GuessingCreateRoomScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Turn Time */}
-        <div className="card-game">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xl">⏱️</span>
-            <h2 className="font-bold">وقت الدور</h2>
-            <span className="mr-auto text-2xl font-black text-primary">{turnTime >= 60 ? `${turnTime / 60} د` : `${turnTime} ث`}</span>
-          </div>
-          <div className="flex gap-2">
-            {[30, 45, 60, 90, 120, 180].map(t => (
-              <button key={t} onClick={() => { playSound('click'); setTurnTime(t); }}
-                className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${turnTime === t ? 'bg-primary text-primary-foreground shadow-md' : 'bg-secondary text-muted-foreground'}`}>
-                {t >= 60 ? `${t / 60}د` : `${t}ث`}
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Categories */}
         <div className="card-game">
