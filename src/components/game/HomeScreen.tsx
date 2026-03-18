@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useGame, AVATAR_OPTIONS } from "@/context/GameContext";
 import { useSettings } from "@/context/SettingsContext";
-import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone, Video, FolderOpen, ArrowRight } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import { Play, HelpCircle, Settings, Users, X, Trash2, Plus, Download, QrCode, Smartphone, Video, FolderOpen, ArrowRight, ArrowLeft } from "lucide-react";
 import { useSavedPlayers } from "@/hooks/useSavedPlayers";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useSavedGroups } from "@/hooks/useSavedGroups";
@@ -31,9 +32,9 @@ import {
 const HomeScreen: React.FC = () => {
   const { setScreen } = useGame();
   const { playSound, vibrate } = useSettings();
+  const { t, isRTL } = useLanguage();
   const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
   const { isInstallable, installApp } = usePWAInstall();
-  const { groups } = useSavedGroups();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [showAddPlayerDialog, setShowAddPlayerDialog] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);

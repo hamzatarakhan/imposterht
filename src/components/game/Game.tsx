@@ -2,6 +2,7 @@ import React from "react";
 import { GameProvider, useGame } from '@/context/GameContext';
 import { OnlineGameProvider, useOnlineGame } from '@/context/OnlineGameContext';
 import { SettingsProvider } from '@/context/SettingsContext';
+import { LanguageProvider } from '@/context/LanguageContext';
 import { GuessingGameProvider } from '@/context/GuessingGameContext';
 import { OnlineGuessingProvider, useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import SplashScreen from './SplashScreen';
@@ -74,17 +75,19 @@ const GameContent: React.FC = () => {
 };
 
 const Game: React.FC = () => (
-  <SettingsProvider>
-    <GameProvider>
-      <OnlineGameProvider>
-        <GuessingGameProvider>
-          <OnlineGuessingProvider>
-            <GameContent />
-          </OnlineGuessingProvider>
-        </GuessingGameProvider>
-      </OnlineGameProvider>
-    </GameProvider>
-  </SettingsProvider>
+  <LanguageProvider>
+    <SettingsProvider>
+      <GameProvider>
+        <OnlineGameProvider>
+          <GuessingGameProvider>
+            <OnlineGuessingProvider>
+              <GameContent />
+            </OnlineGuessingProvider>
+          </GuessingGameProvider>
+        </OnlineGameProvider>
+      </GameProvider>
+    </SettingsProvider>
+  </LanguageProvider>
 );
 
 export default Game;

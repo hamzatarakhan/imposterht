@@ -1,88 +1,112 @@
+# خطة توسيع الكلمات لتشمل الأماكن العربية والكلمات المعروفة 🇯🇴🌍
 
+## الهدف
 
-## Plan: Add English Language Support (i18n)
+توسيع ملف `src/data/words.ts` بإضافة:
 
-### Scope Analysis
-The app has ~30+ screens with hardcoded Arabic text, plus two word databases (`words.ts` ~605 lines, `guessingWords.ts` ~485 lines). Every UI string, category name, button label, and game word needs an English equivalent.
+1. أماكن عربية معروفة (دول ومدن ومعالم)
+2. كلمات كثيرة معروفة ومشتركة بين العرب والأردنيين
+3. الحفاظ على الطابع المحلي مع إضافة البعد العربي
 
-### Architecture
+---
 
-**1. Language Context (`src/context/LanguageContext.tsx`)**
-- Add `language: 'ar' | 'en'` to settings, persisted in localStorage
-- Provide a `t(key)` translation function and `isRTL` boolean
-- When `en` is selected: `dir="ltr"`, font changes, all text flips to English
+## التغييرات المطلوبة
 
-**2. Translation Files (`src/data/translations/`)**
-- `ar.ts` — all Arabic UI strings (extracted from current hardcoded text)
-- `en.ts` — English equivalents
-- Organized by screen/section keys, e.g.:
-```typescript
-hub: {
-  title: "Activities" / "فعاليات",
-  chooseGame: "Choose your game!" / "اختر لعبتك وابدأ المرح!",
-  imposter: "Imposter" / "الإمبوستر",
-  guessing: "Guessing" / "التخمين",
-  ...
-}
-```
+### 1. فئة الأماكن (places) - إضافة أماكن عربية
 
-**3. English Word Databases**
-- `src/data/words_en.ts` — English words for Imposter (same categories: things, places, food, jobs, animals, sports, celebrities, movies)
-- `src/data/guessingWords_en.ts` — English words for Guessing (things, sport players, countries, food, animals)
-- Word selection functions (`getRandomWord`, `getGuessingRandomWord`) will check current language and pull from the correct database
+**دول عربية:**
 
-**4. UI Direction Handling**
-- Arabic = `dir="rtl"`, English = `dir="ltr"`
-- Set on `<html>` element when language changes
-- Arrow icons (ArrowRight for back) flip direction based on language
-- Layout adjustments for LTR (margins, text alignment)
+- مصر، لبنان، سوريا، فلسطين، العراق، السعودية، الإمارات، الكويت، قطر، البحرين، عمان، اليمن، ليبيا، تونس، الجزائر، المغرب، السودان
 
-**5. Language Toggle in Settings**
-- Add a language toggle (🌐) in `SettingsScreen.tsx` with Arabic/English switch
-- Also add a quick language toggle button in the Hub header for easy access
+**مدن عربية مشهورة:**
 
-### Files to Create
-| File | Purpose |
-|------|---------|
-| `src/context/LanguageContext.tsx` | Language state, `t()` function, direction |
-| `src/data/translations/ar.ts` | All Arabic UI strings |
-| `src/data/translations/en.ts` | All English UI strings |
-| `src/data/words_en.ts` | English Imposter words (~same count per category) |
-| `src/data/guessingWords_en.ts` | English Guessing words |
+- **مصر:** الإسكندرية، الأقصر، أسوان، شرم الشيخ، الغردقة، بورسعيد، السويس، المنصورة، المحلة
+- **لبنان:** جونيه، صيدا، طرابلس، بعلبك، زحلة، جبيل، تير
+- **سوريا:** حلب، حمص، اللاذقية، طرطوس، دير الزور، الرقة، إدلب
+- **فلسطين:** القدس، نابلس، رام الله، الخليل، بيت لحم، جنين، طولكرم، غزة، يافا، حيفا، عكا
+- **العراق:** الموصل، البصرة، أربيل، كربلاء، النجف، السليمانية
+- **الخليج:** الرياض، جدة، مكة، المدينة، الدمام، الخبر، أبوظبي، دبي، الشارقة، الكويت، الدوحة، المنامة، مسقط
 
-### Files to Modify
-| File | Changes |
-|------|---------|
-| `src/main.tsx` | Wrap app in `LanguageProvider` |
-| `src/context/SettingsContext.tsx` | Add language setting |
-| `src/data/words.ts` | Export language-aware word functions |
-| `src/data/guessingWords.ts` | Export language-aware word functions |
-| `src/components/game/SettingsScreen.tsx` | Add language toggle |
-| `src/components/game/HubScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/HomeScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/HowToPlayScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/SplashScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/SetupScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/PlayerNamesScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/ShowRoleScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/PassPhoneScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/DiscussionScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/VotingScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/ResultScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| `src/components/game/WordGuessScreen.tsx` | Replace hardcoded Arabic with `t()` |
-| All `online/` screens | Replace hardcoded Arabic with `t()` |
-| All `guessing/` screens | Replace hardcoded Arabic with `t()` |
-| `src/context/PresenceContext.tsx` | Translate away banner text |
-| `index.html` | Dynamic `dir` attribute |
+**معالم عربية مشهورة:**
 
-### Implementation Order
-1. Create `LanguageContext` + translation files (ar/en)
-2. Create English word databases
-3. Add language toggle to Settings
-4. Update word selection functions to be language-aware
-5. Replace hardcoded strings across all screens with `t()` calls
-6. Handle RTL/LTR direction switching
-7. Test all screens in both languages
+- الأهرامات، أبو الهول، برج خليفة، الحرم المكي، المسجد النبوي، المسجد الأقصى، قلعة صلاح الدين، معبد الكرنك، أبو سمبل
+- برج العرب، نخلة جميرا، متحف اللوفر أبوظبي، برج المملكة، ساحة الفنا، مدينة البتراء، سوق خان الخليلي
 
-This is a large task and will be done incrementally across multiple steps.
+### 2. فئة الأشياء (things) - كلمات عربية مشتركة
 
+**أشياء من التراث:**
+
+- سبحة، مصحف، سجادة صلاة، فانوس رمضان، مدفع رمضان، تمرية، إبريق وضوء، كشكول، طربوش، فيشة
+
+**أشياء يومية معروفة عربياً:**
+
+- كشري، طاسة، جردل، كنكة، إبريق شاي، بابور، برايمز، طشت، كومودينو، سرير دورين
+- لعبة طاولة، شيشة، نرجيلة، معسل، فحم جوز الهند، ملقط فحم
+
+### 3. فئة الأكل (food) - أكلات عربية مشهورة
+
+**أكلات مصرية:**
+
+- كشري، فول مدمس، طعمية، ممبار، حواوشي، فتة مصرية، رز معمر، ملوخية مصرية، مسقعة، كوارع
+- أم علي، بسبوسة مصرية، قتايف، زلابية، كنافة مصرية، جلاش
+
+**أكلات خليجية:**
+
+- كبسة، مندي، مضبي، هريس، ثريد، مجبوس، مطبق، سليق، جريش، قرصان
+- لقيمات، رقاق، بلاليط، ساقو، محلبية خليجية
+
+**أكلات شامية إضافية:**
+
+- كبة حلبية، شيش برك، فتوش، تبولة شامية، مقلوبة فلسطينية، مسخن فلسطيني، مقدوس
+
+**أكلات مغاربية:**
+
+- طاجين، بسطيلة، شوربة حريرة، مسمن، بغرير، رفيسة، سفة
+
+**مشروبات عربية:**
+
+- سحلب مصري، كركديه، دوم، عناب، خروب، قمر الدين، تمر هندي، سوبيا، شاي كرك، قهوة سعودي
+
+### 4. فئة الوظائف (jobs) - وظائف معروفة عربياً
+
+**وظائف تراثية:**
+
+- سقّا، قهوجي، طحان، حمّال، صراف عملات، صائغ، عطار، بقال، زيات، حطاب
+
+**وظائف معروفة في المنطقة:**
+
+- شيخ قبيلة، مختار، عمدة، وزير، سفير، قنصل، ملحق ثقافي، موظف سفارة
+- لاعب منتخب، معلق رياضي، محلل رياضي، مدرب منتخب
+
+---
+
+## ملخص الإضافات المتوقعة
+
+| الفئة       | الكلمات الجديدة     |
+| ----------- | ------------------- |
+| أماكن       | +150 مكان عربي      |
+| أشياء       | +50 شيء عربي مشترك  |
+| أكل         | +100 أكلة عربية     |
+| وظائف       | +30 وظيفة           |
+| **المجموع** | **+330 كلمة جديدة** |
+
+---
+
+## الملفات المتأثرة
+
+| الملف               | التغيير                        |
+| ------------------- | ------------------------------ |
+| `src/data/words.ts` | إضافة كلمات جديدة لجميع الفئات |
+
+---
+
+## التفاصيل التقنية
+
+سيتم إضافة الكلمات الجديدة إلى المصفوفات الموجودة في ملف `words.ts` مع:
+
+- إضافة تعليقات تصنيفية جديدة (مثل `// أماكن عربية`)
+- الحفاظ على نفس البنية والتنسيق الحالي
+- عدم حذف أي كلمات موجودة
+- إضافة الكلمات في نهاية كل فئة
+
+المجموع النهائي المتوقع: **أكثر من 1800 كلمة** بدلاً من 1500 كلمة حالياً

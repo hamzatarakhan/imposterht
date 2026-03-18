@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useGame } from '@/context/GameContext';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { Settings, QrCode, Users, FolderOpen, Download, Plus, X, Trash2, Smartphone } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
@@ -30,29 +31,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const games = [
-  {
-    id: 'imposter',
-    name: 'الإمبوستر',
-    icon: '😈',
-    description: 'اكشف المندس بينكم!',
-    gradient: 'from-red-500/20 to-orange-500/20',
-    border: 'border-red-500/30',
-  },
-  {
-    id: 'guessing',
-    name: 'التخمين',
-    icon: '🤔',
-    description: 'احزر كلمة خصمك قبل ما يحزر كلمتك!',
-    gradient: 'from-blue-500/20 to-cyan-500/20',
-    border: 'border-blue-500/30',
-  },
-];
-
 const HubScreen: React.FC = () => {
   const { setScreen } = useGame();
   const { setScreen: setOnlineGuessingScreen } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
+  const { t, language } = useLanguage();
   const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
   const { isInstallable, installApp } = usePWAInstall();
   const { groups } = useSavedGroups();
@@ -88,30 +71,22 @@ const HubScreen: React.FC = () => {
     else setDeviceType('desktop');
   }, []);
 
-  const installSteps: Record<DeviceType, { step: number; icon: string; text: string }[]> = {
-    ios: [
-      { step: 1, icon: '🧭', text: 'افتح الرابط في Safari' },
-      { step: 2, icon: '📤', text: 'اضغط على زر المشاركة (أسفل الشاشة)' },
-      { step: 3, icon: '➕', text: 'اختر "إضافة إلى الشاشة الرئيسية"' },
-      { step: 4, icon: '✅', text: 'اضغط "إضافة" للتأكيد' },
-    ],
-    android: [
-      { step: 1, icon: '🌐', text: 'افتح الرابط في Chrome' },
-      { step: 2, icon: '⋮', text: 'اضغط على القائمة (ثلاث نقاط)' },
-      { step: 3, icon: '📲', text: 'اختر "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية"' },
-      { step: 4, icon: '✅', text: 'اضغط "تثبيت" للتأكيد' },
-    ],
-    desktop: [
-      { step: 1, icon: '🌐', text: 'افتح الرابط في Chrome أو Edge' },
-      { step: 2, icon: '📥', text: 'ابحث عن أيقونة التثبيت في شريط العنوان' },
-      { step: 3, icon: '✅', text: 'اضغط "تثبيت" للتأكيد' },
-    ],
+  const getStepsKey = () => {
+    if (deviceType === 'ios') return 'iosSteps';
+    if (deviceType === 'android') return 'androidSteps';
+    return 'desktopSteps';
+  };
+
+  const stepIcons: Record<string, string[]> = {
+    iosSteps: ['🧭', '📤', '➕', '✅'],
+    androidSteps: ['🌐', '⋮', '📲', '✅'],
+    desktopSteps: ['🌐', '📥', '✅'],
   };
 
   const getDeviceLabel = () => {
-    if (deviceType === 'ios') return 'التثبيت على iPhone';
-    if (deviceType === 'android') return 'التثبيت على Android';
-    return 'التثبيت على الكمبيوتر';
+    if (deviceType === 'ios') return t('hub.installOnIphone');
+    if (deviceType === 'android') return t('hub.installOnAndroid');
+    return t('hub.installOnDesktop');
   };
 
   const appUrl = 'https://imposterht.lovable.app';
@@ -136,6 +111,29 @@ const HubScreen: React.FC = () => {
       if (!keepOpen) setShowAddPlayerDialog(false);
     }
   };
+
+  const games = [
+    {
+      id: 'imposter',
+      name: t('hub.imposter'),
+      icon: '😈',
+      description: t('hub.imposterDesc'),
+      gradient: 'from-red-500/20 to-orange-500/20',
+      border: 'border-red-500/30',
+    },
+    {
+      id: 'guessing',
+      name: t('hub.guessing'),
+      icon: '🤔',
+      description: t('hub.guessingDesc'),
+      gradient: 'from-blue-500/20 to-cyan-500/20',
+      border: 'border-blue-500/30',
+    },
+  ];
+
+  const stepsKey = getStepsKey();
+  const stepsArr = t(`hub.${stepsKey}`) as unknown as string[];
+  const icons = stepIcons[stepsKey];
 
   return (
     <div className="min-h-screen flex flex-col p-6 relative">
@@ -171,7 +169,7 @@ const HubScreen: React.FC = () => {
       <Dialog open={showAddPlayerDialog} onOpenChange={setShowAddPlayerDialog}>
         <DialogContent className="w-[calc(100vw-2rem)] max-w-sm rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-center">➕ إضافة لاعب جديد</DialogTitle>
+            <DialogTitle className="text-center">➕ {t('hub.addNewPlayer')}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-3 py-3">
             <button
@@ -184,22 +182,22 @@ const HubScreen: React.FC = () => {
             >
               {newPlayerAvatar}
             </button>
-            <p className="text-xs text-muted-foreground">اضغط لتغيير الأفاتار</p>
+            <p className="text-xs text-muted-foreground">{t('hub.tapToChangeAvatar')}</p>
             <input
               type="text" value={newPlayerName} onChange={(e) => setNewPlayerName(e.target.value.slice(0, 20))}
-              placeholder="اسم اللاعب" maxLength={20}
+              placeholder={t('hub.playerName')} maxLength={20}
               className="w-full text-center text-lg font-bold py-2.5 px-3 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:text-muted-foreground/50"
               autoFocus onKeyDown={(e) => { if (e.key === 'Enter') handleAddPlayer(false); }}
             />
-            <p className="text-xs text-muted-foreground">{newPlayerName.length}/20 حرف</p>
+            <p className="text-xs text-muted-foreground">{newPlayerName.length}/20 {t('hub.charLimit')}</p>
             <div className="w-full flex flex-col gap-2">
               <button onClick={() => { playSound('click'); vibrate(30); handleAddPlayer(false); }} disabled={!newPlayerName.trim()}
                 className="w-full py-3 px-4 rounded-xl bg-primary text-primary-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">
-                ✅ حفظ وإغلاق
+                {t('hub.saveAndClose')}
               </button>
               <button onClick={() => { playSound('click'); vibrate(30); handleAddPlayer(true); }} disabled={!newPlayerName.trim()}
                 className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors">
-                ➕ حفظ وإضافة آخر
+                {t('hub.saveAndAddAnother')}
               </button>
             </div>
           </div>
@@ -210,15 +208,15 @@ const HubScreen: React.FC = () => {
       <AlertDialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-center">🗑️ مسح كل الأسماء؟</AlertDialogTitle>
+            <AlertDialogTitle className="text-center">{t('hub.deleteAllNames')}</AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              هل أنت متأكد من مسح كل الأسماء المحفوظة؟<br />هذا الإجراء لا يمكن التراجع عنه.
+              {t('hub.deleteAllConfirm')}<br />{t('hub.deleteAllWarn')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-3 justify-center">
-            <AlertDialogCancel className="flex-1 m-0">إلغاء</AlertDialogCancel>
+            <AlertDialogCancel className="flex-1 m-0">{t('hub.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleClearAll} className="flex-1 bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              نعم، امسح الكل
+              {t('hub.yesDeleteAll')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -234,23 +232,23 @@ const HubScreen: React.FC = () => {
               </div>
             </div>
             <DialogTitle className="text-lg">{getDeviceLabel()}</DialogTitle>
-            <p className="text-sm text-muted-foreground mt-1">اتبع الخطوات التالية</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('hub.followSteps')}</p>
           </DialogHeader>
           <div className="space-y-3 my-4">
-            {installSteps[deviceType].map((item) => (
-              <div key={item.step} className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl">
+            {Array.isArray(stepsArr) && stepsArr.map((text: string, idx: number) => (
+              <div key={idx} className="flex items-center gap-3 p-3 bg-secondary/50 rounded-xl">
                 <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <span className="text-lg">{item.icon}</span>
+                  <span className="text-lg">{icons[idx]}</span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs text-muted-foreground mb-0.5">الخطوة {item.step}</p>
-                  <p className="text-sm font-medium text-foreground">{item.text}</p>
+                  <p className="text-xs text-muted-foreground mb-0.5">{t('hub.step')} {idx + 1}</p>
+                  <p className="text-sm font-medium text-foreground">{text}</p>
                 </div>
               </div>
             ))}
           </div>
           <button onClick={() => setShowInstallSteps(false)} className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold hover:bg-secondary/80 transition-colors">
-            فهمت! 👍
+            {t('hub.gotIt')}
           </button>
         </DialogContent>
       </Dialog>
@@ -262,8 +260,8 @@ const HubScreen: React.FC = () => {
           <div className="flex justify-center mb-3 animate-float">
             <span className="text-6xl drop-shadow-2xl">🎮</span>
           </div>
-          <h1 className="text-4xl font-black text-gradient mb-2">فعاليات</h1>
-          <p className="text-muted-foreground text-sm">اختر لعبتك وابدأ المرح!</p>
+          <h1 className="text-4xl font-black text-gradient mb-2">{t('hub.title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('hub.subtitle')}</p>
         </div>
 
         {/* Games Grid */}
@@ -296,7 +294,7 @@ const HubScreen: React.FC = () => {
             className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-accent to-primary/80 text-accent-foreground font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
           >
             <Download size={20} />
-            كيف أضيف التطبيق للشاشة الرئيسية؟
+            {t('hub.howToAddApp')}
           </button>
 
           {isInstallable && (
@@ -305,7 +303,7 @@ const HubScreen: React.FC = () => {
               className="w-full py-3 px-6 rounded-2xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity shadow-lg"
             >
               <Download size={24} />
-              تثبيت التطبيق
+              {t('hub.installApp')}
             </button>
           )}
         </div>
@@ -313,9 +311,9 @@ const HubScreen: React.FC = () => {
 
       {/* Footer */}
       <div className="relative z-10 text-center py-4 space-y-2">
-        <p className="text-sm text-muted-foreground">العبوا مع بعض في نفس المكان 🎮</p>
+        <p className="text-sm text-muted-foreground">{t('hub.playTogether')}</p>
         <p className="text-xs text-muted-foreground">
-          Powered by <span className="text-primary font-bold">Hamza Tarkhan</span>
+          {t('hub.poweredBy')} <span className="text-primary font-bold">Hamza Tarkhan</span>
         </p>
         <div className="flex flex-col items-center gap-1">
           <a href="mailto:Hamzatarakhan2000@gmail.com" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors">
