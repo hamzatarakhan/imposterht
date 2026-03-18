@@ -103,6 +103,7 @@ const GuessingCreateRoomScreen: React.FC = () => {
         {/* Voice Chat & Presence Toggles */}
         <div className="card-game space-y-4">
           <h3 className="font-medium text-sm text-muted-foreground">ميزات إضافية</h3>
+          <p className="text-xs text-muted-foreground/70">مفيدة إذا بتلعب أونلاين مع ناس وكل واحد على جهازه 📱</p>
           
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
