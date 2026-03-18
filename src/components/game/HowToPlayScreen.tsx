@@ -1,114 +1,72 @@
 import React from 'react';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { ArrowRight, Users, Eye, MessageCircle, Vote, Trophy } from 'lucide-react';
-
-const steps = [
-  {
-    icon: Users,
-    title: 'اختر عدد اللاعبين',
-    description: 'من 3 إلى 10 لاعبين يجلسون مع بعض',
-  },
-  {
-    icon: Eye,
-    title: 'شوف دورك',
-    description: 'كل لاعب يمرر الهاتف ويشوف دوره سراً',
-  },
-  {
-    icon: MessageCircle,
-    title: 'تلميحات ذكية',
-    description: 'كل لاعب يعطي تلميح عن الكلمة بدون ما يقولها',
-  },
-  {
-    icon: Vote,
-    title: 'صوّت!',
-    description: 'حاولوا تكتشفون مين الإمبوستر',
-  },
-  {
-    icon: Trophy,
-    title: 'اكشف النتيجة',
-    description: 'هل الإمبوستر خدع الجميع؟',
-  },
-];
+import { useLanguage } from '@/context/LanguageContext';
+import { ArrowRight, ArrowLeft, Users, Eye, MessageCircle, Vote, Trophy } from 'lucide-react';
 
 const HowToPlayScreen: React.FC = () => {
   const { setScreen } = useGame();
   const { playSound, vibrate } = useSettings();
+  const { t, isRTL } = useLanguage();
 
-  const handleBack = () => {
-    playSound('click');
-    vibrate(30);
-    setScreen('hub');
-  };
+  const icons = [Users, Eye, MessageCircle, Vote, Trophy];
+  const steps = (t('howToPlay.steps') as unknown as { title: string; description: string }[]);
+  const tips = (t('howToPlay.tips') as unknown as string[]);
 
-  const handleStartGame = () => {
-    playSound('click');
-    vibrate(50);
-    setScreen('setup');
-  };
+  const BackArrow = isRTL ? ArrowRight : ArrowLeft;
+
+  const handleBack = () => { playSound('click'); vibrate(30); setScreen('hub'); };
+  const handleStartGame = () => { playSound('click'); vibrate(50); setScreen('setup'); };
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background to-card/30" />
       
-      {/* Header - Sticky */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md px-6 py-4">
         <div className="flex items-center gap-4">
-          <button
-            onClick={handleBack}
-            className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
-          >
-            <ArrowRight size={24} />
+          <button onClick={handleBack} className="p-3 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors">
+            <BackArrow size={24} />
           </button>
-          <h1 className="text-2xl font-bold">طريقة اللعب</h1>
+          <h1 className="text-2xl font-bold">{t('howToPlay.title')}</h1>
         </div>
       </div>
       
-      {/* Content - Scrollable */}
       <div className="relative z-10 flex-1 overflow-y-auto px-6 pb-28">
         <div className="space-y-4">
-          {steps.map((step, index) => (
-            <div
-              key={index}
-              className="card-game flex items-start gap-4 animate-slide-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
-                <step.icon className="text-primary" size={24} />
+          {Array.isArray(steps) && steps.map((step, index) => {
+            const Icon = icons[index];
+            return (
+              <div key={index} className="card-game flex items-start gap-4 animate-slide-up" style={{ animationDelay: `${index * 0.1}s` }}>
+                <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Icon className="text-primary" size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg mb-1">{step.title}</h3>
+                  <p className="text-muted-foreground text-sm">{step.description}</p>
+                </div>
+                <span className={`text-3xl font-black text-primary/30 ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
+                  {index + 1}
+                </span>
               </div>
-              <div>
-                <h3 className="font-bold text-lg mb-1">{step.title}</h3>
-                <p className="text-muted-foreground text-sm">{step.description}</p>
-              </div>
-              <span className="text-3xl font-black text-primary/30 mr-auto">
-                {index + 1}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
         
-        {/* Tips */}
         <div className="mt-8 card-game bg-primary/10 border-primary/30">
           <h3 className="font-bold mb-3 flex items-center gap-2">
-            <span>💡</span> نصائح للإمبوستر
+            <span>💡</span> {t('howToPlay.tipsTitle')}
           </h3>
           <ul className="text-sm text-muted-foreground space-y-2">
-            <li>• راقب تلميحات الآخرين واستنتج الكلمة</li>
-            <li>• لا تكن أول من يعطي تلميح</li>
-            <li>• اعطِ تلميحات عامة لكن ذكية</li>
-            <li>• حافظ على هدوئك!</li>
+            {Array.isArray(tips) && tips.map((tip, i) => (
+              <li key={i}>• {tip}</li>
+            ))}
           </ul>
         </div>
       </div>
       
-      {/* Start Button - Fixed */}
       <div className="fixed bottom-0 inset-x-0 z-30 bg-background/95 backdrop-blur-md border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <button
-          onClick={handleStartGame}
-          className="w-full btn-primary-game"
-        >
-          يلا نلعب! 🎮
+        <button onClick={handleStartGame} className="w-full btn-primary-game">
+          {t('howToPlay.letsPlay')}
         </button>
       </div>
     </div>
