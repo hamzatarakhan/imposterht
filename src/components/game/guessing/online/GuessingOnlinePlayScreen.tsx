@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import * as guessingService from '@/services/guessingRoomService';
@@ -14,39 +14,13 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   const [bothReady, setBothReady] = useState(false);
 
   const roundNumber = room?.current_round || 1;
-  const turnTime = room?.turn_time || 60;
-  const startingIndex = (roundNumber - 1) % 2;
-
-  const [activeAskerIndex, setActiveAskerIndex] = useState(startingIndex);
-  const [timeLeft, setTimeLeft] = useState(turnTime);
-
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-  const isChannelReadyRef = useRef(false);
-  const activeAskerIndexRef = useRef(activeAskerIndex);
-  const isMyTurnRef = useRef(false);
 
   const hasTwoPlayers = !!room && players.length >= 2;
-  const activeAsker = hasTwoPlayers ? players[activeAskerIndex] : null;
-  const activeTarget = hasTwoPlayers ? players[activeAskerIndex === 0 ? 1 : 0] : null;
-  const isMyTurn = !!activeAsker && currentPlayer?.player_id === activeAsker.player_id;
-
-  activeAskerIndexRef.current = activeAskerIndex;
-  isMyTurnRef.current = isMyTurn;
-
-  const progressPercent = (timeLeft / turnTime) * 100;
 
   useEffect(() => {
     if (!room?.id || !currentPlayer?.player_id) return;
     const channel = supabase.channel(`guessing-play-${room.id}-r${roundNumber}`, {
       config: { presence: { key: currentPlayer.player_id } },
-    });
-    channel.on('broadcast', { event: 'turn_switch' }, ({ payload }) => {
-      const nextIndex = Number(payload?.newAskerIndex);
-      if (!Number.isFinite(nextIndex)) return;
-      setActiveAskerIndex(nextIndex);
-      setTimeLeft(Number(payload?.resetTime) || turnTime);
-      playSound('alarm');
-      vibrate([50, 30, 50]);
     });
     channel.on('broadcast', { event: 'words_changed' }, () => {
       if (room?.id) {
@@ -59,52 +33,18 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     });
     channel.subscribe(async (status) => {
       if (status === 'SUBSCRIBED') {
-        isChannelReadyRef.current = true;
         await channel.track({ player_id: currentPlayer.player_id });
       }
     });
-    channelRef.current = channel;
+    const channelRef = channel;
     return () => {
-      isChannelReadyRef.current = false;
-      supabase.removeChannel(channel);
-      if (channelRef.current === channel) channelRef.current = null;
+      supabase.removeChannel(channelRef);
     };
-  }, [room?.id, roundNumber, turnTime, playSound, vibrate, currentPlayer?.player_id]);
+  }, [room?.id, roundNumber, currentPlayer?.player_id]);
 
   useEffect(() => {
-    const idx = (roundNumber - 1) % 2;
-    setActiveAskerIndex(idx);
-    setTimeLeft(turnTime);
     setBothReady(false);
-  }, [roundNumber, turnTime]);
-
-  const switchTurn = useCallback(() => {
-    const newIndex = activeAskerIndexRef.current === 0 ? 1 : 0;
-    setActiveAskerIndex(newIndex);
-    setTimeLeft(turnTime);
-    playSound('alarm');
-    vibrate([50, 30, 50]);
-    if (channelRef.current && isChannelReadyRef.current) {
-      channelRef.current.send({
-        type: 'broadcast', event: 'turn_switch',
-        payload: { newAskerIndex: newIndex, resetTime: turnTime },
-      });
-    }
-  }, [turnTime, playSound, vibrate]);
-
-  useEffect(() => {
-    if (!bothReady) return;
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          if (isMyTurnRef.current) setTimeout(() => switchTurn(), 0);
-          return prev;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [bothReady, switchTurn]);
+  }, [roundNumber]);
 
   useEffect(() => {
     if (!room?.id) return;
@@ -116,8 +56,6 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     fetchWord();
   }, [room?.id, room?.current_round]);
 
-  const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
-
   const handleWinner = async (playerId: string) => { playSound('win'); vibrate([50, 30, 50]); await markWinner(playerId); };
   const handleDraw = async () => { playSound('click'); vibrate([50, 30, 50]); await markDraw(); };
   const handleChangeWords = async () => {
@@ -125,24 +63,17 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     setChangingWords(true);
     playSound('click');
     const success = await changeWords();
-    if (success) {
-      if (room?.id) { const w = await guessingService.getMyGuessingWord(room.id); if (w) setMyWord(w); }
-      setTimeLeft(turnTime);
-      const idx = (roundNumber - 1) % 2;
-      setActiveAskerIndex(idx);
-      if (channelRef.current && isChannelReadyRef.current) {
-        channelRef.current.send({ type: 'broadcast', event: 'words_changed', payload: {} });
-        channelRef.current.send({ type: 'broadcast', event: 'turn_switch', payload: { newAskerIndex: idx, resetTime: turnTime } });
-      }
+    if (success && room?.id) {
+      const w = await guessingService.getMyGuessingWord(room.id);
+      if (w) setMyWord(w);
     }
     setChangingWords(false);
   };
-  const handleSkipTurn = () => { if (isMyTurn) switchTurn(); };
 
   if (!room) return null;
 
-  // Opponent disconnected - show friendly message instead of blank screen
-  if (!activeAsker || !activeTarget || players.length < 2) {
+  // Opponent disconnected
+  if (!hasTwoPlayers || players.length < 2) {
     return (
       <div className="min-h-[100dvh] flex flex-col">
         <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background pointer-events-none" />
@@ -204,7 +135,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     <div className="h-[100dvh] flex flex-col overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background pointer-events-none" />
 
-      {/* Compact Header */}
+      {/* Header */}
       <div className="relative z-20 bg-background/80 backdrop-blur-md px-4 py-2.5 flex items-center gap-3">
         <button onClick={async () => { playSound('click'); await leaveRoom(); }}
           className="p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
@@ -213,46 +144,39 @@ const GuessingOnlinePlayScreen: React.FC = () => {
         <h1 className="text-base font-black flex-1">⚔️ المواجهة {room.current_round}/{room.total_rounds}</h1>
       </div>
 
-      {/* Main Content - fills remaining space */}
+      {/* Main Content */}
       <div className="relative z-10 flex-1 flex flex-col p-4 gap-3 min-h-0">
 
         {/* Players VS Card */}
         <div className="card-game !p-3">
           <div className="flex items-center justify-between">
-            {players.map((p, idx) => {
-              const isAsking = idx === activeAskerIndex;
-              return (
-                <div key={p.id} className={`flex items-center gap-2 flex-1 ${idx === 1 ? 'flex-row-reverse' : ''} transition-all duration-300 ${isAsking ? 'opacity-100' : 'opacity-40'}`}>
-                  <div className={`relative ${isAsking ? 'scale-110' : 'scale-90'} transition-transform`}>
-                    <span className="text-3xl">{p.avatar}</span>
-                    <PresenceDot playerId={p.player_id} size="sm" />
-                    {isAsking && (
-                      <span className="absolute -bottom-1 -left-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full font-bold">🗣️</span>
-                    )}
-                  </div>
-                  <div className={`${idx === 1 ? 'text-right' : ''}`}>
-                    <p className="font-bold text-sm leading-tight">{p.name}</p>
-                    <p className="text-[11px] text-muted-foreground">{p.wins} فوز</p>
-                  </div>
+            {players.map((p, idx) => (
+              <div key={p.id} className={`flex items-center gap-2 flex-1 ${idx === 1 ? 'flex-row-reverse' : ''}`}>
+                <div className="relative">
+                  <span className="text-3xl">{p.avatar}</span>
+                  <PresenceDot playerId={p.player_id} size="sm" />
                 </div>
-              );
-            })}
+                <div className={`${idx === 1 ? 'text-right' : ''}`}>
+                  <p className="font-bold text-sm leading-tight">{p.name}</p>
+                  <p className="text-[11px] text-muted-foreground">{p.wins} فوز</p>
+                </div>
+              </div>
+            ))}
             <div className="text-2xl font-black text-primary mx-2 shrink-0">⚔️</div>
           </div>
         </div>
 
-        {/* Timer */}
-        <div className="card-game !p-3 text-center space-y-2">
-          <p className="text-sm font-bold text-muted-foreground">
-            🎯 {activeAsker.name} اسأل {activeTarget.name}!
+        {/* Instructions */}
+        <div className="card-game !p-3 text-center">
+          <p className="text-lg font-bold mb-1">🗣️ اسألوا بعض!</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            كل واحد يسأل الثاني أسئلة عن كلمته
+            <br />
+            أول واحد يحزر كلمة خصمه يفوز! 🏆
           </p>
-          <div className={`text-3xl font-black tabular-nums ${timeLeft <= 10 ? 'text-destructive animate-pulse' : 'text-primary'}`}>
-            {formatTime(timeLeft)}
-          </div>
-          <Progress value={progressPercent} className="h-1.5" />
         </div>
 
-        {/* My Word - sticky bottom banner */}
+        {/* My Word */}
         {myWord && (
           <div className="w-full py-2.5 px-4 rounded-2xl bg-primary/10 border border-primary/30 text-center">
             <span className="text-[11px] text-muted-foreground ml-1">كلمتك</span>
@@ -260,23 +184,10 @@ const GuessingOnlinePlayScreen: React.FC = () => {
           </div>
         )}
 
-        {isMyTurn ? (
-          <button
-            onClick={handleSkipTurn}
-            className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-primary to-primary/80 font-bold text-sm text-primary-foreground active:scale-95 transition-all shadow-lg shadow-primary/30 border-2 border-primary/50"
-          >
-            ⏭️ خلصت، دور المنافس
-          </button>
-        ) : (
-          <div className="w-full py-2.5 px-4 rounded-2xl bg-muted/40 text-muted-foreground font-bold text-xs text-center border border-border/50">
-            🎙️ دور {activeAsker.name} بالسؤال...
-          </div>
-        )}
-
         {/* Spacer */}
         <div className="flex-1 min-h-0" />
 
-        {/* Host Controls - pinned at bottom */}
+        {/* Host Controls */}
         {isHost ? (
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground font-bold text-center">مين حزر أول؟</p>
