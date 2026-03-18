@@ -32,7 +32,7 @@ import {
 const HomeScreen: React.FC = () => {
   const { setScreen } = useGame();
   const { playSound, vibrate } = useSettings();
-  const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
+  const { t, isRTL } = useLanguage();
   const { isInstallable, installApp } = usePWAInstall();
   const { groups } = useSavedGroups();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
