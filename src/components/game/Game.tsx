@@ -75,17 +75,19 @@ const GameContent: React.FC = () => {
 };
 
 const Game: React.FC = () => (
-  <SettingsProvider>
-    <GameProvider>
-      <OnlineGameProvider>
-        <GuessingGameProvider>
-          <OnlineGuessingProvider>
-            <GameContent />
-          </OnlineGuessingProvider>
-        </GuessingGameProvider>
-      </OnlineGameProvider>
-    </GameProvider>
-  </SettingsProvider>
+  <LanguageProvider>
+    <SettingsProvider>
+      <GameProvider>
+        <OnlineGameProvider>
+          <GuessingGameProvider>
+            <OnlineGuessingProvider>
+              <GameContent />
+            </OnlineGuessingProvider>
+          </GuessingGameProvider>
+        </OnlineGameProvider>
+      </GameProvider>
+    </SettingsProvider>
+  </LanguageProvider>
 );
 
 export default Game;
