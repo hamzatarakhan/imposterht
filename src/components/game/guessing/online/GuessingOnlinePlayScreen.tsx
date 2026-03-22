@@ -66,6 +66,10 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     if (success && room?.id) {
       const w = await guessingService.getMyGuessingWord(room.id);
       if (w) setMyWord(w);
+      // Broadcast to guest so they refetch their word too
+      const channel = supabase.channel(`guessing-play-${room.id}-r${roundNumber}`);
+      await channel.send({ type: 'broadcast', event: 'words_changed', payload: {} });
+      supabase.removeChannel(channel);
     }
     setChangingWords(false);
   };
