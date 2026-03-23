@@ -47,6 +47,14 @@ const games = [
     gradient: 'from-blue-500/20 to-cyan-500/20',
     border: 'border-blue-500/30',
   },
+  {
+    id: 'countries',
+    name: 'الدول',
+    icon: '🌍',
+    description: 'ابنوا اسم دولة حرف بحرف!',
+    gradient: 'from-green-500/20 to-emerald-500/20',
+    border: 'border-green-500/30',
+  },
 ];
 
 const HubScreen: React.FC = () => {
