@@ -28,10 +28,6 @@ const CountriesSpectatorScreen: React.FC = () => {
             className="p-2 rounded-xl bg-secondary/50 text-muted-foreground">
             <LogOut size={20} />
           </button>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">الغرفة:</span>
-            <span className="px-3 py-1.5 rounded-xl bg-primary/20 text-primary font-black text-lg tracking-widest">{room.code}</span>
-          </div>
         </div>
 
         <div className="text-center mb-6">
