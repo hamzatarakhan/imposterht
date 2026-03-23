@@ -276,8 +276,8 @@ const HubScreen: React.FC = () => {
           <p className="text-muted-foreground text-sm">اختر لعبتك وابدأ المرح!</p>
         </div>
 
-        {/* Games Grid */}
-        <div className="w-full max-w-sm grid grid-cols-2 gap-4 mb-8">
+        {/* Games Row */}
+        <div className="w-full max-w-sm grid grid-cols-3 gap-3 mb-8">
           {games.map((game) => (
             <button
               key={game.id}
@@ -292,11 +292,10 @@ const HubScreen: React.FC = () => {
                   setScreen('home');
                 }
               }}
-              className={`flex flex-col items-center gap-3 p-6 rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg`}
+              className={`flex flex-col items-center gap-2 py-5 px-2 rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg`}
             >
-              <span className="text-5xl drop-shadow-lg">{game.icon}</span>
-              <span className="text-lg font-bold text-foreground">{game.name}</span>
-              <span className="text-xs text-muted-foreground text-center leading-relaxed">{game.description}</span>
+              <span className="text-4xl drop-shadow-lg">{game.icon}</span>
+              <span className="text-sm font-bold text-foreground">{game.name}</span>
             </button>
           ))}
         </div>
