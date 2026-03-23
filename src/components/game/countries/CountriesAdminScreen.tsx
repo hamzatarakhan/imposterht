@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCountries } from '@/context/CountriesGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Plus, Minus, X, ArrowLeftRight, Trash2, Copy, LogOut, Share2 } from 'lucide-react';
+import { Plus, Minus, X, ArrowLeftRight, LogOut, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
