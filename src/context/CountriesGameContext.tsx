@@ -137,7 +137,7 @@ export const CountriesProvider: React.FC<{ children: ReactNode }> = ({ children 
     setPlayers([]);
     setBurned([]);
     setIsAdmin(false);
-    setScreen('countriesModeSelect');
+    setScreen('countriesIdle');
   };
 
   return (
