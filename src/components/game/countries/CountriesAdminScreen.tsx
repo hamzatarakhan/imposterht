@@ -70,10 +70,15 @@ const CountriesAdminScreen: React.FC = () => {
             <LogOut size={20} />
           </button>
           <h1 className="text-lg font-black text-foreground">👑 لوحة التحكم</h1>
-          <button onClick={handleShare} className="p-2 rounded-xl bg-primary/20 text-primary">
-            <Share2 size={20} />
-          </button>
+          <div className="w-9" />
         </div>
+
+        {/* Share Button */}
+        <button onClick={handleShare}
+          className="w-full mb-3 py-2.5 px-4 rounded-2xl bg-primary/10 border border-primary/30 text-primary font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary/20 transition-colors">
+          <Share2 size={16} />
+          شارك رابط المتابعة
+        </button>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4">
@@ -95,7 +100,7 @@ const CountriesAdminScreen: React.FC = () => {
                 : 'bg-secondary/50 text-muted-foreground'
             }`}
           >
-            🔥 المحترقة ({burned.length})
+            🔥 الدول المحروقة ({burned.length})
           </button>
         </div>
 
