@@ -210,14 +210,18 @@ const CountriesAdminScreen: React.FC = () => {
             </button>
           </div>
           {burned.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {burned.map(b => (
-                <span key={b.id} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-destructive/10 text-destructive text-xs font-medium">
-                  {b.country_name}
-                  <button onClick={() => { playSound('click'); removeBurned(b.id); }} className="hover:text-destructive/80">
+            <div className="space-y-1.5 max-h-48 overflow-y-auto">
+              {burned.map((b, index) => (
+                <div key={b.id} className="flex items-center justify-between py-2 px-3 rounded-xl bg-card/50 border border-border/30">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground font-mono w-5">{index + 1}.</span>
+                    <span className="text-sm font-medium text-foreground">{b.country_name}</span>
+                  </div>
+                  <button onClick={() => { playSound('click'); removeBurned(b.id); }}
+                    className="w-6 h-6 rounded-md bg-destructive/10 text-destructive flex items-center justify-center hover:bg-destructive/20 transition-colors">
                     <X size={12} />
                   </button>
-                </span>
+                </div>
               ))}
             </div>
           )}
