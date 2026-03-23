@@ -10,13 +10,10 @@ const CountriesGame: React.FC = () => {
   const { screen } = useCountries();
 
   switch (screen) {
-    case 'countriesIdle':
-    case 'countriesModeSelect': return <CountriesModeSelect />;
-    case 'countriesCreateRoom': return <CountriesCreateRoom />;
     case 'countriesJoinRoom': return <CountriesJoinRoom />;
     case 'countriesAdmin': return <CountriesAdminScreen />;
     case 'countriesSpectator': return <CountriesSpectatorScreen />;
-    default: return <CountriesModeSelect />;
+    default: return <CountriesAdminScreen />;
   }
 };
 

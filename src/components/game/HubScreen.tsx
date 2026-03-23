@@ -287,7 +287,7 @@ const HubScreen: React.FC = () => {
                 if (game.id === 'guessing') {
                   setOnlineGuessingScreen('guessingCreateRoom');
                 } else if (game.id === 'countries') {
-                  setCountriesScreen('countriesModeSelect');
+                  createCountriesRoom();
                 } else {
                   setScreen('home');
                 }
