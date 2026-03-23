@@ -210,16 +210,16 @@ const CountriesAdminScreen: React.FC = () => {
             </button>
           </div>
           {burned.length > 0 && (
-            <div className="space-y-1.5 max-h-48 overflow-y-auto">
+            <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto">
               {burned.map((b, index) => (
-                <div key={b.id} className="flex items-center justify-between py-2 px-3 rounded-xl bg-card/50 border border-border/30">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground font-mono w-5">{index + 1}.</span>
-                    <span className="text-sm font-medium text-foreground">{b.country_name}</span>
+                <div key={b.id} className="flex items-center justify-between py-1.5 px-2.5 rounded-xl bg-card/50 border border-border/30">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-xs text-muted-foreground font-mono shrink-0">{index + 1}.</span>
+                    <span className="text-xs font-medium text-foreground truncate">{b.country_name}</span>
                   </div>
                   <button onClick={() => { playSound('click'); removeBurned(b.id); }}
-                    className="w-6 h-6 rounded-md bg-destructive/10 text-destructive flex items-center justify-center hover:bg-destructive/20 transition-colors">
-                    <X size={12} />
+                    className="w-5 h-5 rounded-md bg-destructive/10 text-destructive flex items-center justify-center hover:bg-destructive/20 transition-colors shrink-0 ml-1">
+                    <X size={10} />
                   </button>
                 </div>
               ))}
