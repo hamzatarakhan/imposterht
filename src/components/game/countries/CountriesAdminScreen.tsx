@@ -17,7 +17,7 @@ const CountriesAdminScreen: React.FC = () => {
   const [swapActive, setSwapActive] = useState<string | null>(null);
   const [swapEliminated, setSwapEliminated] = useState<string | null>(null);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
-  const [copied, setCopied] = useState(false);
+  
 
   const activePlayers = players.filter(p => p.status === 'active');
   const eliminatedPlayers = players.filter(p => p.status === 'eliminated');
