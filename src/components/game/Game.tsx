@@ -4,6 +4,7 @@ import { OnlineGameProvider, useOnlineGame } from '@/context/OnlineGameContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 import { GuessingGameProvider } from '@/context/GuessingGameContext';
 import { OnlineGuessingProvider, useOnlineGuessing } from '@/context/OnlineGuessingContext';
+import { CountriesProvider, useCountries } from '@/context/CountriesGameContext';
 import SplashScreen from './SplashScreen';
 import HubScreen from './HubScreen';
 import HomeScreen from './HomeScreen';
@@ -21,11 +22,13 @@ import OnlineGame from './online/OnlineGame';
 import ModeSelectScreen from './online/ModeSelectScreen';
 import GuessingGame from './guessing/GuessingGame';
 import OnlineGuessingGame from './guessing/online/OnlineGuessingGame';
+import CountriesGame from './countries/CountriesGame';
 
 const GameContent: React.FC = () => {
   const { screen } = useGame();
   const { screen: onlineScreen, pendingJoinCode } = useOnlineGame();
   const { screen: guessingOnlineScreen } = useOnlineGuessing();
+  const { screen: countriesScreen } = useCountries();
 
   // Imposter online flow
   if (pendingJoinCode || onlineScreen === 'joinRoom') {
@@ -35,10 +38,16 @@ const GameContent: React.FC = () => {
     return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGame /></div>;
   }
 
-  // Guessing online flow (only when actively in a guessing online screen beyond mode select)
+  // Guessing online flow
   const activeGuessingScreens = ['guessingCreateRoom', 'guessingJoinRoom', 'guessingLobby', 'guessingOnlineShowWord', 'guessingOnlinePlay', 'guessingOnlineRoundResult', 'guessingOnlineFinalResult'];
   if (activeGuessingScreens.includes(guessingOnlineScreen)) {
     return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGuessingGame /></div>;
+  }
+
+  // Countries flow
+  const activeCountriesScreens = ['countriesCreateRoom', 'countriesJoinRoom', 'countriesAdmin', 'countriesSpectator'];
+  if (activeCountriesScreens.includes(countriesScreen)) {
+    return <div className="max-w-md mx-auto min-h-screen bg-background relative"><CountriesGame /></div>;
   }
 
   // Guessing local flow
@@ -79,7 +88,9 @@ const Game: React.FC = () => (
       <OnlineGameProvider>
         <GuessingGameProvider>
           <OnlineGuessingProvider>
-            <GameContent />
+            <CountriesProvider>
+              <GameContent />
+            </CountriesProvider>
           </OnlineGuessingProvider>
         </GuessingGameProvider>
       </OnlineGameProvider>
