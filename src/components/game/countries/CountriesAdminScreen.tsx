@@ -87,6 +87,13 @@ const CountriesAdminScreen: React.FC = () => {
           </div>
         </div>
 
+        {/* Share Button */}
+        <button onClick={handleShare}
+          className="w-full mb-4 py-3 px-4 rounded-2xl bg-primary/10 border border-primary/30 text-primary font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary/20 transition-colors">
+          <Share2 size={18} />
+          شارك رابط المتابعة
+        </button>
+
         <h1 className="text-xl font-black text-foreground mb-4 text-center">👑 لوحة تحكم الـ Admin</h1>
 
         {/* Add Player */}
