@@ -1,7 +1,5 @@
 import React from 'react';
 import { useCountries } from '@/context/CountriesGameContext';
-import CountriesModeSelect from './CountriesModeSelect';
-import CountriesCreateRoom from './CountriesCreateRoom';
 import CountriesJoinRoom from './CountriesJoinRoom';
 import CountriesAdminScreen from './CountriesAdminScreen';
 import CountriesSpectatorScreen from './CountriesSpectatorScreen';
