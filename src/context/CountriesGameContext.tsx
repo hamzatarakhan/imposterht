@@ -53,7 +53,19 @@ export const CountriesProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [players, setPlayers] = useState<CountriesPlayer[]>([]);
   const [burned, setBurned] = useState<CountriesBurned[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [pendingJoinCode, setPendingJoinCode] = useState<string | null>(null);
   const hostId = getHostId();
+
+  // Check URL for deep link join code
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const joinCode = urlParams.get('countries_join');
+    if (joinCode && joinCode.length === 6) {
+      window.history.replaceState({}, '', window.location.pathname);
+      setPendingJoinCode(joinCode.toUpperCase());
+      setScreen('countriesJoinRoom');
+    }
+  }, []);
 
   const refreshData = useCallback(async () => {
     if (!room) return;
