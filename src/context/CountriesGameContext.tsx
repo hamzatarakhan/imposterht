@@ -151,14 +151,17 @@ export const CountriesProvider: React.FC<{ children: ReactNode }> = ({ children 
     setPlayers([]);
     setBurned([]);
     setIsAdmin(false);
+    setPendingJoinCode(null);
     setScreen('countriesIdle');
   };
 
+  const clearPendingJoinCode = () => setPendingJoinCode(null);
+
   return (
     <CountriesContext.Provider value={{
-      screen, setScreen, room, players, burned, isAdmin, hostId,
+      screen, setScreen, room, players, burned, isAdmin, hostId, pendingJoinCode,
       createRoom, joinRoom, addPlayer, removePlayer, updateLives,
-      addBurned, removeBurned, swapPlayers: swapPlayersAction, leaveRoom,
+      addBurned, removeBurned, swapPlayers: swapPlayersAction, leaveRoom, clearPendingJoinCode,
     }}>
       {children}
     </CountriesContext.Provider>
