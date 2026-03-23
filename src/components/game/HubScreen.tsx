@@ -292,10 +292,11 @@ const HubScreen: React.FC = () => {
                   setScreen('home');
                 }
               }}
-              className={`flex flex-col items-center gap-2 py-5 px-2 rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg`}
+              className={`flex flex-col items-center gap-1.5 py-4 px-1.5 rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg`}
             >
-              <span className="text-4xl drop-shadow-lg">{game.icon}</span>
+              <span className="text-3xl drop-shadow-lg">{game.icon}</span>
               <span className="text-sm font-bold text-foreground">{game.name}</span>
+              <span className="text-[10px] text-muted-foreground text-center leading-tight px-0.5">{game.description}</span>
             </button>
           ))}
         </div>
