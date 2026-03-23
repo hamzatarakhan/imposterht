@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCountries } from '@/context/CountriesGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Plus, Minus, X, ArrowLeftRight, Trash2, Copy, LogOut, Share2 } from 'lucide-react';
+import { Plus, Minus, X, ArrowLeftRight, LogOut, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -17,7 +17,7 @@ const CountriesAdminScreen: React.FC = () => {
   const [swapActive, setSwapActive] = useState<string | null>(null);
   const [swapEliminated, setSwapEliminated] = useState<string | null>(null);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
-  const [copied, setCopied] = useState(false);
+  
 
   const activePlayers = players.filter(p => p.status === 'active');
   const eliminatedPlayers = players.filter(p => p.status === 'eliminated');
@@ -44,13 +44,6 @@ const CountriesAdminScreen: React.FC = () => {
     setSwapEliminated(null);
   };
 
-  const copyCode = () => {
-    if (room?.code) {
-      navigator.clipboard.writeText(room.code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
 
   const shareUrl = room ? `${window.location.origin}?countries_join=${room.code}` : '';
 
@@ -77,14 +70,6 @@ const CountriesAdminScreen: React.FC = () => {
           <button onClick={() => setShowLeaveDialog(true)} className="p-2 rounded-xl bg-secondary/50 text-muted-foreground">
             <LogOut size={20} />
           </button>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">كود الغرفة:</span>
-            <button onClick={copyCode} className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-primary/20 text-primary font-black text-lg tracking-widest">
-              {room.code}
-              <Copy size={14} />
-            </button>
-            {copied && <span className="text-xs text-green-500">تم النسخ!</span>}
-          </div>
         </div>
 
         {/* Share Button */}
