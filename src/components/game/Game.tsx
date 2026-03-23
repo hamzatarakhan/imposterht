@@ -28,7 +28,7 @@ const GameContent: React.FC = () => {
   const { screen } = useGame();
   const { screen: onlineScreen, pendingJoinCode } = useOnlineGame();
   const { screen: guessingOnlineScreen } = useOnlineGuessing();
-  const { screen: countriesScreen } = useCountries();
+  const { screen: countriesScreen, pendingJoinCode: countriesPendingJoin } = useCountries();
 
   // Imposter online flow
   if (pendingJoinCode || onlineScreen === 'joinRoom') {
