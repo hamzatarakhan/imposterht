@@ -44,13 +44,6 @@ const CountriesAdminScreen: React.FC = () => {
     setSwapEliminated(null);
   };
 
-  const copyCode = () => {
-    if (room?.code) {
-      navigator.clipboard.writeText(room.code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
 
   const shareUrl = room ? `${window.location.origin}?countries_join=${room.code}` : '';
 
