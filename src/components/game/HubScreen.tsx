@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useGame } from '@/context/GameContext';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
+import { useCountries } from '@/context/CountriesGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Settings, QrCode, Users, FolderOpen, Download, Plus, X, Trash2, Smartphone } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
@@ -47,11 +48,20 @@ const games = [
     gradient: 'from-blue-500/20 to-cyan-500/20',
     border: 'border-blue-500/30',
   },
+  {
+    id: 'countries',
+    name: 'الدول',
+    icon: '🌍',
+    description: 'ابنوا اسم دولة حرف بحرف!',
+    gradient: 'from-green-500/20 to-emerald-500/20',
+    border: 'border-green-500/30',
+  },
 ];
 
 const HubScreen: React.FC = () => {
   const { setScreen } = useGame();
   const { setScreen: setOnlineGuessingScreen } = useOnlineGuessing();
+  const { setScreen: setCountriesScreen } = useCountries();
   const { playSound, vibrate } = useSettings();
   const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
   const { isInstallable, installApp } = usePWAInstall();
@@ -276,6 +286,8 @@ const HubScreen: React.FC = () => {
                 vibrate(50);
                 if (game.id === 'guessing') {
                   setOnlineGuessingScreen('guessingCreateRoom');
+                } else if (game.id === 'countries') {
+                  setCountriesScreen('countriesModeSelect');
                 } else {
                   setScreen('home');
                 }
