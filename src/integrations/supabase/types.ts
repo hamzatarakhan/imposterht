@@ -14,6 +14,100 @@ export type Database = {
   }
   public: {
     Tables: {
+      countries_burned: {
+        Row: {
+          country_name: string
+          created_at: string
+          id: string
+          room_id: string
+        }
+        Insert: {
+          country_name: string
+          created_at?: string
+          id?: string
+          room_id: string
+        }
+        Update: {
+          country_name?: string
+          created_at?: string
+          id?: string
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "countries_burned_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "countries_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      countries_players: {
+        Row: {
+          created_at: string
+          id: string
+          lives: number
+          name: string
+          player_order: number
+          room_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lives?: number
+          name: string
+          player_order?: number
+          room_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lives?: number
+          name?: string
+          player_order?: number
+          room_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "countries_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "countries_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      countries_rooms: {
+        Row: {
+          code: string
+          created_at: string
+          host_id: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          code?: string
+          created_at?: string
+          host_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          host_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       guessing_players: {
         Row: {
           avatar: string
@@ -489,6 +583,14 @@ export type Database = {
       }
     }
     Functions: {
+      add_countries_burned: {
+        Args: { p_country_name: string; p_host_id: string; p_room_id: string }
+        Returns: boolean
+      }
+      add_countries_player: {
+        Args: { p_host_id: string; p_name: string; p_room_id: string }
+        Returns: string
+      }
       calculate_winner_secure:
         | { Args: { p_room_id: string }; Returns: string }
         | {
@@ -504,8 +606,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      cleanup_old_countries_rooms: { Args: never; Returns: undefined }
       cleanup_old_guessing_rooms: { Args: never; Returns: undefined }
       cleanup_old_rooms: { Args: never; Returns: undefined }
+      delete_countries_room: {
+        Args: { p_host_id: string; p_room_id: string }
+        Returns: boolean
+      }
       delete_guessing_room: {
         Args: { p_host_player_id: string; p_room_id: string }
         Returns: boolean
@@ -576,6 +683,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      remove_countries_burned: {
+        Args: { p_burned_id: string; p_host_id: string; p_room_id: string }
+        Returns: boolean
+      }
+      remove_countries_player: {
+        Args: { p_host_id: string; p_player_id: string; p_room_id: string }
+        Returns: boolean
+      }
       rename_guessing_player: {
         Args: {
           p_new_name: string
@@ -644,6 +759,24 @@ export type Database = {
       }
       submit_word_guess: {
         Args: { p_guessed_word: string; p_player_id: string; p_room_id: string }
+        Returns: boolean
+      }
+      swap_countries_players: {
+        Args: {
+          p_active_player_id: string
+          p_eliminated_player_id: string
+          p_host_id: string
+          p_room_id: string
+        }
+        Returns: boolean
+      }
+      update_countries_player_lives: {
+        Args: {
+          p_delta: number
+          p_host_id: string
+          p_player_id: string
+          p_room_id: string
+        }
         Returns: boolean
       }
       update_player_scores: {
