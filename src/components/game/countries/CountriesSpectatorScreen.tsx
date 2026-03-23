@@ -77,11 +77,12 @@ const CountriesSpectatorScreen: React.FC = () => {
           <h3 className="text-sm font-bold text-foreground mb-2">🔥 الدول المحترقة ({burned.length})</h3>
           {burned.length === 0 && <p className="text-xs text-muted-foreground text-center py-2">لا يوجد دول محترقة بعد</p>}
           {burned.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {burned.map(b => (
-                <span key={b.id} className="px-2.5 py-1 rounded-full bg-destructive/10 text-destructive text-xs font-medium">
-                  {b.country_name}
-                </span>
+            <div className="space-y-1.5 max-h-48 overflow-y-auto">
+              {burned.map((b, index) => (
+                <div key={b.id} className="flex items-center gap-2 py-2 px-3 rounded-xl bg-card/50 border border-border/30">
+                  <span className="text-xs text-muted-foreground font-mono w-5">{index + 1}.</span>
+                  <span className="text-sm font-medium text-foreground">{b.country_name}</span>
+                </div>
               ))}
             </div>
           )}
