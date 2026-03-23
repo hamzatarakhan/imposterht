@@ -95,7 +95,7 @@ const CountriesAdminScreen: React.FC = () => {
                 : 'bg-secondary/50 text-muted-foreground'
             }`}
           >
-            🔥 المحترقة ({burned.length})
+            🔥 الدول المحروقة ({burned.length})
           </button>
         </div>
 
