@@ -61,7 +61,7 @@ const games = [
 const HubScreen: React.FC = () => {
   const { setScreen } = useGame();
   const { setScreen: setOnlineGuessingScreen } = useOnlineGuessing();
-  const { setScreen: setCountriesScreen } = useCountries();
+  const { setScreen: setCountriesScreen, createRoom: createCountriesRoom } = useCountries();
   const { playSound, vibrate } = useSettings();
   const { savedPlayers, addPlayers, removePlayer, clearAllPlayers } = useSavedPlayers();
   const { isInstallable, installApp } = usePWAInstall();
@@ -287,7 +287,7 @@ const HubScreen: React.FC = () => {
                 if (game.id === 'guessing') {
                   setOnlineGuessingScreen('guessingCreateRoom');
                 } else if (game.id === 'countries') {
-                  setCountriesScreen('countriesModeSelect');
+                  createCountriesRoom();
                 } else {
                   setScreen('home');
                 }
