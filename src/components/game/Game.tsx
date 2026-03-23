@@ -45,7 +45,7 @@ const GameContent: React.FC = () => {
   }
 
   // Countries flow
-  const activeCountriesScreens = ['countriesCreateRoom', 'countriesJoinRoom', 'countriesAdmin', 'countriesSpectator'];
+  const activeCountriesScreens = ['countriesModeSelect', 'countriesCreateRoom', 'countriesJoinRoom', 'countriesAdmin', 'countriesSpectator'];
   if (activeCountriesScreens.includes(countriesScreen)) {
     return <div className="max-w-md mx-auto min-h-screen bg-background relative"><CountriesGame /></div>;
   }

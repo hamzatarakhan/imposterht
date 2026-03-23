@@ -4,6 +4,7 @@ import * as countriesService from '@/services/countriesRoomService';
 import { CountriesRoom, CountriesPlayer, CountriesBurned } from '@/services/countriesRoomService';
 
 export type CountriesScreen =
+  | 'countriesIdle'
   | 'countriesModeSelect'
   | 'countriesCreateRoom'
   | 'countriesJoinRoom'
@@ -47,7 +48,7 @@ const getHostId = (): string => {
 };
 
 export const CountriesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [screen, setScreen] = useState<CountriesScreen>('countriesModeSelect');
+  const [screen, setScreen] = useState<CountriesScreen>('countriesIdle');
   const [room, setRoom] = useState<CountriesRoom | null>(null);
   const [players, setPlayers] = useState<CountriesPlayer[]>([]);
   const [burned, setBurned] = useState<CountriesBurned[]>([]);
@@ -136,7 +137,7 @@ export const CountriesProvider: React.FC<{ children: ReactNode }> = ({ children 
     setPlayers([]);
     setBurned([]);
     setIsAdmin(false);
-    setScreen('countriesModeSelect');
+    setScreen('countriesIdle');
   };
 
   return (
