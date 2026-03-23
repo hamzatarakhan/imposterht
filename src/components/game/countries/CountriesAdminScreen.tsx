@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useCountries } from '@/context/CountriesGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Plus, Minus, X, ArrowLeftRight, Trash2, Copy, LogOut } from 'lucide-react';
+import { Plus, Minus, X, ArrowLeftRight, Trash2, Copy, LogOut, Share2 } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -51,6 +52,19 @@ const CountriesAdminScreen: React.FC = () => {
     }
   };
 
+  const shareUrl = room ? `${window.location.origin}?countries_join=${room.code}` : '';
+
+  const handleShare = async () => {
+    if (!room) return;
+    playSound('click'); vibrate(30);
+    try {
+      await navigator.share({ title: '🌍 لعبة الدول - فعاليات', text: 'تعال تابع معنا لعبة الدول!', url: shareUrl });
+    } catch {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success('تم نسخ الرابط!');
+    }
+  };
+
   if (!room) return null;
 
   return (
@@ -72,6 +86,13 @@ const CountriesAdminScreen: React.FC = () => {
             {copied && <span className="text-xs text-green-500">تم النسخ!</span>}
           </div>
         </div>
+
+        {/* Share Button */}
+        <button onClick={handleShare}
+          className="w-full mb-4 py-3 px-4 rounded-2xl bg-primary/10 border border-primary/30 text-primary font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary/20 transition-colors">
+          <Share2 size={18} />
+          شارك رابط المتابعة
+        </button>
 
         <h1 className="text-xl font-black text-foreground mb-4 text-center">👑 لوحة تحكم الـ Admin</h1>
 
@@ -112,7 +133,8 @@ const CountriesAdminScreen: React.FC = () => {
                     <Minus size={16} />
                   </button>
                   <button onClick={() => { playSound('click'); vibrate(20); updateLives(p.id, 1); }}
-                    className="w-8 h-8 rounded-lg bg-green-500/20 text-green-500 flex items-center justify-center hover:bg-green-500/30">
+                    disabled={p.lives >= 3}
+                    className="w-8 h-8 rounded-lg bg-green-500/20 text-green-500 flex items-center justify-center hover:bg-green-500/30 disabled:opacity-30 disabled:cursor-not-allowed">
                     <Plus size={16} />
                   </button>
                   <button onClick={() => { playSound('click'); vibrate(20); removePlayer(p.id); }}

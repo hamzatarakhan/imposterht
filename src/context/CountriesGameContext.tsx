@@ -19,6 +19,7 @@ interface CountriesContextType {
   burned: CountriesBurned[];
   isAdmin: boolean;
   hostId: string;
+  pendingJoinCode: string | null;
   createRoom: () => Promise<string | null>;
   joinRoom: (code: string) => Promise<boolean>;
   addPlayer: (name: string) => Promise<boolean>;
@@ -28,6 +29,7 @@ interface CountriesContextType {
   removeBurned: (burnedId: string) => Promise<boolean>;
   swapPlayers: (activeId: string, eliminatedId: string) => Promise<boolean>;
   leaveRoom: () => void;
+  clearPendingJoinCode: () => void;
 }
 
 const CountriesContext = createContext<CountriesContextType | null>(null);
@@ -53,7 +55,19 @@ export const CountriesProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [players, setPlayers] = useState<CountriesPlayer[]>([]);
   const [burned, setBurned] = useState<CountriesBurned[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [pendingJoinCode, setPendingJoinCode] = useState<string | null>(null);
   const hostId = getHostId();
+
+  // Check URL for deep link join code
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const joinCode = urlParams.get('countries_join');
+    if (joinCode && joinCode.length === 6) {
+      window.history.replaceState({}, '', window.location.pathname);
+      setPendingJoinCode(joinCode.toUpperCase());
+      setScreen('countriesJoinRoom');
+    }
+  }, []);
 
   const refreshData = useCallback(async () => {
     if (!room) return;
@@ -137,14 +151,17 @@ export const CountriesProvider: React.FC<{ children: ReactNode }> = ({ children 
     setPlayers([]);
     setBurned([]);
     setIsAdmin(false);
+    setPendingJoinCode(null);
     setScreen('countriesIdle');
   };
 
+  const clearPendingJoinCode = () => setPendingJoinCode(null);
+
   return (
     <CountriesContext.Provider value={{
-      screen, setScreen, room, players, burned, isAdmin, hostId,
+      screen, setScreen, room, players, burned, isAdmin, hostId, pendingJoinCode,
       createRoom, joinRoom, addPlayer, removePlayer, updateLives,
-      addBurned, removeBurned, swapPlayers: swapPlayersAction, leaveRoom,
+      addBurned, removeBurned, swapPlayers: swapPlayersAction, leaveRoom, clearPendingJoinCode,
     }}>
       {children}
     </CountriesContext.Provider>
