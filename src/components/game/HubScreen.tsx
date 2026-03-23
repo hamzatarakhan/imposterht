@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useGame } from '@/context/GameContext';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
+import { useCountries } from '@/context/CountriesGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Settings, QrCode, Users, FolderOpen, Download, Plus, X, Trash2, Smartphone } from 'lucide-react';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
