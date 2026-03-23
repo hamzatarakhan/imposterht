@@ -4,6 +4,7 @@ import * as countriesService from '@/services/countriesRoomService';
 import { CountriesRoom, CountriesPlayer, CountriesBurned } from '@/services/countriesRoomService';
 
 export type CountriesScreen =
+  | 'countriesIdle'
   | 'countriesModeSelect'
   | 'countriesCreateRoom'
   | 'countriesJoinRoom'
