@@ -52,6 +52,19 @@ const CountriesAdminScreen: React.FC = () => {
     }
   };
 
+  const shareUrl = room ? `${window.location.origin}?countries_join=${room.code}` : '';
+
+  const handleShare = async () => {
+    if (!room) return;
+    playSound('click'); vibrate(30);
+    try {
+      await navigator.share({ title: '🌍 لعبة الدول - فعاليات', text: 'تعال تابع معنا لعبة الدول!', url: shareUrl });
+    } catch {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success('تم نسخ الرابط!');
+    }
+  };
+
   if (!room) return null;
 
   return (
