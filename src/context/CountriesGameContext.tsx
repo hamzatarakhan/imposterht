@@ -19,6 +19,7 @@ interface CountriesContextType {
   burned: CountriesBurned[];
   isAdmin: boolean;
   hostId: string;
+  pendingJoinCode: string | null;
   createRoom: () => Promise<string | null>;
   joinRoom: (code: string) => Promise<boolean>;
   addPlayer: (name: string) => Promise<boolean>;
@@ -28,6 +29,7 @@ interface CountriesContextType {
   removeBurned: (burnedId: string) => Promise<boolean>;
   swapPlayers: (activeId: string, eliminatedId: string) => Promise<boolean>;
   leaveRoom: () => void;
+  clearPendingJoinCode: () => void;
 }
 
 const CountriesContext = createContext<CountriesContextType | null>(null);
