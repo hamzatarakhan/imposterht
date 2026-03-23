@@ -133,7 +133,8 @@ const CountriesAdminScreen: React.FC = () => {
                     <Minus size={16} />
                   </button>
                   <button onClick={() => { playSound('click'); vibrate(20); updateLives(p.id, 1); }}
-                    className="w-8 h-8 rounded-lg bg-green-500/20 text-green-500 flex items-center justify-center hover:bg-green-500/30">
+                    disabled={p.lives >= 3}
+                    className="w-8 h-8 rounded-lg bg-green-500/20 text-green-500 flex items-center justify-center hover:bg-green-500/30 disabled:opacity-30 disabled:cursor-not-allowed">
                     <Plus size={16} />
                   </button>
                   <button onClick={() => { playSound('click'); vibrate(20); removePlayer(p.id); }}
