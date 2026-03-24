@@ -289,15 +289,12 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const calculateResult = () => {
-    const sortedByVotes = [...state.players].sort((a, b) => b.votes - a.votes);
-    const mostVoted = sortedByVotes[0];
-    
-    // Check if imposter was caught
-    const imposterCaught = mostVoted.isImposter;
-    const gameWinner: 'players' | 'imposters' = imposterCaught ? 'players' : 'imposters';
-    
-    // Update scores with new system
     setState(prev => {
+      const sortedByVotes = [...prev.players].sort((a, b) => b.votes - a.votes);
+      const mostVoted = sortedByVotes[0];
+      
+      const imposterCaught = mostVoted.isImposter;
+      const gameWinner: 'players' | 'imposters' = imposterCaught ? 'players' : 'imposters';
       const imposters = prev.players.filter(p => p.isImposter);
       
       const updatedScores = prev.playerScores.map(score => {
