@@ -1,61 +1,36 @@
 
 
-## لعبة الدول - خطة التنفيذ
+## Fix: Voting System Bug in Local Imposter Game
 
-### الفكرة
-لعبة جماعية فيها Admin واحد يتحكم بكل شي، والباقين يشوفوا حالة اللعبة لحظياً. اللاعبين يبنوا اسم دولة حرف بحرف، وفي نظام تحدي وأرواح وتبديل.
+### Problem Found
+The `calculateResult` function in `GameContext.tsx` has a **stale state bug**. On line 292, it reads `state.players` (the state at render time) instead of the latest state. Since the last voter's `voteForPlayer` call updates state via `setState`, and `calculateResult` is called immediately after via `setTimeout`, `state.players` still reflects the old state **without the last vote counted**.
 
-### المكونات الرئيسية
+This means the last player's vote is effectively ignored when determining the winner.
 
-**1. قاعدة البيانات (3 جداول جديدة)**
-- `countries_rooms` — غرفة اللعب (كود، حالة، admin)
-- `countries_players` — اللاعبين (اسم، أرواح 3، حالة active/eliminated، ترتيب)
-- `countries_burned` — الدول المحترقة (اسم الدولة، وقت الإضافة)
-- Views عامة + RLS + RPC functions للتعديل الآمن
+### Fix
 
-**2. Context Provider**
-- `CountriesGameContext` — إدارة حالة اللعبة والمزامنة اللحظية عبر Supabase Realtime
+**File: `src/context/GameContext.tsx`**
 
-**3. الشاشات**
-- `CountriesModeSelect` — اختيار إنشاء غرفة أو انضمام
-- `CountriesCreateRoom` — Admin يضيف أسماء اللاعبين ويبدأ
-- `CountriesJoinRoom` — المتابعين يدخلوا بكود الغرفة
-- `CountriesAdminScreen` — شاشة التحكم الكاملة للـ Admin:
-  - قائمة اللاعبين مع قلوب (❤️) وأزرار +/- أرواح
-  - إضافة دولة محترقة + حذفها
-  - قسم التبديل: اختيار لاعب برا + لاعب داخل → تبديل
-  - الحروف الحالية (اختياري)
-- `CountriesSpectatorScreen` — شاشة المتابعين (قراءة فقط):
-  - قائمة اللاعبين وأرواحهم
-  - الدول المحترقة
-  - تحديث لحظي
+Refactor `calculateResult` to move all logic inside `setState(prev => ...)` so it uses the latest state (including the last vote):
 
-**4. التكامل**
-- إضافة اللعبة في `HubScreen` كخيار ثالث (🌍 دول)
-- إضافة routing في `Game.tsx`
-- إضافة Provider في سلسلة Providers
+```typescript
+const calculateResult = () => {
+  setState(prev => {
+    const sortedByVotes = [...prev.players].sort((a, b) => b.votes - a.votes);
+    const mostVoted = sortedByVotes[0];
+    
+    const imposterCaught = mostVoted.isImposter;
+    const gameWinner: 'players' | 'imposters' = imposterCaught ? 'players' : 'imposters';
+    
+    // ... rest of scoring logic stays the same, already uses `prev`
+  });
+};
+```
 
-### التفاصيل التقنية
+The key change: replace `state.players` with `prev.players` on lines 292-297, and merge the two separate operations (determine winner + update scores) into the single existing `setState` call.
 
-**DB Functions (RPC):**
-- `create_countries_room` — إنشاء غرفة
-- `add_countries_player` — إضافة لاعب
-- `update_player_lives` — تعديل أرواح (+/-)
-- `add_burned_country` — إضافة دولة محترقة
-- `remove_burned_country` — حذف دولة
-- `swap_players` — تبديل لاعب داخل بلاعب برا (نقل الأرواح)
-- `eliminate_player` / `revive_player`
-
-**Realtime:** تفعيل على الجداول الثلاثة عبر `supabase_realtime`
-
-**ملفات جديدة:**
-- `src/context/CountriesGameContext.tsx`
-- `src/components/game/countries/CountriesModeSelect.tsx`
-- `src/components/game/countries/CountriesCreateRoom.tsx`
-- `src/components/game/countries/CountriesJoinRoom.tsx`
-- `src/components/game/countries/CountriesAdminScreen.tsx`
-- `src/components/game/countries/CountriesSpectatorScreen.tsx`
-- `src/components/game/countries/CountriesGame.tsx`
-- `src/services/countriesRoomService.ts`
-- Migration SQL file
+### Impact
+- Fixes: Last voter's vote being ignored
+- Fixes: Potentially wrong winner being declared
+- No UI changes needed — VotingScreen and ResultScreen work correctly once the state is accurate
 
