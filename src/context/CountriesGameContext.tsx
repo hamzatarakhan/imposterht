@@ -146,7 +146,10 @@ export const CountriesProvider: React.FC<{ children: ReactNode }> = ({ children 
     return countriesService.swapPlayers(room.id, hostId, activeId, eliminatedId);
   };
 
-  const leaveRoom = () => {
+  const leaveRoom = async () => {
+    if (room && isAdmin) {
+      await countriesService.deleteCountriesRoom(room.id, hostId);
+    }
     setRoom(null);
     setPlayers([]);
     setBurned([]);
