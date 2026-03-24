@@ -98,6 +98,14 @@ export const CountriesProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, [room?.id, refreshData]);
 
   const createRoom = async (): Promise<string | null> => {
+    // Clean up any old room first
+    if (room && isAdmin) {
+      await countriesService.deleteCountriesRoom(room.id, hostId);
+    }
+    setRoom(null);
+    setPlayers([]);
+    setBurned([]);
+    
     const r = await countriesService.createCountriesRoom(hostId);
     if (!r) return null;
     setRoom(r);
@@ -146,7 +154,10 @@ export const CountriesProvider: React.FC<{ children: ReactNode }> = ({ children 
     return countriesService.swapPlayers(room.id, hostId, activeId, eliminatedId);
   };
 
-  const leaveRoom = () => {
+  const leaveRoom = async () => {
+    if (room && isAdmin) {
+      await countriesService.deleteCountriesRoom(room.id, hostId);
+    }
     setRoom(null);
     setPlayers([]);
     setBurned([]);
