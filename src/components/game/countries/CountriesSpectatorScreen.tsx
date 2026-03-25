@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCountries } from '@/context/CountriesGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { LogOut } from 'lucide-react';
+import { LogOut, Search } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -11,6 +11,7 @@ const CountriesSpectatorScreen: React.FC = () => {
   const { room, players, burned, leaveRoom } = useCountries();
   const { playSound, vibrate } = useSettings();
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [burnedSearch, setBurnedSearch] = useState('');
 
   const activePlayers = players.filter(p => p.status === 'active');
   const eliminatedPlayers = players.filter(p => p.status === 'eliminated');
@@ -70,11 +71,23 @@ const CountriesSpectatorScreen: React.FC = () => {
 
         {/* Burned Countries */}
         <div className="mb-4 p-3 rounded-2xl bg-secondary/30 border border-border/50">
-          <h3 className="text-sm font-bold text-foreground mb-2">🔥 الدول المحترقة ({burned.length})</h3>
-          {burned.length === 0 && <p className="text-xs text-muted-foreground text-center py-2">لا يوجد دول محترقة بعد</p>}
+          <h3 className="text-sm font-bold text-foreground mb-2">🔥 الدول المحروقة ({burned.length})</h3>
+          {burned.length > 3 && (
+            <div className="relative mb-2">
+              <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text" value={burnedSearch} onChange={(e) => setBurnedSearch(e.target.value)}
+                placeholder="ابحث عن دولة..."
+                className="w-full text-sm py-2 pr-9 pl-3 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all"
+              />
+            </div>
+          )}
+          {burned.length === 0 && <p className="text-xs text-muted-foreground text-center py-2">لا يوجد دول محروقة بعد</p>}
           {burned.length > 0 && (
             <div className="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto">
-              {burned.map((b, index) => (
+              {burned
+                .filter(b => !burnedSearch || b.country_name.includes(burnedSearch))
+                .map((b, index) => (
                 <div key={b.id} className="flex items-center gap-1.5 py-1.5 px-2.5 rounded-xl bg-card/50 border border-border/30">
                   <span className="text-xs text-muted-foreground font-mono shrink-0">{index + 1}.</span>
                   <span className="text-xs font-medium text-foreground truncate">{b.country_name}</span>
