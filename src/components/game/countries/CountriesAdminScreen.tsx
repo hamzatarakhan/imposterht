@@ -18,7 +18,6 @@ const CountriesAdminScreen: React.FC = () => {
   const [swapEliminated, setSwapEliminated] = useState<string | null>(null);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<'players' | 'burned'>('players');
-  const [burnedSearch, setBurnedSearch] = useState('');
 
   const activePlayers = players.filter(p => p.status === 'active');
   const eliminatedPlayers = players.filter(p => p.status === 'eliminated');
@@ -221,33 +220,11 @@ const CountriesAdminScreen: React.FC = () => {
                 </div>
               </div>
 
-              {/* Search */}
-              {burned.length > 3 && (
-                <div className="relative">
-                  <input
-                    type="text" value={burnedSearch} onChange={(e) => setBurnedSearch(e.target.value)}
-                    placeholder="🔍 ابحث عن دولة..."
-                    className="w-full text-sm py-2 px-3 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all"
-                  />
-                  {burnedSearch && (
-                    <button onClick={() => setBurnedSearch('')} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                      <X size={14} />
-                    </button>
-                  )}
-                </div>
-              )}
-
               {/* Burned List */}
-              {burned.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">ما في دول محروقة بعد</p>}
-              {burned.length > 0 && (() => {
-                const filtered = burnedSearch.trim()
-                  ? burned.filter(b => b.country_name.includes(burnedSearch.trim()))
-                  : burned;
-                return filtered.length === 0 ? (
-                  <p className="text-xs text-muted-foreground text-center py-4">ما في نتائج لـ "{burnedSearch}"</p>
-                ) : (
+              {burned.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">ما في دول محترقة بعد</p>}
+              {burned.length > 0 && (
                 <div className="grid grid-cols-2 gap-1.5">
-                  {filtered.map((b, index) => (
+                  {burned.map((b, index) => (
                     <div key={b.id} className="flex items-center justify-between py-1.5 px-2.5 rounded-xl bg-card/50 border border-border/30">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <span className="text-xs text-muted-foreground font-mono shrink-0">{index + 1}.</span>
@@ -260,8 +237,7 @@ const CountriesAdminScreen: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                );
-              })()}
+              )}
             </div>
           )}
         </div>
