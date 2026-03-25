@@ -15,6 +15,7 @@ const CountriesAdminScreen: React.FC = () => {
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newCountryName, setNewCountryName] = useState('');
   const [burnedSearch, setBurnedSearch] = useState('');
+  const [swapActive, setSwapActive] = useState<string | null>(null);
   const [swapEliminated, setSwapEliminated] = useState<string | null>(null);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<'players' | 'burned'>('players');
