@@ -11,7 +11,7 @@ const CountriesGame: React.FC = () => {
     case 'countriesJoinRoom': return <CountriesJoinRoom />;
     case 'countriesAdmin': return <CountriesAdminScreen />;
     case 'countriesSpectator': return <CountriesSpectatorScreen />;
-    default: return <CountriesAdminScreen />;
+    default: return null;
   }
 };
 
