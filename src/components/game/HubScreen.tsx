@@ -75,6 +75,9 @@ const HubScreen: React.FC = () => {
   const [showGroupsModal, setShowGroupsModal] = React.useState(false);
   const [newPlayerName, setNewPlayerName] = React.useState('');
   const [newPlayerAvatar, setNewPlayerAvatar] = React.useState('👤');
+  const [showCountriesPin, setShowCountriesPin] = React.useState(false);
+  const [countriesPin, setCountriesPin] = React.useState('');
+  const [countriesPinError, setCountriesPinError] = React.useState(false);
 
   const hasPlayedWelcome = useRef(false);
 
@@ -287,7 +290,13 @@ const HubScreen: React.FC = () => {
                 if (game.id === 'guessing') {
                   setOnlineGuessingScreen('guessingCreateRoom');
                 } else if (game.id === 'countries') {
-                  createCountriesRoom();
+                  if (localStorage.getItem('countries_unlocked') === 'true') {
+                    createCountriesRoom();
+                  } else {
+                    setCountriesPin('');
+                    setCountriesPinError(false);
+                    setShowCountriesPin(true);
+                  }
                 } else {
                   setScreen('home');
                 }
