@@ -82,11 +82,11 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     const setup = () => {
       unsubscribe = guessingService.subscribeToGuessingRoom(
         state.room!.id,
-        (room) => { if (!cancelled) setState(prev => ({ ...prev, room })); },
+      (room) => { if (!cancelled) setState(prev => ({ ...prev, room, isHost: room.host_id === prev.myPlayerId })); },
         (players) => {
           if (cancelled) return;
           const me = players.find(p => p.player_id === state.myPlayerId);
-          setState(prev => ({ ...prev, players, currentPlayer: me || null, isHost: me?.is_host || false }));
+          setState(prev => ({ ...prev, players, currentPlayer: me || null, isHost: prev.room?.host_id === prev.myPlayerId || me?.is_host || false }));
         }
       );
     };
@@ -99,7 +99,7 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
       ]);
       if (cancelled || !room) return;
       const me = players.find(p => p.player_id === state.myPlayerId);
-      setState(prev => ({ ...prev, room, players, currentPlayer: me || null, isHost: me?.is_host || false }));
+      setState(prev => ({ ...prev, room, players, currentPlayer: me || null, isHost: room.host_id === prev.myPlayerId || me?.is_host || false }));
     };
 
     setup();
