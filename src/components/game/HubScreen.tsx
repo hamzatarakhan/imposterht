@@ -347,6 +347,57 @@ const HubScreen: React.FC = () => {
           </a>
         </div>
       </div>
+      {/* Countries PIN Dialog */}
+      <Dialog open={showCountriesPin} onOpenChange={setShowCountriesPin}>
+        <DialogContent className="max-w-xs rounded-3xl bg-card border-border text-center">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black text-foreground">🔒 للرجال فقط</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground mb-2">أدخل رمز الدخول للعبة الدول</p>
+          <input
+            type="password"
+            inputMode="numeric"
+            maxLength={4}
+            value={countriesPin}
+            onChange={(e) => {
+              setCountriesPin(e.target.value.slice(0, 4));
+              setCountriesPinError(false);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                if (countriesPin === '2026') {
+                  localStorage.setItem('countries_unlocked', 'true');
+                  setShowCountriesPin(false);
+                  createCountriesRoom();
+                } else {
+                  setCountriesPinError(true);
+                }
+              }
+            }}
+            placeholder="****"
+            className="w-full text-center text-2xl font-black tracking-[0.5em] py-3 px-3 rounded-2xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:tracking-normal"
+            autoFocus
+          />
+          {countriesPinError && (
+            <p className="text-sm text-destructive font-bold">رمز خاطئ ❌</p>
+          )}
+          <button
+            onClick={() => {
+              if (countriesPin === '2026') {
+                localStorage.setItem('countries_unlocked', 'true');
+                setShowCountriesPin(false);
+                createCountriesRoom();
+              } else {
+                setCountriesPinError(true);
+              }
+            }}
+            disabled={countriesPin.length < 4}
+            className="w-full py-3 rounded-2xl bg-primary text-primary-foreground font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            دخول 🚀
+          </button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
