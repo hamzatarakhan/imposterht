@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
 
-const GAME_ICONS = ['😈', '🤔', '🎭', '🃏', '🎲'];
+const GAME_ICONS = ['🕵️', '🧩', '🌍'];
 
 const SplashScreen: React.FC = () => {
   const { setScreen } = useGame();
@@ -14,7 +14,7 @@ const SplashScreen: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIcon((prev) => (prev + 1) % GAME_ICONS.length);
-    }, 600);
+    }, 800);
     return () => clearInterval(interval);
   }, []);
 
@@ -73,7 +73,7 @@ const SplashScreen: React.FC = () => {
             فعاليات
           </h1>
           <p className="text-base text-muted-foreground font-medium tracking-wide">
-            ألعاب جماعية · مرح لا حدود له
+            جمّع شلتك وغيّروا جو 🔥
           </p>
         </div>
 
