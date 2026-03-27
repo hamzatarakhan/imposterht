@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, X } from 'lucide-react';
 import PresenceDot from '@/components/game/PresenceDot';
+import { GUESSING_CATEGORIES, GuessingCategory } from '@/data/guessingWords';
 
 const GuessingOnlineFinalResultScreen: React.FC = () => {
   const { players, isHost, leaveRoom, resetOnlineGuessing, replayRoom, setScreen } = useOnlineGuessing();
   const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
   const [loading, setLoading] = useState(false);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const [newCategories, setNewCategories] = useState<GuessingCategory[]>(['random']);
+  const [replayLoading, setReplayLoading] = useState(false);
 
   if (players.length < 2) {
     return (
@@ -37,11 +41,29 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
     setLoading(false);
   };
 
+  const toggleNewCategory = (cat: GuessingCategory) => {
+    if (cat === 'random') { setNewCategories(['random']); return; }
+    if (newCategories.includes('random')) { setNewCategories([cat]); return; }
+    if (newCategories.includes(cat)) {
+      if (newCategories.length === 1) return;
+      setNewCategories(newCategories.filter(c => c !== cat));
+    } else {
+      setNewCategories([...newCategories, cat]);
+    }
+  };
+
   const handleReplayNewCategory = async () => {
     playSound('click'); vibrate(50);
-    await leaveRoom();
-    resetOnlineGuessing();
-    setScreen('guessingCreateRoom');
+    setShowCategoryPicker(true);
+  };
+
+  const handleConfirmNewCategory = async () => {
+    if (replayLoading) return;
+    playSound('click'); vibrate(50);
+    setReplayLoading(true);
+    await replayRoom(newCategories);
+    setReplayLoading(false);
+    setShowCategoryPicker(false);
   };
 
   const handleBackToHub = async () => {
@@ -110,6 +132,40 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
         )}
       </div>
       </div>
+      {/* Category Picker Modal */}
+      {showCategoryPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="card-game w-full max-w-sm space-y-4 relative">
+            <button onClick={() => { setShowCategoryPicker(false); }} className="absolute top-3 left-3 p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground">
+              <X size={18} />
+            </button>
+            <h3 className="text-lg font-black text-center">🔀 اختر الفئة الجديدة</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {GUESSING_CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => { playSound('click'); toggleNewCategory(cat.id); }}
+                  className={`p-3 rounded-xl text-center transition-all ${
+                    newCategories.includes(cat.id)
+                      ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 scale-105'
+                      : 'bg-secondary/50 hover:bg-secondary/80'
+                  }`}
+                >
+                  <div className="text-xl mb-1">{cat.icon}</div>
+                  <div className="text-xs font-bold">{cat.label}</div>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleConfirmNewCategory}
+              disabled={replayLoading}
+              className="w-full btn-primary-game flex items-center justify-center gap-2"
+            >
+              {replayLoading ? <Loader2 size={18} className="animate-spin" /> : '🚀'} ابدأ بالفئة الجديدة
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
