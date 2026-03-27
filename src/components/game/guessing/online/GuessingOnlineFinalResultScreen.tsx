@@ -41,11 +41,29 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
     setLoading(false);
   };
 
+  const toggleNewCategory = (cat: GuessingCategory) => {
+    if (cat === 'random') { setNewCategories(['random']); return; }
+    if (newCategories.includes('random')) { setNewCategories([cat]); return; }
+    if (newCategories.includes(cat)) {
+      if (newCategories.length === 1) return;
+      setNewCategories(newCategories.filter(c => c !== cat));
+    } else {
+      setNewCategories([...newCategories, cat]);
+    }
+  };
+
   const handleReplayNewCategory = async () => {
     playSound('click'); vibrate(50);
-    await leaveRoom();
-    resetOnlineGuessing();
-    setScreen('guessingCreateRoom');
+    setShowCategoryPicker(true);
+  };
+
+  const handleConfirmNewCategory = async () => {
+    if (replayLoading) return;
+    playSound('click'); vibrate(50);
+    setReplayLoading(true);
+    await replayRoom(newCategories);
+    setReplayLoading(false);
+    setShowCategoryPicker(false);
   };
 
   const handleBackToHub = async () => {
