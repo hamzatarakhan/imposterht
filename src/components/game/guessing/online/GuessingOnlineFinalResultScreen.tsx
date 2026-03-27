@@ -11,6 +11,9 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
   const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
   const [loading, setLoading] = useState(false);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const [newCategories, setNewCategories] = useState<GuessingCategory[]>(['random']);
+  const [replayLoading, setReplayLoading] = useState(false);
 
   if (players.length < 2) {
     return (
