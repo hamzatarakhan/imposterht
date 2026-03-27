@@ -43,7 +43,7 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative">
+    <div className="min-h-screen flex flex-col relative pb-24">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background" />
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
         <button onClick={async () => { playSound('click'); await leaveRoom(); }}
@@ -53,43 +53,55 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
         <h1 className="text-xl font-black">📊 نتيجة الجولة</h1>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-      <div className="w-full max-w-sm space-y-5">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 text-center relative z-10">
+      <div className="w-full max-w-sm space-y-3">
+        {/* Winner + Score combined */}
         <div className="card-game text-center">
           {isDraw ? (
-            <>
-              <div className="text-6xl mb-3">🤝</div>
-              <h2 className="text-2xl font-black mb-1">تعادل!</h2>
-              <p className="text-muted-foreground">ما حدا حزر هالمرة</p>
-            </>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="text-3xl">🤝</span>
+              <h2 className="text-xl font-black">تعادل!</h2>
+            </div>
           ) : (
-            <>
-              <div className="text-6xl mb-3">🎉</div>
-              <h2 className="text-2xl font-black mb-1">{winner?.name} فاز!</h2>
-              <div className="text-4xl mb-3">{winner?.avatar}</div>
-            </>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="text-3xl">🎉</span>
+              <h2 className="text-xl font-black">{winner?.name} فاز!</h2>
+              <span className="text-2xl">{winner?.avatar}</span>
+            </div>
           )}
+          <div className="flex items-center justify-center gap-8 pt-2 border-t border-border/50">
+            {players.map(p => (
+              <div key={p.id} className="text-center">
+                <div className="relative inline-block">
+                  <span className="text-xl">{p.avatar}</span>
+                  <PresenceDot playerId={p.player_id} size="sm" />
+                </div>
+                <p className="text-xl font-black text-primary">{p.wins}</p>
+                <p className="text-xs text-muted-foreground">{p.name}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Words Reveal */}
         {words && (
           <div className="card-game">
-            <h3 className="font-bold mb-3 text-center">📝 الكلمات كانت:</h3>
-            <div className="space-y-3">
+            <h3 className="font-bold mb-2 text-center text-sm">📝 الكلمات كانت:</h3>
+            <div className="space-y-2">
               {players.map((p, i) => {
                 const w = i === 0 ? words.player1_word : words.player2_word;
                 return (
-                   <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
+                   <div key={p.id} className="flex items-center justify-between p-2 rounded-xl bg-secondary/50">
                     <div className="flex items-center gap-2">
                       <div className="relative">
-                        <span className="text-xl">{p.avatar}</span>
+                        <span className="text-lg">{p.avatar}</span>
                         <PresenceDot playerId={p.player_id} size="sm" />
                       </div>
                       <span className="font-bold text-sm">{p.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <WordImage word={w} size="sm" />
-                      <span className="font-black text-primary">{w}</span>
+                      <span className="font-black text-primary text-sm">{w}</span>
                     </div>
                   </div>
                 );
@@ -97,33 +109,20 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
             </div>
           </div>
         )}
-
-        {/* Score */}
-        <div className="card-game">
-          <div className="flex items-center justify-center gap-8">
-            {players.map(p => (
-              <div key={p.id} className="text-center">
-                <div className="relative inline-block">
-                  <span className="text-2xl">{p.avatar}</span>
-                  <PresenceDot playerId={p.player_id} size="sm" />
-                </div>
-                <p className="text-2xl font-black text-primary">{p.wins}</p>
-                <p className="text-xs text-muted-foreground">{p.name}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {isHost ? (
-          <button onClick={handleNext} className="w-full btn-primary-game text-lg">
-            {room.current_round >= room.total_rounds ? '🏆 النتائج النهائية' : '⚔️ المواجهة التالية'}
-          </button>
-        ) : (
-          <div className="text-center py-4">
-            <p className="text-muted-foreground animate-pulse">⏳ بانتظار المضيف...</p>
-          </div>
-        )}
       </div>
+      </div>
+
+      {/* Sticky bottom button */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 p-4 bg-background/90 backdrop-blur-md border-t border-border/30">
+        <div className="max-w-sm mx-auto">
+          {isHost ? (
+            <button onClick={handleNext} className="w-full btn-primary-game text-lg">
+              {room.current_round >= room.total_rounds ? '🏆 النتائج النهائية' : '⚔️ المواجهة التالية'}
+            </button>
+          ) : (
+            <p className="text-center text-muted-foreground animate-pulse">⏳ بانتظار المضيف...</p>
+          )}
+        </div>
       </div>
     </div>
   );
