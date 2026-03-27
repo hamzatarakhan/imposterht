@@ -45,6 +45,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
 
   useEffect(() => {
     setBothReady(false);
+    setRevealed(false);
   }, [roundNumber]);
 
   useEffect(() => {
