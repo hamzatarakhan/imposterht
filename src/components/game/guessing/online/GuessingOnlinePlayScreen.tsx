@@ -182,9 +182,9 @@ const GuessingOnlinePlayScreen: React.FC = () => {
 
         {/* My Word */}
         {myWord && (
-          <div className="w-full py-2.5 px-4 rounded-2xl bg-primary/10 border border-primary/30 text-center">
-            <span className="text-[11px] text-muted-foreground ml-1">كلمتك</span>
-            <span className="text-lg font-black text-primary mr-2">{myWord}</span>
+          <div className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-primary/15 to-primary/5 border-2 border-primary/40 text-center shadow-lg shadow-primary/10">
+            <span className="text-[10px] text-muted-foreground block mb-0.5">كلمتك</span>
+            <span className="text-2xl font-black text-primary tracking-wide">{myWord}</span>
           </div>
         )}
 
