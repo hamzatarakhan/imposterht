@@ -154,21 +154,29 @@ const GuessingOnlinePlayScreen: React.FC = () => {
         {/* Players VS Card */}
         <div className="card-game !p-3">
           <div className="flex items-center justify-between">
-            {players.map((p, idx) => (
-              <React.Fragment key={p.id}>
-                {idx === 1 && <div className="text-2xl font-black text-primary mx-2 shrink-0">⚔️</div>}
-                <div className={`flex items-center gap-2 flex-1 ${idx === 1 ? 'flex-row-reverse' : ''}`}>
-                  <div className="relative">
-                    <span className="text-3xl">{p.avatar}</span>
-                    <PresenceDot playerId={p.player_id} size="sm" />
+            {players.map((p, idx) => {
+              const isFirstAsker = idx === (roundNumber % 2 === 1 ? 0 : 1);
+              return (
+                <React.Fragment key={p.id}>
+                  {idx === 1 && <div className="text-2xl font-black text-primary mx-2 shrink-0">⚔️</div>}
+                  <div className={`flex items-center gap-2 flex-1 ${idx === 1 ? 'flex-row-reverse' : ''}`}>
+                    <div className="relative">
+                      <span className="text-3xl">{p.avatar}</span>
+                      <PresenceDot playerId={p.player_id} size="sm" />
+                    </div>
+                    <div className={`${idx === 1 ? 'text-right' : ''}`}>
+                      <p className="font-bold text-sm leading-tight">{p.name}</p>
+                      <p className="text-[11px] text-muted-foreground">{p.wins} فوز</p>
+                      {isFirstAsker && (
+                        <span className="inline-block mt-0.5 text-[10px] font-bold text-primary bg-primary/15 px-1.5 py-0.5 rounded-full">
+                          🎤 يسأل أول
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className={`${idx === 1 ? 'text-right' : ''}`}>
-                    <p className="font-bold text-sm leading-tight">{p.name}</p>
-                    <p className="text-[11px] text-muted-foreground">{p.wins} فوز</p>
-                  </div>
-                </div>
-              </React.Fragment>
-            ))}
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
 
