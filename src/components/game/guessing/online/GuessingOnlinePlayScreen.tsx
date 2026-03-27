@@ -75,9 +75,55 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     setChangingWords(false);
   };
 
-  if (!room) return null;
+  if (!room || !currentPlayer) return null;
 
-  // Opponent disconnected
+  // Word reveal step (replaces separate ShowWord screen)
+  if (!revealed) {
+    return (
+      <div className="min-h-[100dvh] flex flex-col">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background pointer-events-none" />
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
+          <button onClick={async () => { playSound('click'); await leaveRoom(); }}
+            className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowRight size={20} />
+          </button>
+          <h1 className="text-xl font-black">🤔 كلمتك</h1>
+          <span className="text-sm text-muted-foreground mr-auto">المواجهة {room.current_round}/{room.total_rounds}</span>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative z-10">
+          <div className="w-full max-w-sm space-y-5">
+            <div className="card-game text-center space-y-3">
+              <div className="text-5xl">{currentPlayer.avatar}</div>
+              <h2 className="text-xl font-black">{currentPlayer.name}</h2>
+              {myWord ? (
+                <>
+                  <p className="text-sm text-muted-foreground">كلمتك اللي لازم الخصم يحزرها:</p>
+                  <div className="py-4 px-6 bg-primary/10 rounded-2xl animate-reveal">
+                    <span className="text-3xl font-black text-primary">{myWord}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    احفظها كويس 🤫
+                    <br />
+                    <span className="text-destructive font-bold">لا تخلي حد يشوف شاشتك!</span>
+                  </p>
+                </>
+              ) : (
+                <p className="text-muted-foreground animate-pulse">جاري تحميل الكلمة...</p>
+              )}
+            </div>
+            {myWord && (
+              <button onClick={() => { playSound('click'); vibrate(50); setRevealed(true); }}
+                className="w-full btn-primary-game text-lg">
+                ✅ حفظتها، يلا نبدأ!
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
   if (!hasTwoPlayers || players.length < 2) {
     return (
       <div className="min-h-[100dvh] flex flex-col">
