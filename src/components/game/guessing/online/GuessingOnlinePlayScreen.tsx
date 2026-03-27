@@ -12,6 +12,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   const [myWord, setMyWord] = useState<string | null>(null);
   const [changingWords, setChangingWords] = useState(false);
   const [bothReady, setBothReady] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
   const roundNumber = room?.current_round || 1;
 
