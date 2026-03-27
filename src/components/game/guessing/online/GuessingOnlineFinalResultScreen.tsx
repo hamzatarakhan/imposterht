@@ -132,6 +132,40 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
         )}
       </div>
       </div>
+      {/* Category Picker Modal */}
+      {showCategoryPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="card-game w-full max-w-sm space-y-4 relative">
+            <button onClick={() => { setShowCategoryPicker(false); }} className="absolute top-3 left-3 p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground">
+              <X size={18} />
+            </button>
+            <h3 className="text-lg font-black text-center">🔀 اختر الفئة الجديدة</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {GUESSING_CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => { playSound('click'); toggleNewCategory(cat.id); }}
+                  className={`p-3 rounded-xl text-center transition-all ${
+                    newCategories.includes(cat.id)
+                      ? 'bg-primary text-primary-foreground ring-2 ring-primary/50 scale-105'
+                      : 'bg-secondary/50 hover:bg-secondary/80'
+                  }`}
+                >
+                  <div className="text-xl mb-1">{cat.icon}</div>
+                  <div className="text-xs font-bold">{cat.label}</div>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleConfirmNewCategory}
+              disabled={replayLoading}
+              className="w-full btn-primary-game flex items-center justify-center gap-2"
+            >
+              {replayLoading ? <Loader2 size={18} className="animate-spin" /> : '🚀'} ابدأ بالفئة الجديدة
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
