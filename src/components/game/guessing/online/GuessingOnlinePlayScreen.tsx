@@ -155,18 +155,20 @@ const GuessingOnlinePlayScreen: React.FC = () => {
         <div className="card-game !p-3">
           <div className="flex items-center justify-between">
             {players.map((p, idx) => (
-              <div key={p.id} className={`flex items-center gap-2 flex-1 ${idx === 1 ? 'flex-row-reverse' : ''}`}>
-                <div className="relative">
-                  <span className="text-3xl">{p.avatar}</span>
-                  <PresenceDot playerId={p.player_id} size="sm" />
+              <React.Fragment key={p.id}>
+                {idx === 1 && <div className="text-2xl font-black text-primary mx-2 shrink-0">⚔️</div>}
+                <div className={`flex items-center gap-2 flex-1 ${idx === 1 ? 'flex-row-reverse' : ''}`}>
+                  <div className="relative">
+                    <span className="text-3xl">{p.avatar}</span>
+                    <PresenceDot playerId={p.player_id} size="sm" />
+                  </div>
+                  <div className={`${idx === 1 ? 'text-right' : ''}`}>
+                    <p className="font-bold text-sm leading-tight">{p.name}</p>
+                    <p className="text-[11px] text-muted-foreground">{p.wins} فوز</p>
+                  </div>
                 </div>
-                <div className={`${idx === 1 ? 'text-right' : ''}`}>
-                  <p className="font-bold text-sm leading-tight">{p.name}</p>
-                  <p className="text-[11px] text-muted-foreground">{p.wins} فوز</p>
-                </div>
-              </div>
+              </React.Fragment>
             ))}
-            <div className="text-2xl font-black text-primary mx-2 shrink-0">⚔️</div>
           </div>
         </div>
 
