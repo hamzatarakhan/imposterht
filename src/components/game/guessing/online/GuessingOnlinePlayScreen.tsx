@@ -159,7 +159,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
               return (
                 <React.Fragment key={p.id}>
                   {idx === 1 && <div className="text-2xl font-black text-primary mx-2 shrink-0">⚔️</div>}
-                  <div className={`flex items-center gap-2 flex-1 ${idx === 1 ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex items-center gap-2 flex-1 p-1.5 rounded-xl transition-colors ${isFirstAsker ? 'bg-primary/10 ring-1 ring-primary/30' : ''} ${idx === 1 ? 'flex-row-reverse' : ''}`}>
                     <div className="relative">
                       <span className="text-3xl">{p.avatar}</span>
                       <PresenceDot playerId={p.player_id} size="sm" />
@@ -167,17 +167,15 @@ const GuessingOnlinePlayScreen: React.FC = () => {
                     <div className={`${idx === 1 ? 'text-right' : ''}`}>
                       <p className="font-bold text-sm leading-tight">{p.name}</p>
                       <p className="text-[11px] text-muted-foreground">{p.wins} فوز</p>
-                      {isFirstAsker && (
-                        <span className="inline-block mt-0.5 text-[10px] font-bold text-primary bg-primary/15 px-1.5 py-0.5 rounded-full">
-                          🎤 يسأل أول
-                        </span>
-                      )}
                     </div>
                   </div>
                 </React.Fragment>
               );
             })}
           </div>
+          <p className="text-[10px] text-center text-muted-foreground mt-2">
+            🎤 {players[roundNumber % 2 === 1 ? 0 : 1]?.name} يسأل أول
+          </p>
         </div>
 
         {/* Instructions */}
