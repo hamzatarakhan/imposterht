@@ -1,17 +1,17 @@
-import React, { useEffect, useRef } from 'react';
-import { useGame } from '@/context/GameContext';
-import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
-import { useCountries } from '@/context/CountriesGameContext';
-import { useSettings } from '@/context/SettingsContext';
-import { Settings, QrCode, Users, FolderOpen, Download, Plus, X, Trash2, Smartphone } from 'lucide-react';
-import { useSavedPlayers } from '@/hooks/useSavedPlayers';
-import { usePWAInstall } from '@/hooks/usePWAInstall';
-import { useSavedGroups } from '@/hooks/useSavedGroups';
-import { AVATAR_OPTIONS } from '@/context/GameContext';
-import QRCodeModal from './QRCodeModal';
-import VideoTutorialModal from './VideoTutorialModal';
-import GroupManagementModal from './GroupManagementModal';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useEffect, useRef } from "react";
+import { useGame } from "@/context/GameContext";
+import { useOnlineGuessing } from "@/context/OnlineGuessingContext";
+import { useCountries } from "@/context/CountriesGameContext";
+import { useSettings } from "@/context/SettingsContext";
+import { Settings, QrCode, Users, FolderOpen, Download, Plus, X, Trash2, Smartphone } from "lucide-react";
+import { useSavedPlayers } from "@/hooks/useSavedPlayers";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
+import { useSavedGroups } from "@/hooks/useSavedGroups";
+import { AVATAR_OPTIONS } from "@/context/GameContext";
+import QRCodeModal from "./QRCodeModal";
+import VideoTutorialModal from "./VideoTutorialModal";
+import GroupManagementModal from "./GroupManagementModal";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,32 +29,32 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 
 const games = [
   {
-    id: 'imposter',
-    name: 'الإمبوستر',
-    icon: '😈',
-    description: 'اكشف المندس بينكم!',
-    gradient: 'from-red-500/20 to-orange-500/20',
-    border: 'border-red-500/30',
+    id: "imposter",
+    name: "الإمبوستر",
+    icon: "😈",
+    description: "اكشف المندس بينكم!",
+    gradient: "from-red-500/20 to-orange-500/20",
+    border: "border-red-500/30",
   },
   {
-    id: 'guessing',
-    name: 'التخمين',
-    icon: '🤔',
-    description: 'احزر كلمة خصمك قبل ما يحزر كلمتك!',
-    gradient: 'from-blue-500/20 to-cyan-500/20',
-    border: 'border-blue-500/30',
+    id: "guessing",
+    name: "التخمين",
+    icon: "🤔",
+    description: "احزر كلمة خصمك قبل ما يحزر كلمتك!",
+    gradient: "from-blue-500/20 to-cyan-500/20",
+    border: "border-blue-500/30",
   },
   {
-    id: 'countries',
-    name: 'الدول',
-    icon: '🌍',
-    description: 'ابنوا اسم دولة حرف بحرف!',
-    gradient: 'from-green-500/20 to-emerald-500/20',
-    border: 'border-green-500/30',
+    id: "countries",
+    name: "الدول",
+    icon: "🌍",
+    description: "ابنوا اسم دولة حرف بحرف!",
+    gradient: "from-green-500/20 to-emerald-500/20",
+    border: "border-green-500/30",
   },
 ];
 
@@ -73,10 +73,10 @@ const HubScreen: React.FC = () => {
   const [showVideoModal, setShowVideoModal] = React.useState(false);
   const [showInstallSteps, setShowInstallSteps] = React.useState(false);
   const [showGroupsModal, setShowGroupsModal] = React.useState(false);
-  const [newPlayerName, setNewPlayerName] = React.useState('');
-  const [newPlayerAvatar, setNewPlayerAvatar] = React.useState('👤');
+  const [newPlayerName, setNewPlayerName] = React.useState("");
+  const [newPlayerAvatar, setNewPlayerAvatar] = React.useState("👤");
   const [showCountriesPin, setShowCountriesPin] = React.useState(false);
-  const [countriesPin, setCountriesPin] = React.useState('');
+  const [countriesPin, setCountriesPin] = React.useState("");
   const [countriesPinError, setCountriesPinError] = React.useState(false);
 
   const hasPlayedWelcome = useRef(false);
@@ -85,49 +85,49 @@ const HubScreen: React.FC = () => {
     if (!hasPlayedWelcome.current) {
       hasPlayedWelcome.current = true;
       setTimeout(() => {
-        playSound('welcome');
+        playSound("welcome");
         vibrate(30);
       }, 300);
     }
   }, [playSound, vibrate]);
 
-  type DeviceType = 'ios' | 'android' | 'desktop';
-  const [deviceType, setDeviceType] = React.useState<DeviceType>('desktop');
+  type DeviceType = "ios" | "android" | "desktop";
+  const [deviceType, setDeviceType] = React.useState<DeviceType>("desktop");
 
   React.useEffect(() => {
     const ua = navigator.userAgent.toLowerCase();
-    if (/iphone|ipad|ipod/.test(ua)) setDeviceType('ios');
-    else if (/android/.test(ua)) setDeviceType('android');
-    else setDeviceType('desktop');
+    if (/iphone|ipad|ipod/.test(ua)) setDeviceType("ios");
+    else if (/android/.test(ua)) setDeviceType("android");
+    else setDeviceType("desktop");
   }, []);
 
   const installSteps: Record<DeviceType, { step: number; icon: string; text: string }[]> = {
     ios: [
-      { step: 1, icon: '🧭', text: 'افتح الرابط في Safari' },
-      { step: 2, icon: '📤', text: 'اضغط على زر المشاركة (أسفل الشاشة)' },
-      { step: 3, icon: '➕', text: 'اختر "إضافة إلى الشاشة الرئيسية"' },
-      { step: 4, icon: '✅', text: 'اضغط "إضافة" للتأكيد' },
+      { step: 1, icon: "🧭", text: "افتح الرابط في Safari" },
+      { step: 2, icon: "📤", text: "اضغط على زر المشاركة (أسفل الشاشة)" },
+      { step: 3, icon: "➕", text: 'اختر "إضافة إلى الشاشة الرئيسية"' },
+      { step: 4, icon: "✅", text: 'اضغط "إضافة" للتأكيد' },
     ],
     android: [
-      { step: 1, icon: '🌐', text: 'افتح الرابط في Chrome' },
-      { step: 2, icon: '⋮', text: 'اضغط على القائمة (ثلاث نقاط)' },
-      { step: 3, icon: '📲', text: 'اختر "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية"' },
-      { step: 4, icon: '✅', text: 'اضغط "تثبيت" للتأكيد' },
+      { step: 1, icon: "🌐", text: "افتح الرابط في Chrome" },
+      { step: 2, icon: "⋮", text: "اضغط على القائمة (ثلاث نقاط)" },
+      { step: 3, icon: "📲", text: 'اختر "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية"' },
+      { step: 4, icon: "✅", text: 'اضغط "تثبيت" للتأكيد' },
     ],
     desktop: [
-      { step: 1, icon: '🌐', text: 'افتح الرابط في Chrome أو Edge' },
-      { step: 2, icon: '📥', text: 'ابحث عن أيقونة التثبيت في شريط العنوان' },
-      { step: 3, icon: '✅', text: 'اضغط "تثبيت" للتأكيد' },
+      { step: 1, icon: "🌐", text: "افتح الرابط في Chrome أو Edge" },
+      { step: 2, icon: "📥", text: "ابحث عن أيقونة التثبيت في شريط العنوان" },
+      { step: 3, icon: "✅", text: 'اضغط "تثبيت" للتأكيد' },
     ],
   };
 
   const getDeviceLabel = () => {
-    if (deviceType === 'ios') return 'التثبيت على iPhone';
-    if (deviceType === 'android') return 'التثبيت على Android';
-    return 'التثبيت على الكمبيوتر';
+    if (deviceType === "ios") return "التثبيت على iPhone";
+    if (deviceType === "android") return "التثبيت على Android";
+    return "التثبيت على الكمبيوتر";
   };
 
-  const appUrl = 'https://imposterht.lovable.app';
+  const appUrl = "https://imposterht.lovable.app";
 
   const handleRemovePlayer = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
@@ -144,8 +144,8 @@ const HubScreen: React.FC = () => {
     const trimmedName = newPlayerName.trim();
     if (trimmedName) {
       addPlayers([{ name: trimmedName, avatar: newPlayerAvatar }]);
-      setNewPlayerName('');
-      setNewPlayerAvatar('👤');
+      setNewPlayerName("");
+      setNewPlayerAvatar("👤");
       if (!keepOpen) setShowAddPlayerDialog(false);
     }
   };
@@ -161,13 +161,21 @@ const HubScreen: React.FC = () => {
       <div className="relative z-10 flex justify-between">
         <div className="flex gap-2">
           <button
-            onClick={() => { playSound('click'); vibrate(30); setScreen('settings'); }}
+            onClick={() => {
+              playSound("click");
+              vibrate(30);
+              setScreen("settings");
+            }}
             className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
           >
             <Settings size={24} />
           </button>
           <button
-            onClick={() => { playSound('click'); vibrate(30); setShowQRModal(true); }}
+            onClick={() => {
+              playSound("click");
+              vibrate(30);
+              setShowQRModal(true);
+            }}
             className="p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
           >
             <QrCode size={24} />
@@ -189,7 +197,7 @@ const HubScreen: React.FC = () => {
           <div className="flex flex-col items-center gap-3 py-3">
             <button
               onClick={() => {
-                playSound('click');
+                playSound("click");
                 const idx = AVATAR_OPTIONS.indexOf(newPlayerAvatar);
                 setNewPlayerAvatar(AVATAR_OPTIONS[(idx + 1) % AVATAR_OPTIONS.length]);
               }}
@@ -199,19 +207,39 @@ const HubScreen: React.FC = () => {
             </button>
             <p className="text-xs text-muted-foreground">اضغط لتغيير الأفاتار</p>
             <input
-              type="text" value={newPlayerName} onChange={(e) => setNewPlayerName(e.target.value.slice(0, 20))}
-              placeholder="اسم اللاعب" maxLength={20}
+              type="text"
+              value={newPlayerName}
+              onChange={(e) => setNewPlayerName(e.target.value.slice(0, 20))}
+              placeholder="اسم اللاعب"
+              maxLength={20}
               className="w-full text-center text-lg font-bold py-2.5 px-3 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:text-muted-foreground/50"
-              autoFocus onKeyDown={(e) => { if (e.key === 'Enter') handleAddPlayer(false); }}
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleAddPlayer(false);
+              }}
             />
             <p className="text-xs text-muted-foreground">{newPlayerName.length}/20 حرف</p>
             <div className="w-full flex flex-col gap-2">
-              <button onClick={() => { playSound('click'); vibrate(30); handleAddPlayer(false); }} disabled={!newPlayerName.trim()}
-                className="w-full py-3 px-4 rounded-xl bg-primary text-primary-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity">
+              <button
+                onClick={() => {
+                  playSound("click");
+                  vibrate(30);
+                  handleAddPlayer(false);
+                }}
+                disabled={!newPlayerName.trim()}
+                className="w-full py-3 px-4 rounded-xl bg-primary text-primary-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+              >
                 ✅ حفظ وإغلاق
               </button>
-              <button onClick={() => { playSound('click'); vibrate(30); handleAddPlayer(true); }} disabled={!newPlayerName.trim()}
-                className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors">
+              <button
+                onClick={() => {
+                  playSound("click");
+                  vibrate(30);
+                  handleAddPlayer(true);
+                }}
+                disabled={!newPlayerName.trim()}
+                className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors"
+              >
                 ➕ حفظ وإضافة آخر
               </button>
             </div>
@@ -225,12 +253,17 @@ const HubScreen: React.FC = () => {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-center">🗑️ مسح كل الأسماء؟</AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              هل أنت متأكد من مسح كل الأسماء المحفوظة؟<br />هذا الإجراء لا يمكن التراجع عنه.
+              هل أنت متأكد من مسح كل الأسماء المحفوظة؟
+              <br />
+              هذا الإجراء لا يمكن التراجع عنه.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-3 justify-center">
             <AlertDialogCancel className="flex-1 m-0">إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={handleClearAll} className="flex-1 bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={handleClearAll}
+              className="flex-1 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               نعم، امسح الكل
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -262,7 +295,10 @@ const HubScreen: React.FC = () => {
               </div>
             ))}
           </div>
-          <button onClick={() => setShowInstallSteps(false)} className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold hover:bg-secondary/80 transition-colors">
+          <button
+            onClick={() => setShowInstallSteps(false)}
+            className="w-full py-3 px-4 rounded-xl bg-secondary text-foreground font-bold hover:bg-secondary/80 transition-colors"
+          >
             فهمت! 👍
           </button>
         </DialogContent>
@@ -285,27 +321,29 @@ const HubScreen: React.FC = () => {
             <button
               key={game.id}
               onClick={() => {
-                playSound('click');
+                playSound("click");
                 vibrate(50);
-                if (game.id === 'guessing') {
-                  setOnlineGuessingScreen('guessingCreateRoom');
-                } else if (game.id === 'countries') {
-                  if (localStorage.getItem('countries_unlocked') === 'true') {
+                if (game.id === "guessing") {
+                  setOnlineGuessingScreen("guessingCreateRoom");
+                } else if (game.id === "countries") {
+                  if (localStorage.getItem("countries_unlocked") === "true") {
                     createCountriesRoom();
                   } else {
-                    setCountriesPin('');
+                    setCountriesPin("");
                     setCountriesPinError(false);
                     setShowCountriesPin(true);
                   }
                 } else {
-                  setScreen('home');
+                  setScreen("home");
                 }
               }}
               className={`flex flex-col items-center gap-1.5 py-4 px-1.5 rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg`}
             >
               <span className="text-3xl drop-shadow-lg">{game.icon}</span>
               <span className="text-sm font-bold text-foreground">{game.name}</span>
-              <span className="text-[10px] text-muted-foreground text-center leading-tight px-0.5">{game.description}</span>
+              <span className="text-[10px] text-muted-foreground text-center leading-tight px-0.5">
+                {game.description}
+              </span>
             </button>
           ))}
         </div>
@@ -313,7 +351,11 @@ const HubScreen: React.FC = () => {
         {/* Utility Buttons */}
         <div className="w-full max-w-sm space-y-3">
           <button
-            onClick={() => { playSound('click'); vibrate(30); setShowInstallSteps(true); }}
+            onClick={() => {
+              playSound("click");
+              vibrate(30);
+              setShowInstallSteps(true);
+            }}
             className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-accent to-primary/80 text-accent-foreground font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
           >
             <Download size={20} />
@@ -322,7 +364,11 @@ const HubScreen: React.FC = () => {
 
           {isInstallable && (
             <button
-              onClick={() => { playSound('click'); vibrate(50); installApp(); }}
+              onClick={() => {
+                playSound("click");
+                vibrate(50);
+                installApp();
+              }}
               className="w-full py-3 px-6 rounded-2xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity shadow-lg"
             >
               <Download size={24} />
@@ -334,15 +380,22 @@ const HubScreen: React.FC = () => {
 
       {/* Footer */}
       <div className="relative z-10 text-center py-4 space-y-2">
-        <p className="text-sm text-muted-foreground">العبوا مع بعض في نفس المكان 🎮</p>
         <p className="text-xs text-muted-foreground">
           Powered by <span className="text-primary font-bold">Hamza Tarkhan</span>
         </p>
         <div className="flex flex-col items-center gap-1">
-          <a href="mailto:Hamzatarakhan2000@gmail.com" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors">
+          <a
+            href="mailto:Hamzatarakhan2000@gmail.com"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors"
+          >
             ✉️ Hamzatarakhan2000@gmail.com
           </a>
-          <a href="https://instagram.com/hamza_tarakhan_" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors">
+          <a
+            href="https://instagram.com/hamza_tarakhan_"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors"
+          >
             📸 @hamza_tarakhan_
           </a>
         </div>
@@ -364,9 +417,9 @@ const HubScreen: React.FC = () => {
               setCountriesPinError(false);
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                if (countriesPin === '2026') {
-                  localStorage.setItem('countries_unlocked', 'true');
+              if (e.key === "Enter") {
+                if (countriesPin === "2026") {
+                  localStorage.setItem("countries_unlocked", "true");
                   setShowCountriesPin(false);
                   createCountriesRoom();
                 } else {
@@ -378,13 +431,11 @@ const HubScreen: React.FC = () => {
             className="w-full text-center text-2xl font-black tracking-[0.5em] py-3 px-3 rounded-2xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all placeholder:tracking-normal"
             autoFocus
           />
-          {countriesPinError && (
-            <p className="text-sm text-destructive font-bold">رمز خاطئ ❌</p>
-          )}
+          {countriesPinError && <p className="text-sm text-destructive font-bold">رمز خاطئ ❌</p>}
           <button
             onClick={() => {
-              if (countriesPin === '2026') {
-                localStorage.setItem('countries_unlocked', 'true');
+              if (countriesPin === "2026") {
+                localStorage.setItem("countries_unlocked", "true");
                 setShowCountriesPin(false);
                 createCountriesRoom();
               } else {
