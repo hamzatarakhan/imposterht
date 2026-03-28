@@ -129,8 +129,8 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     if (!state.room) return;
     switch (state.room.status) {
       case 'playing':
-        if (state.screen !== 'guessingOnlinePlay') {
-          setState(prev => ({ ...prev, screen: 'guessingOnlinePlay' }));
+        if (state.screen !== 'guessingOnlineShowWord' && state.screen !== 'guessingOnlinePlay') {
+          setState(prev => ({ ...prev, screen: 'guessingOnlineShowWord' }));
         }
         break;
       case 'round_result':
