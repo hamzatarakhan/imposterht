@@ -1,10 +1,10 @@
-import { useServiceWorkerUpdate } from '@/hooks/useServiceWorkerUpdate';
-import { RefreshCw, X } from 'lucide-react';
-import { useState } from 'react';
+import { useServiceWorkerUpdate } from "@/hooks/useServiceWorkerUpdate";
+import { RefreshCw, X } from "lucide-react";
+import { useState } from "react";
 
 export const UpdateNotification = () => {
   const { updateAvailable, applyUpdate } = useServiceWorkerUpdate();
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
   const [dismissed, setDismissed] = useState(false);
 
   if (!updateAvailable || !isStandalone || dismissed) return null;
@@ -38,10 +38,13 @@ export const UpdateNotification = () => {
         {/* Buttons */}
         <div className="flex flex-col gap-2">
           <button
-            onClick={() => { setDismissed(true); applyUpdate(); }}
+            onClick={() => {
+              setDismissed(true);
+              applyUpdate();
+            }}
             className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            هات الابديت دلعني 🚀
+            هات الابديت الأااان 🚀
           </button>
           <button
             onClick={handleDismiss}
