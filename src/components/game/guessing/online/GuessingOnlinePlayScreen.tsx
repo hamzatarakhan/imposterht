@@ -209,7 +209,8 @@ const GuessingOnlinePlayScreen: React.FC = () => {
                 <button
                   key={player.id}
                   onClick={() => handleWinner(player.player_id)}
-                  className={`flex-1 py-3 px-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 ${
+                  disabled={submitting}
+                  className={`flex-1 py-3 px-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 ${
                     player.is_host
                       ? 'bg-blue-500 border-2 border-blue-400 text-white shadow-md shadow-blue-500/25'
                       : 'bg-red-500 border-2 border-red-400 text-white shadow-md shadow-red-500/25'
