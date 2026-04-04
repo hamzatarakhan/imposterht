@@ -10,6 +10,7 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
   const { room, players, isHost, nextRound, leaveRoom } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
   const [words, setWords] = useState<{ player1_word: string; player2_word: string } | null>(null);
+  const [navigating, setNavigating] = useState(false);
 
   useEffect(() => {
     if (!room) return;
@@ -38,8 +39,11 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
   const isDraw = !room.round_winner_id;
 
   const handleNext = async () => {
+    if (navigating) return;
+    setNavigating(true);
     playSound('click'); vibrate(50);
-    await nextRound();
+    const success = await nextRound();
+    if (!success) setNavigating(false);
   };
 
   return (
@@ -123,7 +127,7 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
       <div className="relative z-30 p-4 bg-background/90 backdrop-blur-md border-t border-border/30">
         <div className="max-w-sm mx-auto">
           {isHost ? (
-            <button onClick={handleNext} className="w-full btn-primary-game text-lg">
+            <button onClick={handleNext} disabled={navigating} className="w-full btn-primary-game text-lg disabled:opacity-50">
               {room.current_round >= room.total_rounds ? '🏆 النتائج النهائية' : '⚔️ المواجهة التالية'}
             </button>
           ) : (
