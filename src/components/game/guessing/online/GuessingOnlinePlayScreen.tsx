@@ -222,8 +222,8 @@ const GuessingOnlinePlayScreen: React.FC = () => {
               ))}
             </div>
             <div className="flex gap-2">
-              <button onClick={handleDraw}
-                className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 bg-card border border-border text-foreground hover:border-primary/60">
+              <button onClick={handleDraw} disabled={submitting}
+                className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 bg-card border border-border text-foreground hover:border-primary/60 disabled:opacity-50">
                 🤝 تعادل
               </button>
               <button onClick={handleChangeWords} disabled={changingWords}
