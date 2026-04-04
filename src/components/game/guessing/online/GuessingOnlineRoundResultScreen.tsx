@@ -39,8 +39,11 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
   const isDraw = !room.round_winner_id;
 
   const handleNext = async () => {
+    if (navigating) return;
+    setNavigating(true);
     playSound('click'); vibrate(50);
-    await nextRound();
+    const success = await nextRound();
+    if (!success) setNavigating(false);
   };
 
   return (
