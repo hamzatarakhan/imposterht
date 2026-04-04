@@ -12,6 +12,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
   const [myWord, setMyWord] = useState<string | null>(null);
   const [changingWords, setChangingWords] = useState(false);
   const [bothReady, setBothReady] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const roundNumber = room?.current_round || 1;
 
@@ -56,8 +57,8 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     fetchWord();
   }, [room?.id, room?.current_round]);
 
-  const handleWinner = async (playerId: string) => { playSound('win'); vibrate([50, 30, 50]); await markWinner(playerId); };
-  const handleDraw = async () => { playSound('click'); vibrate([50, 30, 50]); await markDraw(); };
+  const handleWinner = async (playerId: string) => { if (submitting) return; setSubmitting(true); playSound('win'); vibrate([50, 30, 50]); await markWinner(playerId); };
+  const handleDraw = async () => { if (submitting) return; setSubmitting(true); playSound('click'); vibrate([50, 30, 50]); await markDraw(); };
   const handleChangeWords = async () => {
     if (changingWords) return;
     setChangingWords(true);
@@ -208,7 +209,8 @@ const GuessingOnlinePlayScreen: React.FC = () => {
                 <button
                   key={player.id}
                   onClick={() => handleWinner(player.player_id)}
-                  className={`flex-1 py-3 px-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 ${
+                  disabled={submitting}
+                  className={`flex-1 py-3 px-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 ${
                     player.is_host
                       ? 'bg-blue-500 border-2 border-blue-400 text-white shadow-md shadow-blue-500/25'
                       : 'bg-red-500 border-2 border-red-400 text-white shadow-md shadow-red-500/25'
@@ -220,8 +222,8 @@ const GuessingOnlinePlayScreen: React.FC = () => {
               ))}
             </div>
             <div className="flex gap-2">
-              <button onClick={handleDraw}
-                className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 bg-card border border-border text-foreground hover:border-primary/60">
+              <button onClick={handleDraw} disabled={submitting}
+                className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 bg-card border border-border text-foreground hover:border-primary/60 disabled:opacity-50">
                 🤝 تعادل
               </button>
               <button onClick={handleChangeWords} disabled={changingWords}
