@@ -127,7 +127,7 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
       <div className="relative z-30 p-4 bg-background/90 backdrop-blur-md border-t border-border/30">
         <div className="max-w-sm mx-auto">
           {isHost ? (
-            <button onClick={handleNext} className="w-full btn-primary-game text-lg">
+            <button onClick={handleNext} disabled={navigating} className="w-full btn-primary-game text-lg disabled:opacity-50">
               {room.current_round >= room.total_rounds ? '🏆 النتائج النهائية' : '⚔️ المواجهة التالية'}
             </button>
           ) : (
