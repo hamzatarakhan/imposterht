@@ -57,8 +57,8 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     fetchWord();
   }, [room?.id, room?.current_round]);
 
-  const handleWinner = async (playerId: string) => { playSound('win'); vibrate([50, 30, 50]); await markWinner(playerId); };
-  const handleDraw = async () => { playSound('click'); vibrate([50, 30, 50]); await markDraw(); };
+  const handleWinner = async (playerId: string) => { if (submitting) return; setSubmitting(true); playSound('win'); vibrate([50, 30, 50]); await markWinner(playerId); };
+  const handleDraw = async () => { if (submitting) return; setSubmitting(true); playSound('click'); vibrate([50, 30, 50]); await markDraw(); };
   const handleChangeWords = async () => {
     if (changingWords) return;
     setChangingWords(true);
