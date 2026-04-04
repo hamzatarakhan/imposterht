@@ -10,6 +10,7 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
   const { room, players, isHost, nextRound, leaveRoom } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
   const [words, setWords] = useState<{ player1_word: string; player2_word: string } | null>(null);
+  const [navigating, setNavigating] = useState(false);
 
   useEffect(() => {
     if (!room) return;
