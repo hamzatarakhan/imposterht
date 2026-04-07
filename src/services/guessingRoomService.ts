@@ -161,6 +161,13 @@ export const getMyGuessingWord = async (roomId: string): Promise<string | null> 
   return data;
 };
 
+// Get spectator words (visible during playing too)
+export const getGuessingSpectatorWords = async (roomId: string): Promise<{ player1_word: string; player2_word: string } | null> => {
+  const { data, error } = await supabase.rpc('get_guessing_spectator_words', { p_room_id: roomId });
+  if (error || !data || data.length === 0) return null;
+  return data[0];
+};
+
 // Get round words (after round ends)
 export const getGuessingRoundWords = async (roomId: string): Promise<{ player1_word: string; player2_word: string } | null> => {
   const { data, error } = await supabase.rpc('get_guessing_round_words', { p_room_id: roomId });

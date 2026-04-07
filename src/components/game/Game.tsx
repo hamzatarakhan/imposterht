@@ -39,7 +39,7 @@ const GameContent: React.FC = () => {
   }
 
   // Guessing online flow
-  const activeGuessingScreens = ['guessingCreateRoom', 'guessingJoinRoom', 'guessingLobby', 'guessingOnlineShowWord', 'guessingOnlinePlay', 'guessingOnlineRoundResult', 'guessingOnlineFinalResult'];
+  const activeGuessingScreens = ['guessingCreateRoom', 'guessingJoinRoom', 'guessingLobby', 'guessingOnlineShowWord', 'guessingOnlinePlay', 'guessingOnlineRoundResult', 'guessingOnlineFinalResult', 'guessingSpectator'];
   if (activeGuessingScreens.includes(guessingOnlineScreen)) {
     return <div className="max-w-md mx-auto min-h-screen bg-background relative"><OnlineGuessingGame /></div>;
   }

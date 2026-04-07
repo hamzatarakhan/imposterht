@@ -8,6 +8,7 @@ import GuessingOnlineShowWordScreen from './GuessingOnlineShowWordScreen';
 import GuessingOnlinePlayScreen from './GuessingOnlinePlayScreen';
 import GuessingOnlineRoundResultScreen from './GuessingOnlineRoundResultScreen';
 import GuessingOnlineFinalResultScreen from './GuessingOnlineFinalResultScreen';
+import GuessingSpectatorScreen from './GuessingSpectatorScreen';
 import VoiceChatOverlay from '@/components/game/VoiceChatOverlay';
 import { PresenceProvider } from '@/context/PresenceContext';
 
@@ -20,6 +21,7 @@ const screens = {
   guessingOnlinePlay: GuessingOnlinePlayScreen,
   guessingOnlineRoundResult: GuessingOnlineRoundResultScreen,
   guessingOnlineFinalResult: GuessingOnlineFinalResultScreen,
+  guessingSpectator: GuessingSpectatorScreen,
 };
 
 const OnlineGuessingGame: React.FC = () => {

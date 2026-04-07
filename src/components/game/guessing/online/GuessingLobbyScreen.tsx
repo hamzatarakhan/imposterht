@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Copy, Share2, LogOut, ArrowRight, Pencil, Check, X } from 'lucide-react';
+import { Copy, Share2, LogOut, ArrowRight, Pencil, Check, X, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import * as guessingService from '@/services/guessingRoomService';
 import { useActiveSpeakers } from '@/context/ActiveSpeakersContext';
@@ -98,6 +98,22 @@ const GuessingLobbyScreen: React.FC = () => {
           <button onClick={handleShare}
             className="w-full py-3 px-4 rounded-xl bg-accent/20 text-accent font-bold flex items-center justify-center gap-2 hover:bg-accent/30 transition-colors">
             <Share2 size={18} /> مشاركة الرابط
+          </button>
+          <button onClick={() => {
+            playSound('click'); vibrate(30);
+            const spectateUrl = `${window.location.origin}?guessing_spectate=${room.code}`;
+            if (navigator.share) {
+              navigator.share({ title: '👁️ تفرّج على لعبة التخمين', text: 'تعال شوف مين بيفوز!', url: spectateUrl }).catch(() => {
+                navigator.clipboard.writeText(spectateUrl);
+                toast.success('تم نسخ رابط المتفرج!');
+              });
+            } else {
+              navigator.clipboard.writeText(spectateUrl);
+              toast.success('تم نسخ رابط المتفرج!');
+            }
+          }}
+            className="w-full py-2.5 px-4 rounded-xl bg-secondary/50 text-muted-foreground font-bold flex items-center justify-center gap-2 hover:bg-secondary/70 transition-colors text-sm">
+            <Eye size={16} /> رابط المتفرجين
           </button>
         </div>
 
