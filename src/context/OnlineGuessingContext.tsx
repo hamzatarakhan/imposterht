@@ -246,11 +246,20 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
   }, [state.room, state.isHost]);
 
   const leaveRoom = useCallback(async () => {
-    if (!state.room) return;
-    if (state.isHost) await guessingService.deleteGuessingRoom(state.room.id);
-    else await guessingService.leaveGuessingRoom(state.room.id);
+    if (!state.room) {
+      setIsSpectator(false);
+      setSpectatorWords(null);
+      setState(prev => ({ ...initialState, myPlayerId: prev.myPlayerId }));
+      return;
+    }
+    if (!isSpectator) {
+      if (state.isHost) await guessingService.deleteGuessingRoom(state.room.id);
+      else await guessingService.leaveGuessingRoom(state.room.id);
+    }
+    setIsSpectator(false);
+    setSpectatorWords(null);
     setState({ ...initialState, myPlayerId: state.myPlayerId });
-  }, [state.room, state.isHost, state.myPlayerId]);
+  }, [state.room, state.isHost, state.myPlayerId, isSpectator]);
 
   const resetOnlineGuessing = useCallback(() => {
     setState(prev => ({ ...initialState, myPlayerId: prev.myPlayerId }));
@@ -263,7 +272,7 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
   return (
     <OnlineGuessingContext.Provider value={{
       ...state, setScreen, createRoom, joinRoom, startGame,
-      markWinner, markDraw, nextRound, changeWords, replayRoom, leaveRoom, resetOnlineGuessing, clearPendingJoinCode,
+      markWinner, markDraw, nextRound, changeWords, replayRoom, leaveRoom, resetOnlineGuessing, clearPendingJoinCode, spectatorWords,
     }}>
       {children}
     </OnlineGuessingContext.Provider>
@@ -284,6 +293,7 @@ const defaultState: OnlineGuessingContextType = {
   leaveRoom: async () => {},
   resetOnlineGuessing: () => {},
   clearPendingJoinCode: () => {},
+  spectatorWords: null,
 };
 
 export const useOnlineGuessing = () => {
