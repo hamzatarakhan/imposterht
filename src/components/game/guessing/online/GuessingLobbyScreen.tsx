@@ -112,7 +112,7 @@ const GuessingLobbyScreen: React.FC = () => {
               toast.success('تم نسخ رابط المتفرج!');
             }
           }}
-            className="w-full py-2.5 px-4 rounded-xl bg-secondary/50 text-muted-foreground font-bold flex items-center justify-center gap-2 hover:bg-secondary/70 transition-colors text-sm">
+            className="w-full mt-2 py-2.5 px-4 rounded-xl bg-secondary/50 text-muted-foreground font-bold flex items-center justify-center gap-2 hover:bg-secondary/70 transition-colors text-sm">
             <Eye size={16} /> رابط المتفرجين
           </button>
         </div>
