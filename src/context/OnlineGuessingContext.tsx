@@ -12,7 +12,8 @@ export type OnlineGuessingScreen =
   | 'guessingOnlineShowWord'
   | 'guessingOnlinePlay'
   | 'guessingOnlineRoundResult'
-  | 'guessingOnlineFinalResult';
+  | 'guessingOnlineFinalResult'
+  | 'guessingSpectator';
 
 interface OnlineGuessingState {
   screen: OnlineGuessingScreen;
@@ -37,6 +38,7 @@ interface OnlineGuessingContextType extends OnlineGuessingState {
   leaveRoom: () => Promise<void>;
   resetOnlineGuessing: () => void;
   clearPendingJoinCode: () => void;
+  spectatorWords: { player1_word: string; player2_word: string } | null;
 }
 
 const initialState: OnlineGuessingState = {
