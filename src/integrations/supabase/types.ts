@@ -630,6 +630,13 @@ export type Database = {
           player2_word: string
         }[]
       }
+      get_guessing_spectator_words: {
+        Args: { p_room_id: string }
+        Returns: {
+          player1_word: string
+          player2_word: string
+        }[]
+      }
       get_guessing_word: {
         Args: { p_player_id: string; p_room_id: string }
         Returns: string
