@@ -55,14 +55,40 @@ const OnlineGuessingContext = createContext<OnlineGuessingContextType | undefine
 
 export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, setState] = useState<OnlineGuessingState>(initialState);
+  const [spectatorWords, setSpectatorWords] = useState<{ player1_word: string; player2_word: string } | null>(null);
+  const [isSpectator, setIsSpectator] = useState(false);
 
-  // Init player ID and check for join code in URL
+  // Init player ID and check for join/spectate code in URL
   useEffect(() => {
     const playerId = getOrCreatePlayerId();
     const urlParams = new URLSearchParams(window.location.search);
     const joinCode = urlParams.get('guessing_join');
+    const spectateCode = urlParams.get('guessing_spectate');
     
-    if (joinCode && joinCode.length === 6) {
+    if (spectateCode && spectateCode.length === 6) {
+      window.history.replaceState({}, '', window.location.pathname);
+      setIsSpectator(true);
+      // Fetch room by code and enter spectator mode
+      (async () => {
+        const { data: room } = await (await import('@/integrations/supabase/client')).supabase
+          .from('public_guessing_rooms')
+          .select('*')
+          .eq('code', spectateCode.toUpperCase())
+          .maybeSingle();
+        if (room) {
+          const players = await guessingService.getGuessingPlayers(room.id);
+          setState(prev => ({
+            ...prev,
+            myPlayerId: playerId,
+            room: room as GuessingRoom,
+            players,
+            screen: 'guessingSpectator',
+          }));
+        } else {
+          setState(prev => ({ ...prev, myPlayerId: playerId }));
+        }
+      })();
+    } else if (joinCode && joinCode.length === 6) {
       window.history.replaceState({}, '', window.location.pathname);
       setState(prev => ({
         ...prev,
@@ -126,9 +152,18 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     };
   }, [state.room?.id, state.myPlayerId]);
 
+  // Fetch spectator words when room status changes
+  useEffect(() => {
+    if (!isSpectator || !state.room?.id) return;
+    if (['playing', 'round_result', 'finished'].includes(state.room.status)) {
+      guessingService.getGuessingSpectatorWords(state.room.id).then(w => setSpectatorWords(w));
+    }
+  }, [isSpectator, state.room?.id, state.room?.status, state.room?.current_round]);
+
   // Auto-navigate based on room status
   useEffect(() => {
     if (!state.room) return;
+    if (isSpectator) return; // spectator stays on spectator screen
     switch (state.room.status) {
       case 'playing':
         if (state.screen !== 'guessingOnlineShowWord' && state.screen !== 'guessingOnlinePlay') {
@@ -146,7 +181,7 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
         }
         break;
     }
-  }, [state.room?.status]);
+  }, [state.room?.status, isSpectator]);
 
   const setScreen = useCallback((s: OnlineGuessingScreen) => setState(prev => ({ ...prev, screen: s })), []);
 
