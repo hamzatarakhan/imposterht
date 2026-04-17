@@ -417,7 +417,7 @@ const HubScreen: React.FC = () => {
             {infoGame && (
               <>
                 {/* Hero header */}
-                <div className={`relative bg-gradient-to-br ${infoGame.gradient} border-b ${infoGame.border} px-5 pt-6 pb-5`}>
+                <div className={`relative bg-gradient-to-br ${infoGame.gradient} border-b ${infoGame.border} px-5 pt-6 pb-4`}>
                   <div className="flex flex-col items-center text-center gap-2">
                     <div className="w-16 h-16 rounded-2xl bg-card/70 backdrop-blur flex items-center justify-center shadow-lg">
                       <span className="text-4xl drop-shadow-lg">{infoGame.icon}</span>
@@ -425,6 +425,19 @@ const HubScreen: React.FC = () => {
                     <DialogTitle className="text-xl font-black text-foreground">{infoGame.name}</DialogTitle>
                     <p className="text-xs text-muted-foreground">{infoGame.description}</p>
                   </div>
+
+                  {/* Subtle owner contact strip */}
+                  <a
+                    href="tel:0770706289"
+                    onClick={() => { playSound('click'); vibrate(30); }}
+                    className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl bg-card/50 backdrop-blur border border-border/40 hover:bg-card/70 transition-colors"
+                  >
+                    <span className="text-xs">💬</span>
+                    <span className="text-[10.5px] text-muted-foreground leading-none">
+                      للاستفسار تواصل مع <span className="font-bold text-foreground" dir="ltr">Hamza Tarakhan</span>
+                    </span>
+                    <span className="text-[10.5px] font-black text-primary leading-none" dir="ltr">0770706289</span>
+                  </a>
                 </div>
 
                 {/* Scrollable content */}
@@ -480,32 +493,6 @@ const HubScreen: React.FC = () => {
                     </ul>
                   </div>
 
-                  {/* Owner contact - highlighted */}
-                  <div className={`relative overflow-hidden rounded-2xl border-2 ${infoGame.border} bg-gradient-to-br ${infoGame.gradient} p-3.5`}>
-                    <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-primary/20 blur-2xl" />
-                    <div className="relative flex items-start gap-3">
-                      <div className="shrink-0 w-10 h-10 rounded-xl bg-card/80 backdrop-blur flex items-center justify-center text-xl">
-                        📞
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[11px] font-bold text-foreground leading-snug mb-0.5">
-                          بدك تفهم أكثر كيف آلية اللعبة؟
-                        </p>
-                        <p className="text-[10px] text-muted-foreground mb-2 leading-snug">
-                          تواصل مع الـ Owner <span className="font-black text-foreground">حمزة طرخان</span>
-                        </p>
-                        <a
-                          href="tel:0770706289"
-                          onClick={() => { playSound('click'); vibrate(30); }}
-                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border ${infoGame.border} text-xs font-black ${infoGame.accent} hover:bg-card/80 transition-colors`}
-                          dir="ltr"
-                        >
-                          <span>📱</span>
-                          <span>0770706289</span>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Sticky CTA */}
