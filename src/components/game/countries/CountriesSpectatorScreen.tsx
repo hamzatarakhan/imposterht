@@ -36,6 +36,39 @@ const CountriesSpectatorScreen: React.FC = () => {
     { key: 'eliminated', label: 'الخارجين', icon: <Skull size={16} />, count: eliminatedPlayers.length, color: 'text-rose-500' },
   ];
 
+  const sortOptions: { key: SortKey; label: string; icon: React.ReactNode }[] = [
+    { key: 'newest', label: 'الأحدث أولاً', icon: <Clock size={14} /> },
+    { key: 'oldest', label: 'الأقدم أولاً', icon: <History size={14} /> },
+    { key: 'az', label: 'أبجدي (أ - ي)', icon: <ArrowDownAZ size={14} /> },
+    { key: 'za', label: 'أبجدي (ي - أ)', icon: <ArrowUpAZ size={14} /> },
+  ];
+
+  const sortedBurned = useMemo(() => {
+    const filtered = burned.filter(b => !burnedSearch || b.country_name.includes(burnedSearch));
+    const arr = [...filtered];
+    switch (sortKey) {
+      case 'newest':
+        return arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      case 'oldest':
+        return arr.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      case 'az':
+        return arr.sort((a, b) => a.country_name.localeCompare(b.country_name, 'ar'));
+      case 'za':
+        return arr.sort((a, b) => b.country_name.localeCompare(a.country_name, 'ar'));
+      default:
+        return arr;
+    }
+  }, [burned, burnedSearch, sortKey]);
+
+  const currentSort = sortOptions.find(s => s.key === sortKey)!;
+
+  const handleSortSelect = (key: SortKey) => {
+    playSound('click');
+    vibrate(20);
+    setSortKey(key);
+    setShowSortMenu(false);
+  };
+
   return (
     <div className="min-h-screen flex flex-col p-4 relative">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
