@@ -258,25 +258,65 @@ const CountriesAdminScreen: React.FC = () => {
                 </div>
               </div>
 
-              {/* Search */}
-              {burned.length > 3 && (
-                <div className="relative">
-                  <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    type="text" value={burnedSearch} onChange={(e) => setBurnedSearch(e.target.value)}
-                    placeholder="ابحث عن دولة..."
-                    className="w-full text-sm py-2 pr-9 pl-3 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all"
-                  />
+              {/* Search + Sort */}
+              {burned.length > 0 && (
+                <div className="flex gap-2">
+                  {burned.length > 3 && (
+                    <div className="relative flex-1">
+                      <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <input
+                        type="text" value={burnedSearch} onChange={(e) => setBurnedSearch(e.target.value)}
+                        placeholder="ابحث عن دولة..."
+                        className="w-full text-sm py-2 pr-9 pl-3 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none transition-all"
+                      />
+                    </div>
+                  )}
+                  <div className="relative">
+                    <button
+                      onClick={() => { playSound('click'); vibrate(20); setShowSortMenu(v => !v); }}
+                      className="flex items-center gap-1.5 py-2 px-3 rounded-xl bg-secondary border-2 border-transparent hover:border-primary/40 transition-all text-xs font-bold text-foreground"
+                      aria-label="ترتيب"
+                    >
+                      {currentSort.icon}
+                      <span className="hidden xs:inline">{currentSort.label}</span>
+                    </button>
+                    {showSortMenu && (
+                      <>
+                        <div className="fixed inset-0 z-10" onClick={() => setShowSortMenu(false)} />
+                        <div className="absolute left-0 top-full mt-1.5 z-20 min-w-[160px] rounded-xl bg-card border border-border/60 shadow-lg overflow-hidden">
+                          {sortOptions.map(opt => {
+                            const isActive = sortKey === opt.key;
+                            return (
+                              <button
+                                key={opt.key}
+                                onClick={() => handleSortSelect(opt.key)}
+                                className={`w-full flex items-center gap-2 py-2 px-3 text-xs font-bold transition-colors text-right ${
+                                  isActive ? 'bg-primary/15 text-primary' : 'text-foreground hover:bg-secondary/60'
+                                }`}
+                              >
+                                {opt.icon}
+                                <span>{opt.label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               )}
 
               {/* Burned List */}
               {burned.length === 0 && <p className="text-xs text-muted-foreground text-center py-4">ما في دول محروقة بعد</p>}
-              {burned.length > 0 && (
+              {burned.length > 0 && sortedBurned.length === 0 && (
+                <div className="text-center py-8">
+                  <span className="text-4xl block mb-2 opacity-50">🔍</span>
+                  <p className="text-xs text-muted-foreground">ما في نتائج للبحث</p>
+                </div>
+              )}
+              {sortedBurned.length > 0 && (
                 <div className="grid grid-cols-2 gap-1.5">
-                  {burned
-                    .filter(b => !burnedSearch || b.country_name.includes(burnedSearch))
-                    .map((b, index) => (
+                  {sortedBurned.map((b, index) => (
                     <div key={b.id} className="flex items-center justify-between py-1.5 px-2.5 rounded-xl bg-card/50 border border-border/30">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <span className="text-xs text-muted-foreground font-mono shrink-0">{index + 1}.</span>
