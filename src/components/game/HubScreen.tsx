@@ -536,6 +536,29 @@ const HubScreen: React.FC = () => {
 
         {/* Utility Buttons */}
         <div className="w-full max-w-sm space-y-3">
+          {/* Owner contact - subtle */}
+          <div className="w-full rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 p-3 flex items-center gap-3">
+            <div className="shrink-0 w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center text-base">
+              💬
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] text-muted-foreground leading-tight mb-0.5">
+                لأي استفسار عن الألعاب أو اقتراح
+              </p>
+              <p className="text-[11px] text-foreground leading-tight">
+                تواصل مع <span className="font-bold">حمزة طرخان</span>
+              </p>
+            </div>
+            <a
+              href="tel:0770706289"
+              onClick={() => { playSound('click'); vibrate(30); }}
+              className="shrink-0 px-2.5 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/30 text-[11px] font-black text-primary transition-colors"
+              dir="ltr"
+            >
+              0770706289
+            </a>
+          </div>
+
           <button
             onClick={() => {
               playSound("click");
