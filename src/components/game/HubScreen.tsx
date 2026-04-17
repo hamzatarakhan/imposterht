@@ -3,7 +3,7 @@ import { useGame } from "@/context/GameContext";
 import { useOnlineGuessing } from "@/context/OnlineGuessingContext";
 import { useCountries } from "@/context/CountriesGameContext";
 import { useSettings } from "@/context/SettingsContext";
-import { Settings, QrCode, Users, FolderOpen, Download, Plus, X, Trash2, Smartphone } from "lucide-react";
+import { Settings, QrCode, Users, FolderOpen, Download, Plus, X, Trash2, Smartphone, Info } from "lucide-react";
 import { useSavedPlayers } from "@/hooks/useSavedPlayers";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useSavedGroups } from "@/hooks/useSavedGroups";
@@ -39,6 +39,22 @@ const games = [
     description: "اكشف المندس بينكم!",
     gradient: "from-red-500/20 to-orange-500/20",
     border: "border-red-500/30",
+    accent: "text-red-500",
+    players: "3-10 لاعبين",
+    duration: "10-20 دقيقة",
+    mode: "محلي (تمرير الجهاز)",
+    howToPlay: [
+      { icon: "📱", text: "كل لاعب بدوره بياخد الجهاز ويشوف دوره بالسر" },
+      { icon: "🤫", text: "أغلب اللاعبين بيشوفوا نفس الكلمة، بس واحد (أو أكثر) هو 'المندس' وما بيشوفها" },
+      { icon: "💬", text: "بتبلش جلسة نقاش، كل لاعب بيوصف الكلمة بكلمة وحدة بدون ما يفضحها" },
+      { icon: "🗳️", text: "بعد النقاش، كل لاعب بيصوّت على اللي بشك إنه المندس" },
+      { icon: "🎯", text: "إذا انكشف المندس، بصير عنده فرصة يخمّن الكلمة من 4 خيارات وينقذ نفسه" },
+    ],
+    tips: [
+      "اختر كلمات وصفك دقيقة بس مش واضحة",
+      "إذا انت المندس، ركّز على ردود الباقيين عشان تخمّن الكلمة",
+      "تقدر تختار أكتر من فئة كلمات بنفس الوقت",
+    ],
   },
   {
     id: "guessing",
@@ -47,6 +63,23 @@ const games = [
     description: "احزر كلمة خصمك قبل ما يحزر كلمتك!",
     gradient: "from-blue-500/20 to-cyan-500/20",
     border: "border-blue-500/30",
+    accent: "text-blue-500",
+    players: "لاعبين فقط (1 ضد 1)",
+    duration: "5-15 دقيقة",
+    mode: "أونلاين (غرفة برابط)",
+    howToPlay: [
+      { icon: "🔗", text: "المضيف بيعمل غرفة وبيختار الفئة (أشياء، رياضة، دول، أكل، أو الكل)" },
+      { icon: "📤", text: "بيشير الرابط لخصمه وبفوت معه بالغرفة" },
+      { icon: "🎲", text: "كل لاعب بيطلعله كلمة عشوائية من الفئة المختارة (الخصم ما بيشوفها)" },
+      { icon: "❓", text: "بتبدأوا تسألوا بعض أسئلة جوابها 'نعم' أو 'لا' فقط" },
+      { icon: "🚫", text: "ممنوع تكرار سؤال انسأل من قبل، إذا تكرر بنحرق عليك دورك" },
+      { icon: "🏆", text: "أول واحد يخمّن كلمة خصمه بفوز الجولة. اللعبة 3 أو 5 أو 7 جولات" },
+    ],
+    tips: [
+      "ابدأ بأسئلة عامة لتصفية الخيارات (هل هو شخص؟ هل هو حي؟)",
+      "ركّز على إجابات خصمك واستنتج منها",
+      "تقدر تشغل المحادثة الصوتية من الإعدادات",
+    ],
   },
   {
     id: "countries",
@@ -55,6 +88,23 @@ const games = [
     description: "ابنوا اسم دولة حرف بحرف!",
     gradient: "from-green-500/20 to-emerald-500/20",
     border: "border-green-500/30",
+    accent: "text-green-500",
+    players: "لاعبين أو أكثر",
+    duration: "غير محدد",
+    mode: "جلسة جماعية (أدمن + متابعين)",
+    howToPlay: [
+      { icon: "👑", text: "في 'أدمن' بيدير الجلسة وبضيف اللاعبين من لوحة التحكم" },
+      { icon: "📤", text: "بيشير رابط المتابعة للحضور عشان يتابعوا اللعبة لحظياً" },
+      { icon: "🔤", text: "كل لاعب بدوره بيقول حرف واحد، والهدف بناء اسم دولة حرف بحرف" },
+      { icon: "❤️", text: "كل لاعب عنده 3 أرواح، إذا غلط أو ما لحق بضيع روح" },
+      { icon: "🔥", text: "الدول اللي اتذكرت بصيروا 'محروقة' وما بتنفع تتكرر" },
+      { icon: "🔄", text: "الأدمن بقدر يبدّل لاعب طالع بلاعب فايت ويكمل بأرواحه" },
+    ],
+    tips: [
+      "الأدمن بشوف كل الدول المحروقة وبقدر يرتبها أبجدي أو بالأحدث",
+      "اللاعب الخارج بقدر يرجع للجلسة عبر التبديل",
+      "اللعبة محمية برمز دخول 🔒",
+    ],
   },
 ];
 
@@ -78,6 +128,8 @@ const HubScreen: React.FC = () => {
   const [showCountriesPin, setShowCountriesPin] = React.useState(false);
   const [countriesPin, setCountriesPin] = React.useState("");
   const [countriesPinError, setCountriesPinError] = React.useState(false);
+  const [infoGameId, setInfoGameId] = React.useState<string | null>(null);
+  const infoGame = games.find((g) => g.id === infoGameId);
 
   const hasPlayedWelcome = useRef(false);
 
@@ -318,35 +370,153 @@ const HubScreen: React.FC = () => {
         {/* Games Row */}
         <div className="w-full max-w-sm grid grid-cols-3 gap-3 mb-8">
           {games.map((game) => (
-            <button
+            <div
               key={game.id}
-              onClick={() => {
-                playSound("click");
-                vibrate(50);
-                if (game.id === "guessing") {
-                  setOnlineGuessingScreen("guessingCreateRoom");
-                } else if (game.id === "countries") {
-                  if (localStorage.getItem("countries_unlocked") === "true") {
-                    createCountriesRoom();
-                  } else {
-                    setCountriesPin("");
-                    setCountriesPinError(false);
-                    setShowCountriesPin(true);
-                  }
-                } else {
-                  setScreen("home");
-                }
-              }}
-              className={`flex flex-col items-center gap-1.5 py-4 px-1.5 rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg`}
+              className={`relative flex flex-col rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm shadow-lg overflow-hidden`}
             >
-              <span className="text-3xl drop-shadow-lg">{game.icon}</span>
-              <span className="text-sm font-bold text-foreground">{game.name}</span>
-              <span className="text-[10px] text-muted-foreground text-center leading-tight px-0.5">
-                {game.description}
-              </span>
-            </button>
+              <button
+                onClick={() => {
+                  playSound("click");
+                  vibrate(50);
+                  if (game.id === "guessing") {
+                    setOnlineGuessingScreen("guessingCreateRoom");
+                  } else if (game.id === "countries") {
+                    if (localStorage.getItem("countries_unlocked") === "true") {
+                      createCountriesRoom();
+                    } else {
+                      setCountriesPin("");
+                      setCountriesPinError(false);
+                      setShowCountriesPin(true);
+                    }
+                  } else {
+                    setScreen("home");
+                  }
+                }}
+                className="flex flex-col items-center gap-1.5 pt-4 pb-2 px-1.5 hover:scale-[1.03] active:scale-95 transition-transform duration-300"
+              >
+                <span className="text-3xl drop-shadow-lg">{game.icon}</span>
+                <span className="text-sm font-bold text-foreground">{game.name}</span>
+                <span className="text-[10px] text-muted-foreground text-center leading-tight px-0.5 min-h-[1.5rem]">
+                  {game.description}
+                </span>
+              </button>
+              <button
+                onClick={() => {
+                  playSound("click");
+                  vibrate(20);
+                  setInfoGameId(game.id);
+                }}
+                className="mt-1 mx-2 mb-2 py-1.5 rounded-xl bg-card/60 hover:bg-card/90 active:bg-card border border-border/40 text-[10px] font-bold text-foreground flex items-center justify-center gap-1 transition-colors"
+                aria-label={`شرح لعبة ${game.name}`}
+              >
+                <Info size={11} className={game.accent} />
+                <span>كيف تلعب؟</span>
+              </button>
+            </div>
           ))}
         </div>
+
+        {/* Game Info Modal */}
+        <Dialog open={!!infoGameId} onOpenChange={(open) => !open && setInfoGameId(null)}>
+          <DialogContent className="w-[calc(100vw-2rem)] max-w-md rounded-3xl p-0 overflow-hidden max-h-[85vh] flex flex-col">
+            {infoGame && (
+              <>
+                {/* Hero header */}
+                <div className={`relative bg-gradient-to-br ${infoGame.gradient} border-b ${infoGame.border} px-5 pt-6 pb-5`}>
+                  <div className="flex flex-col items-center text-center gap-2">
+                    <div className="w-16 h-16 rounded-2xl bg-card/70 backdrop-blur flex items-center justify-center shadow-lg">
+                      <span className="text-4xl drop-shadow-lg">{infoGame.icon}</span>
+                    </div>
+                    <DialogTitle className="text-xl font-black text-foreground">{infoGame.name}</DialogTitle>
+                    <p className="text-xs text-muted-foreground">{infoGame.description}</p>
+                  </div>
+                </div>
+
+                {/* Scrollable content */}
+                <div className="overflow-y-auto px-5 py-4 space-y-4">
+                  {/* Quick info chips */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-secondary/50 border border-border/40">
+                      <span className="text-base">👥</span>
+                      <span className="text-[10px] font-bold text-foreground text-center leading-tight">{infoGame.players}</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-secondary/50 border border-border/40">
+                      <span className="text-base">⏱️</span>
+                      <span className="text-[10px] font-bold text-foreground text-center leading-tight">{infoGame.duration}</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-secondary/50 border border-border/40">
+                      <span className="text-base">🎮</span>
+                      <span className="text-[10px] font-bold text-foreground text-center leading-tight">{infoGame.mode}</span>
+                    </div>
+                  </div>
+
+                  {/* How to play */}
+                  <div>
+                    <h3 className={`text-sm font-black mb-2 flex items-center gap-1.5 ${infoGame.accent}`}>
+                      📖 طريقة اللعب
+                    </h3>
+                    <ol className="space-y-2">
+                      {infoGame.howToPlay.map((step, idx) => (
+                        <li key={idx} className="flex items-start gap-2.5 p-2.5 rounded-xl bg-secondary/40 border border-border/30">
+                          <div className={`shrink-0 w-7 h-7 rounded-full bg-card flex items-center justify-center text-xs font-black ${infoGame.accent} border ${infoGame.border}`}>
+                            {idx + 1}
+                          </div>
+                          <div className="flex-1 flex items-start gap-1.5">
+                            <span className="text-base shrink-0 leading-tight">{step.icon}</span>
+                            <p className="text-xs text-foreground leading-relaxed flex-1">{step.text}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  {/* Tips */}
+                  <div>
+                    <h3 className={`text-sm font-black mb-2 flex items-center gap-1.5 ${infoGame.accent}`}>
+                      💡 نصائح
+                    </h3>
+                    <ul className="space-y-1.5">
+                      {infoGame.tips.map((tip, idx) => (
+                        <li key={idx} className="flex items-start gap-2 p-2 rounded-lg bg-secondary/30">
+                          <span className="text-xs">✨</span>
+                          <p className="text-xs text-muted-foreground leading-relaxed flex-1">{tip}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Sticky CTA */}
+                <div className="border-t border-border/40 p-3 bg-card/80 backdrop-blur">
+                  <button
+                    onClick={() => {
+                      const id = infoGame.id;
+                      setInfoGameId(null);
+                      playSound("click");
+                      vibrate(50);
+                      if (id === "guessing") {
+                        setOnlineGuessingScreen("guessingCreateRoom");
+                      } else if (id === "countries") {
+                        if (localStorage.getItem("countries_unlocked") === "true") {
+                          createCountriesRoom();
+                        } else {
+                          setCountriesPin("");
+                          setCountriesPinError(false);
+                          setShowCountriesPin(true);
+                        }
+                      } else {
+                        setScreen("home");
+                      }
+                    }}
+                    className={`w-full py-3 rounded-2xl bg-gradient-to-r ${infoGame.gradient} border ${infoGame.border} font-black text-sm text-foreground hover:opacity-90 transition-opacity`}
+                  >
+                    {infoGame.icon} ابدأ اللعب الآن
+                  </button>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Utility Buttons */}
         <div className="w-full max-w-sm space-y-3">
