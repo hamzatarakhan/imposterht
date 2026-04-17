@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useCountries } from '@/context/CountriesGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { LogOut, Search, Users, Flame, Skull } from 'lucide-react';
+import { LogOut, Search, Users, Flame, Skull, ArrowDownAZ, Clock, ArrowUpAZ, History } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
