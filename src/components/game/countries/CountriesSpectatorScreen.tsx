@@ -22,7 +22,6 @@ const CountriesSpectatorScreen: React.FC = () => {
   const activePlayers = players.filter(p => p.status === 'active');
   const eliminatedPlayers = players.filter(p => p.status === 'eliminated');
 
-  if (!room) return null;
 
   const handleTabChange = (tab: TabKey) => {
     playSound('click');
