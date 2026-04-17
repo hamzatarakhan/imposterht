@@ -417,7 +417,7 @@ const HubScreen: React.FC = () => {
             {infoGame && (
               <>
                 {/* Hero header */}
-                <div className={`relative bg-gradient-to-br ${infoGame.gradient} border-b ${infoGame.border} px-5 pt-6 pb-5`}>
+                <div className={`relative bg-gradient-to-br ${infoGame.gradient} border-b ${infoGame.border} px-5 pt-6 pb-4`}>
                   <div className="flex flex-col items-center text-center gap-2">
                     <div className="w-16 h-16 rounded-2xl bg-card/70 backdrop-blur flex items-center justify-center shadow-lg">
                       <span className="text-4xl drop-shadow-lg">{infoGame.icon}</span>
@@ -425,6 +425,19 @@ const HubScreen: React.FC = () => {
                     <DialogTitle className="text-xl font-black text-foreground">{infoGame.name}</DialogTitle>
                     <p className="text-xs text-muted-foreground">{infoGame.description}</p>
                   </div>
+
+                  {/* Subtle owner contact strip */}
+                  <a
+                    href="tel:0770706289"
+                    onClick={() => { playSound('click'); vibrate(30); }}
+                    className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl bg-card/50 backdrop-blur border border-border/40 hover:bg-card/70 transition-colors"
+                  >
+                    <span className="text-xs">💬</span>
+                    <span className="text-[10.5px] text-muted-foreground leading-none">
+                      للاستفسار تواصل مع <span className="font-bold text-foreground" dir="ltr">Hamza Tarakhan</span>
+                    </span>
+                    <span className="text-[10.5px] font-black text-primary leading-none" dir="ltr">0770706289</span>
+                  </a>
                 </div>
 
                 {/* Scrollable content */}
