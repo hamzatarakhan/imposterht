@@ -543,7 +543,7 @@ const HubScreen: React.FC = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[11px] text-muted-foreground leading-tight mb-0.5">
-                لأي استفسار عن الألعاب أو اقتراح
+                لأي استفسار أو اقتراح أو شرح عن أي لعبة
               </p>
               <p className="text-[11px] text-foreground leading-tight">
                 تواصل مع <span className="font-bold">حمزة طرخان</span>
