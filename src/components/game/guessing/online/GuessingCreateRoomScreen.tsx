@@ -40,7 +40,7 @@ const GuessingCreateRoomScreen: React.FC = () => {
         <h1 className="text-xl font-black">🏠 إنشاء غرفة تخمين</h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 pb-32 space-y-5">
+      <div className="flex-1 overflow-y-auto p-4 pb-56 space-y-5">
         {/* Name & Avatar */}
         <div className="card-game">
           <h2 className="font-bold mb-3">👤 اسمك</h2>
