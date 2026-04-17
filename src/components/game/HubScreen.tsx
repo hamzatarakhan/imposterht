@@ -3,7 +3,7 @@ import { useGame } from "@/context/GameContext";
 import { useOnlineGuessing } from "@/context/OnlineGuessingContext";
 import { useCountries } from "@/context/CountriesGameContext";
 import { useSettings } from "@/context/SettingsContext";
-import { Settings, QrCode, Users, FolderOpen, Download, Plus, X, Trash2, Smartphone } from "lucide-react";
+import { Settings, QrCode, Users, FolderOpen, Download, Plus, X, Trash2, Smartphone, Info } from "lucide-react";
 import { useSavedPlayers } from "@/hooks/useSavedPlayers";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useSavedGroups } from "@/hooks/useSavedGroups";
