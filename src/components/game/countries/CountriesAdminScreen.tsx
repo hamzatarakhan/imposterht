@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useCountries } from '@/context/CountriesGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Plus, Minus, X, ArrowLeftRight, LogOut, Share2, Search } from 'lucide-react';
+import { Plus, Minus, X, ArrowLeftRight, LogOut, Share2, Search, Clock, History, ArrowDownAZ, ArrowUpAZ } from 'lucide-react';
+
+type SortKey = 'newest' | 'oldest' | 'az' | 'za';
 import { toast } from 'sonner';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
