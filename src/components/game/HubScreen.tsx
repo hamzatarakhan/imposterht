@@ -210,8 +210,8 @@ const HubScreen: React.FC = () => {
       <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
       <div className="absolute bottom-40 right-10 w-40 h-40 bg-accent/10 rounded-full blur-3xl" />
 
-      {/* Header Icons */}
-      <div className="relative z-10 flex justify-between">
+      {/* Header */}
+      <div className="relative z-10 flex justify-between items-center gap-2">
         <div className="flex gap-2">
           <button
             onClick={() => {
@@ -234,6 +234,22 @@ const HubScreen: React.FC = () => {
             <QrCode size={24} />
           </button>
         </div>
+
+        {/* Owner contact chip - subtle */}
+        <a
+          href="tel:0770706289"
+          onClick={() => { playSound('click'); vibrate(30); }}
+          className="flex items-center gap-1.5 px-2.5 py-2 rounded-2xl bg-secondary/50 hover:bg-secondary/80 border border-border/40 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="تواصل مع الـ Owner Hamza Tarakhan"
+        >
+          <span className="text-sm">💬</span>
+          <span className="text-[10px] font-medium leading-tight text-right hidden xs:inline">
+            تواصل مع الـ Owner
+          </span>
+          <span className="text-[10px] font-bold leading-tight" dir="ltr">
+            Hamza
+          </span>
+        </a>
       </div>
 
       {/* Modals */}
