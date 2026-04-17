@@ -210,8 +210,8 @@ const HubScreen: React.FC = () => {
       <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
       <div className="absolute bottom-40 right-10 w-40 h-40 bg-accent/10 rounded-full blur-3xl" />
 
-      {/* Header */}
-      <div className="relative z-10 flex justify-between items-center gap-2">
+      {/* Header Icons */}
+      <div className="relative z-10 flex justify-between">
         <div className="flex gap-2">
           <button
             onClick={() => {
@@ -234,22 +234,6 @@ const HubScreen: React.FC = () => {
             <QrCode size={24} />
           </button>
         </div>
-
-        {/* Owner contact chip - subtle */}
-        <a
-          href="tel:0770706289"
-          onClick={() => { playSound('click'); vibrate(30); }}
-          className="flex items-center gap-1.5 px-2.5 py-2 rounded-2xl bg-secondary/50 hover:bg-secondary/80 border border-border/40 text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="تواصل مع الـ Owner Hamza Tarakhan"
-        >
-          <span className="text-sm">💬</span>
-          <span className="text-[10px] font-medium leading-tight text-right hidden xs:inline">
-            تواصل مع الـ Owner
-          </span>
-          <span className="text-[10px] font-bold leading-tight" dir="ltr">
-            Hamza
-          </span>
-        </a>
       </div>
 
       {/* Modals */}
@@ -495,6 +479,33 @@ const HubScreen: React.FC = () => {
                       ))}
                     </ul>
                   </div>
+
+                  {/* Owner contact - highlighted */}
+                  <div className={`relative overflow-hidden rounded-2xl border-2 ${infoGame.border} bg-gradient-to-br ${infoGame.gradient} p-3.5`}>
+                    <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-primary/20 blur-2xl" />
+                    <div className="relative flex items-start gap-3">
+                      <div className="shrink-0 w-10 h-10 rounded-xl bg-card/80 backdrop-blur flex items-center justify-center text-xl">
+                        📞
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] font-bold text-foreground leading-snug mb-0.5">
+                          بدك تفهم أكثر كيف آلية اللعبة؟
+                        </p>
+                        <p className="text-[10px] text-muted-foreground mb-2 leading-snug">
+                          تواصل مع الـ Owner <span className="font-black text-foreground">حمزة طرخان</span>
+                        </p>
+                        <a
+                          href="tel:0770706289"
+                          onClick={() => { playSound('click'); vibrate(30); }}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border ${infoGame.border} text-xs font-black ${infoGame.accent} hover:bg-card/80 transition-colors`}
+                          dir="ltr"
+                        >
+                          <span>📱</span>
+                          <span>0770706289</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Sticky CTA */}
@@ -525,6 +536,29 @@ const HubScreen: React.FC = () => {
 
         {/* Utility Buttons */}
         <div className="w-full max-w-sm space-y-3">
+          {/* Owner contact - subtle */}
+          <div className="w-full rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 p-3 flex items-center gap-3">
+            <div className="shrink-0 w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center text-base">
+              💬
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] text-muted-foreground leading-tight mb-0.5">
+                لأي استفسار أو اقتراح أو شرح عن أي لعبة
+              </p>
+              <p className="text-[11px] text-foreground leading-tight">
+                تواصل مع الـ Owner <span className="font-bold" dir="ltr">Hamza Tarakhan</span>
+              </p>
+            </div>
+            <a
+              href="tel:0770706289"
+              onClick={() => { playSound('click'); vibrate(30); }}
+              className="shrink-0 px-2.5 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/30 text-[11px] font-black text-primary transition-colors"
+              dir="ltr"
+            >
+              0770706289
+            </a>
+          </div>
+
           <button
             onClick={() => {
               playSound("click");
