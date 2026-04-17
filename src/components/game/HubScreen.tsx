@@ -128,6 +128,8 @@ const HubScreen: React.FC = () => {
   const [showCountriesPin, setShowCountriesPin] = React.useState(false);
   const [countriesPin, setCountriesPin] = React.useState("");
   const [countriesPinError, setCountriesPinError] = React.useState(false);
+  const [infoGameId, setInfoGameId] = React.useState<string | null>(null);
+  const infoGame = games.find((g) => g.id === infoGameId);
 
   const hasPlayedWelcome = useRef(false);
 
