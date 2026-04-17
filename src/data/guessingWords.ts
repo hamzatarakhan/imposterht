@@ -1,9 +1,9 @@
 /**
  * كلمات وفئات مخصصة للعبة التخمين فقط
- * 5 فئات: أشياء، رياضة (لاعبين مشهورين)، دول، أكل، حيوانات
+ * 6 فئات: أشياء، رياضة (لاعبين مشهورين)، دول، أكل، حيوانات، مسلسلات
  */
 
-export type GuessingCategory = "random" | "things" | "sportPlayers" | "countries" | "food" | "animals";
+export type GuessingCategory = "random" | "things" | "sportPlayers" | "countries" | "food" | "animals" | "series";
 
 export const GUESSING_CATEGORIES: { id: GuessingCategory; label: string; icon: string }[] = [
   { id: "random", label: "الكل", icon: "🎲" },
@@ -12,6 +12,7 @@ export const GUESSING_CATEGORIES: { id: GuessingCategory; label: string; icon: s
   { id: "countries", label: "دول", icon: "🌍" },
   { id: "food", label: "أكل", icon: "🍕" },
   { id: "animals", label: "حيوانات", icon: "🐾" },
+  { id: "series", label: "مسلسلات", icon: "🎬" },
 ];
 
 export const guessingWords: Record<Exclude<GuessingCategory, "random">, string[]> = {
@@ -453,6 +454,84 @@ export const guessingWords: Record<Exclude<GuessingCategory, "random">, string[]
     "نملة",
     "عنكبوت",
     "ثعبان",
+  ],
+  series: [
+    // مسلسلات عربية شهيرة
+    "باب الحارة",
+    "الهيبة",
+    "الاجتياح",
+    "ضيعة ضايعة",
+    "الكبير أوي",
+    "ليالي الحلمية",
+    "رأفت الهجان",
+    "الفتوة",
+    "غرابيب سود",
+    "العراب",
+    "كسر عضم",
+    "البحث عن علا",
+    "جن",
+    "ولد الغلابة",
+    "الاختيار",
+    "نسل الأغراب",
+    "رامز جلال",
+    "الاسطورة",
+    "زلزال",
+    "الزيبق",
+    "موسى",
+    "صاحب السعادة",
+    "بدون سابق إنذار",
+    "ابن حلال",
+    "جراند أوتيل",
+    // مسلسلات تركية
+    "وادي الذئاب",
+    "حريم السلطان",
+    "قيامة أرطغرل",
+    "العشق الممنوع",
+    "نور",
+    "سامحيني",
+    "فاطمة",
+    "عاصي",
+    "كوزي جوناي",
+    "السلطان عبد الحميد",
+    "قيامة عثمان",
+    "ميسرة",
+    "اسمي فرح",
+    "أنت اطرق بابي",
+    "الحفرة",
+    // مسلسلات أجنبية شهيرة
+    "Breaking Bad",
+    "Game of Thrones",
+    "Money Heist",
+    "Squid Game",
+    "Stranger Things",
+    "Friends",
+    "Lost",
+    "Prison Break",
+    "Dark",
+    "Vikings",
+    "Peaky Blinders",
+    "The Witcher",
+    "Sherlock",
+    "House of Cards",
+    "Narcos",
+    "The Walking Dead",
+    "The Crown",
+    "Better Call Saul",
+    "Wednesday",
+    "You",
+    "The Boys",
+    "Mr Robot",
+    "Westworld",
+    "Suits",
+    "How I Met Your Mother",
+    // كرتون شهير
+    "سبونج بوب",
+    "توم وجيري",
+    "المحقق كونان",
+    "ون بيس",
+    "ناروتو",
+    "دراغون بول",
+    "بوكيمون",
   ],
 };
 

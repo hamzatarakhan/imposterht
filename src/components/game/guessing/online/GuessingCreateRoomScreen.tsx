@@ -18,15 +18,8 @@ const GuessingCreateRoomScreen: React.FC = () => {
   const [presenceEnabled, setPresenceEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const toggleCategory = (cat: GuessingCategory) => {
-    if (cat === 'random') { setCategories(['random']); return; }
-    if (categories.includes('random')) { setCategories([cat]); return; }
-    if (categories.includes(cat)) {
-      if (categories.length === 1) return;
-      setCategories(categories.filter(c => c !== cat));
-    } else {
-      setCategories([...categories, cat]);
-    }
+  const selectCategory = (cat: GuessingCategory) => {
+    setCategories([cat]);
   };
 
   const handleCreate = async () => {
@@ -88,15 +81,26 @@ const GuessingCreateRoomScreen: React.FC = () => {
         <div className="card-game">
           <div className="flex items-center gap-2 mb-3">
             <Shuffle size={20} className="text-primary" />
-            <h2 className="font-bold">الفئات</h2>
+            <h2 className="font-bold">الفئة</h2>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {GUESSING_CATEGORIES.map(cat => (
-              <button key={cat.id} onClick={() => { playSound('click'); toggleCategory(cat.id); }}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${categories.includes(cat.id) ? 'bg-primary text-primary-foreground shadow-md' : 'bg-secondary text-muted-foreground'}`}>
-                {cat.icon} {cat.label}
-              </button>
-            ))}
+          <div className="grid grid-cols-3 gap-2">
+            {GUESSING_CATEGORIES.map(cat => {
+              const isSelected = categories[0] === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => { playSound('click'); vibrate(20); selectCategory(cat.id); }}
+                  className={`flex flex-col items-center gap-1 px-2 py-3 rounded-xl text-xs font-bold transition-all ${
+                    isSelected
+                      ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]'
+                      : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+                  }`}
+                >
+                  <span className="text-xl">{cat.icon}</span>
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
