@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 type TabKey = 'players' | 'burned' | 'eliminated';
+type SortKey = 'newest' | 'oldest' | 'az' | 'za';
 
 const CountriesSpectatorScreen: React.FC = () => {
   const { room, players, burned, leaveRoom } = useCountries();
@@ -15,6 +16,8 @@ const CountriesSpectatorScreen: React.FC = () => {
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [burnedSearch, setBurnedSearch] = useState('');
   const [activeTab, setActiveTab] = useState<TabKey>('players');
+  const [sortKey, setSortKey] = useState<SortKey>('newest');
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
   const activePlayers = players.filter(p => p.status === 'active');
   const eliminatedPlayers = players.filter(p => p.status === 'eliminated');
