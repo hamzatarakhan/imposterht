@@ -1,9 +1,9 @@
 /**
  * كلمات وفئات مخصصة للعبة التخمين فقط
- * 5 فئات: أشياء، رياضة (لاعبين مشهورين)، دول، أكل، حيوانات
+ * 6 فئات: أشياء، رياضة (لاعبين مشهورين)، دول، أكل، حيوانات، مسلسلات
  */
 
-export type GuessingCategory = "random" | "things" | "sportPlayers" | "countries" | "food" | "animals";
+export type GuessingCategory = "random" | "things" | "sportPlayers" | "countries" | "food" | "animals" | "series";
 
 export const GUESSING_CATEGORIES: { id: GuessingCategory; label: string; icon: string }[] = [
   { id: "random", label: "الكل", icon: "🎲" },
@@ -12,6 +12,7 @@ export const GUESSING_CATEGORIES: { id: GuessingCategory; label: string; icon: s
   { id: "countries", label: "دول", icon: "🌍" },
   { id: "food", label: "أكل", icon: "🍕" },
   { id: "animals", label: "حيوانات", icon: "🐾" },
+  { id: "series", label: "مسلسلات", icon: "🎬" },
 ];
 
 export const guessingWords: Record<Exclude<GuessingCategory, "random">, string[]> = {
