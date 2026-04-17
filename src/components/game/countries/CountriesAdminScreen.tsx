@@ -21,9 +21,44 @@ const CountriesAdminScreen: React.FC = () => {
   const [swapEliminated, setSwapEliminated] = useState<string | null>(null);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<'players' | 'burned'>('players');
+  const [sortKey, setSortKey] = useState<SortKey>('newest');
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
   const activePlayers = players.filter(p => p.status === 'active');
   const eliminatedPlayers = players.filter(p => p.status === 'eliminated');
+
+  const sortOptions: { key: SortKey; label: string; icon: React.ReactNode }[] = [
+    { key: 'newest', label: 'الأحدث أولاً', icon: <Clock size={14} /> },
+    { key: 'oldest', label: 'الأقدم أولاً', icon: <History size={14} /> },
+    { key: 'az', label: 'أبجدي (أ - ي)', icon: <ArrowDownAZ size={14} /> },
+    { key: 'za', label: 'أبجدي (ي - أ)', icon: <ArrowUpAZ size={14} /> },
+  ];
+
+  const sortedBurned = useMemo(() => {
+    const filtered = burned.filter(b => !burnedSearch || b.country_name.includes(burnedSearch));
+    const arr = [...filtered];
+    switch (sortKey) {
+      case 'newest':
+        return arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      case 'oldest':
+        return arr.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      case 'az':
+        return arr.sort((a, b) => a.country_name.localeCompare(b.country_name, 'ar'));
+      case 'za':
+        return arr.sort((a, b) => b.country_name.localeCompare(a.country_name, 'ar'));
+      default:
+        return arr;
+    }
+  }, [burned, burnedSearch, sortKey]);
+
+  const currentSort = sortOptions.find(s => s.key === sortKey)!;
+
+  const handleSortSelect = (key: SortKey) => {
+    playSound('click');
+    vibrate(20);
+    setSortKey(key);
+    setShowSortMenu(false);
+  };
 
   const handleAddPlayer = async () => {
     if (!newPlayerName.trim()) return;
