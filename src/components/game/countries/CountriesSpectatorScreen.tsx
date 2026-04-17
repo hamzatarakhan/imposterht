@@ -68,6 +68,8 @@ const CountriesSpectatorScreen: React.FC = () => {
     setShowSortMenu(false);
   };
 
+  if (!room) return null;
+
   return (
     <div className="min-h-screen flex flex-col p-4 relative">
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/50 to-background" />
