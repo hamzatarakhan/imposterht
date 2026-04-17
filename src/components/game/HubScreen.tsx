@@ -370,35 +370,153 @@ const HubScreen: React.FC = () => {
         {/* Games Row */}
         <div className="w-full max-w-sm grid grid-cols-3 gap-3 mb-8">
           {games.map((game) => (
-            <button
+            <div
               key={game.id}
-              onClick={() => {
-                playSound("click");
-                vibrate(50);
-                if (game.id === "guessing") {
-                  setOnlineGuessingScreen("guessingCreateRoom");
-                } else if (game.id === "countries") {
-                  if (localStorage.getItem("countries_unlocked") === "true") {
-                    createCountriesRoom();
-                  } else {
-                    setCountriesPin("");
-                    setCountriesPinError(false);
-                    setShowCountriesPin(true);
-                  }
-                } else {
-                  setScreen("home");
-                }
-              }}
-              className={`flex flex-col items-center gap-1.5 py-4 px-1.5 rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg`}
+              className={`relative flex flex-col rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm shadow-lg overflow-hidden`}
             >
-              <span className="text-3xl drop-shadow-lg">{game.icon}</span>
-              <span className="text-sm font-bold text-foreground">{game.name}</span>
-              <span className="text-[10px] text-muted-foreground text-center leading-tight px-0.5">
-                {game.description}
-              </span>
-            </button>
+              <button
+                onClick={() => {
+                  playSound("click");
+                  vibrate(50);
+                  if (game.id === "guessing") {
+                    setOnlineGuessingScreen("guessingCreateRoom");
+                  } else if (game.id === "countries") {
+                    if (localStorage.getItem("countries_unlocked") === "true") {
+                      createCountriesRoom();
+                    } else {
+                      setCountriesPin("");
+                      setCountriesPinError(false);
+                      setShowCountriesPin(true);
+                    }
+                  } else {
+                    setScreen("home");
+                  }
+                }}
+                className="flex flex-col items-center gap-1.5 pt-4 pb-2 px-1.5 hover:scale-[1.03] active:scale-95 transition-transform duration-300"
+              >
+                <span className="text-3xl drop-shadow-lg">{game.icon}</span>
+                <span className="text-sm font-bold text-foreground">{game.name}</span>
+                <span className="text-[10px] text-muted-foreground text-center leading-tight px-0.5 min-h-[1.5rem]">
+                  {game.description}
+                </span>
+              </button>
+              <button
+                onClick={() => {
+                  playSound("click");
+                  vibrate(20);
+                  setInfoGameId(game.id);
+                }}
+                className="mt-1 mx-2 mb-2 py-1.5 rounded-xl bg-card/60 hover:bg-card/90 active:bg-card border border-border/40 text-[10px] font-bold text-foreground flex items-center justify-center gap-1 transition-colors"
+                aria-label={`شرح لعبة ${game.name}`}
+              >
+                <Info size={11} className={game.accent} />
+                <span>كيف تلعب؟</span>
+              </button>
+            </div>
           ))}
         </div>
+
+        {/* Game Info Modal */}
+        <Dialog open={!!infoGameId} onOpenChange={(open) => !open && setInfoGameId(null)}>
+          <DialogContent className="w-[calc(100vw-2rem)] max-w-md rounded-3xl p-0 overflow-hidden max-h-[85vh] flex flex-col">
+            {infoGame && (
+              <>
+                {/* Hero header */}
+                <div className={`relative bg-gradient-to-br ${infoGame.gradient} border-b ${infoGame.border} px-5 pt-6 pb-5`}>
+                  <div className="flex flex-col items-center text-center gap-2">
+                    <div className="w-16 h-16 rounded-2xl bg-card/70 backdrop-blur flex items-center justify-center shadow-lg">
+                      <span className="text-4xl drop-shadow-lg">{infoGame.icon}</span>
+                    </div>
+                    <DialogTitle className="text-xl font-black text-foreground">{infoGame.name}</DialogTitle>
+                    <p className="text-xs text-muted-foreground">{infoGame.description}</p>
+                  </div>
+                </div>
+
+                {/* Scrollable content */}
+                <div className="overflow-y-auto px-5 py-4 space-y-4">
+                  {/* Quick info chips */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-secondary/50 border border-border/40">
+                      <span className="text-base">👥</span>
+                      <span className="text-[10px] font-bold text-foreground text-center leading-tight">{infoGame.players}</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-secondary/50 border border-border/40">
+                      <span className="text-base">⏱️</span>
+                      <span className="text-[10px] font-bold text-foreground text-center leading-tight">{infoGame.duration}</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-secondary/50 border border-border/40">
+                      <span className="text-base">🎮</span>
+                      <span className="text-[10px] font-bold text-foreground text-center leading-tight">{infoGame.mode}</span>
+                    </div>
+                  </div>
+
+                  {/* How to play */}
+                  <div>
+                    <h3 className={`text-sm font-black mb-2 flex items-center gap-1.5 ${infoGame.accent}`}>
+                      📖 طريقة اللعب
+                    </h3>
+                    <ol className="space-y-2">
+                      {infoGame.howToPlay.map((step, idx) => (
+                        <li key={idx} className="flex items-start gap-2.5 p-2.5 rounded-xl bg-secondary/40 border border-border/30">
+                          <div className={`shrink-0 w-7 h-7 rounded-full bg-card flex items-center justify-center text-xs font-black ${infoGame.accent} border ${infoGame.border}`}>
+                            {idx + 1}
+                          </div>
+                          <div className="flex-1 flex items-start gap-1.5">
+                            <span className="text-base shrink-0 leading-tight">{step.icon}</span>
+                            <p className="text-xs text-foreground leading-relaxed flex-1">{step.text}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  {/* Tips */}
+                  <div>
+                    <h3 className={`text-sm font-black mb-2 flex items-center gap-1.5 ${infoGame.accent}`}>
+                      💡 نصائح
+                    </h3>
+                    <ul className="space-y-1.5">
+                      {infoGame.tips.map((tip, idx) => (
+                        <li key={idx} className="flex items-start gap-2 p-2 rounded-lg bg-secondary/30">
+                          <span className="text-xs">✨</span>
+                          <p className="text-xs text-muted-foreground leading-relaxed flex-1">{tip}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Sticky CTA */}
+                <div className="border-t border-border/40 p-3 bg-card/80 backdrop-blur">
+                  <button
+                    onClick={() => {
+                      const id = infoGame.id;
+                      setInfoGameId(null);
+                      playSound("click");
+                      vibrate(50);
+                      if (id === "guessing") {
+                        setOnlineGuessingScreen("guessingCreateRoom");
+                      } else if (id === "countries") {
+                        if (localStorage.getItem("countries_unlocked") === "true") {
+                          createCountriesRoom();
+                        } else {
+                          setCountriesPin("");
+                          setCountriesPinError(false);
+                          setShowCountriesPin(true);
+                        }
+                      } else {
+                        setScreen("home");
+                      }
+                    }}
+                    className={`w-full py-3 rounded-2xl bg-gradient-to-r ${infoGame.gradient} border ${infoGame.border} font-black text-sm text-foreground hover:opacity-90 transition-opacity`}
+                  >
+                    {infoGame.icon} ابدأ اللعب الآن
+                  </button>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Utility Buttons */}
         <div className="w-full max-w-sm space-y-3">
