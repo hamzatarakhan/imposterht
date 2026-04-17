@@ -479,6 +479,33 @@ const HubScreen: React.FC = () => {
                       ))}
                     </ul>
                   </div>
+
+                  {/* Owner contact - highlighted */}
+                  <div className={`relative overflow-hidden rounded-2xl border-2 ${infoGame.border} bg-gradient-to-br ${infoGame.gradient} p-3.5`}>
+                    <div className="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-primary/20 blur-2xl" />
+                    <div className="relative flex items-start gap-3">
+                      <div className="shrink-0 w-10 h-10 rounded-xl bg-card/80 backdrop-blur flex items-center justify-center text-xl">
+                        📞
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] font-bold text-foreground leading-snug mb-0.5">
+                          بدك تفهم أكثر كيف آلية اللعبة؟
+                        </p>
+                        <p className="text-[10px] text-muted-foreground mb-2 leading-snug">
+                          تواصل مع الـ Owner <span className="font-black text-foreground">حمزة طرخان</span>
+                        </p>
+                        <a
+                          href="tel:0770706289"
+                          onClick={() => { playSound('click'); vibrate(30); }}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border ${infoGame.border} text-xs font-black ${infoGame.accent} hover:bg-card/80 transition-colors`}
+                          dir="ltr"
+                        >
+                          <span>📱</span>
+                          <span>0770706289</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Sticky CTA */}
