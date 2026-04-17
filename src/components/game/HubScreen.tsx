@@ -546,7 +546,7 @@ const HubScreen: React.FC = () => {
                 لأي استفسار أو اقتراح أو شرح عن أي لعبة
               </p>
               <p className="text-[11px] text-foreground leading-tight">
-                تواصل مع <span className="font-bold">حمزة طرخان</span>
+                تواصل مع الـ Owner <span className="font-bold" dir="ltr">Hamza Tarakhan</span>
               </p>
             </div>
             <a
