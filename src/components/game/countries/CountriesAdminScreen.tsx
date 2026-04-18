@@ -15,6 +15,7 @@ import {
 const CountriesAdminScreen: React.FC = () => {
   const { room, players, burned, addPlayer, removePlayer, updateLives, addBurned, removeBurned, swapPlayers, leaveRoom } = useCountries();
   const { playSound, vibrate } = useSettings();
+  const { savedPlayers } = useSavedPlayers();
 
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newCountryName, setNewCountryName] = useState('');
@@ -25,9 +26,14 @@ const CountriesAdminScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'players' | 'burned'>('players');
   const [sortKey, setSortKey] = useState<SortKey>('newest');
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [showGroupsModal, setShowGroupsModal] = useState(false);
 
   const activePlayers = players.filter(p => p.status === 'active');
   const eliminatedPlayers = players.filter(p => p.status === 'eliminated');
+
+  // Saved names not yet added as players
+  const existingNames = new Set(players.map(p => p.name.toLowerCase()));
+  const availableSavedNames = savedPlayers.filter(s => !existingNames.has(s.name.toLowerCase()));
 
   const sortOptions: { key: SortKey; label: string; icon: React.ReactNode }[] = [
     { key: 'newest', label: 'الأحدث أولاً', icon: <Clock size={14} /> },
