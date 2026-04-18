@@ -406,6 +406,13 @@ const CountriesAdminScreen: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Saved Groups Modal */}
+      <GroupManagementModal
+        isOpen={showGroupsModal}
+        onClose={() => setShowGroupsModal(false)}
+        onSelectGroup={handleSelectGroup}
+      />
     </div>
   );
 };
