@@ -383,7 +383,7 @@ const HubScreen: React.FC = () => {
             <span className="text-2xl">🎮</span>
             <h1 className="text-xl font-black text-gradient">فعاليات</h1>
           </div>
-          <p className="text-xs text-muted-foreground">اختار اللعبة اللي ببالك ويلا ننبسط</p>
+          <p className="text-xs text-muted-foreground">اختار اللعبة اللي ببالك ويلا نغير جو</p>
         </div>
 
         {/* Games Row */}
