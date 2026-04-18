@@ -28,9 +28,9 @@ export const UpdateNotification = () => {
         {/* Text */}
         <h3 className="text-lg font-black text-foreground mb-1">سلام عالزلام 👋</h3>
         <p className="text-sm text-muted-foreground mb-2">
-          طرخان بسلم عليك وبقلك في ابديت جديد، لازم تعمله عشان تكمل تلعب
+          طرخان بسلم عليك وبقلك في ابديت جديد، لازم تعمله عشان تكمل اللعب
         </p>
-        <p className="text-[11px] text-muted-foreground/70 mb-5">(ما في مجال تتجاهله، آسفين 😅)</p>
+        <p className="text-[11px] text-muted-foreground/70 mb-5">(ما في مهرب بدك تأبدت يعني بدك تأبدت ، آسفين 🔫)</p>
 
         {/* Button */}
         <button
