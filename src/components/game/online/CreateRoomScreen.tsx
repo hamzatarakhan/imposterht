@@ -3,6 +3,7 @@ import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Users, Skull, Clock, Loader2, Mic, Eye } from 'lucide-react';
 import { categoryNames, Category } from '@/data/words';
+import { useUserName } from '@/hooks/useUserName';
 import OnlineRestartButton from './OnlineRestartButton';
 const categoryOptions = Object.entries(categoryNames)
   .filter(([id]) => id !== 'custom')
@@ -11,9 +12,8 @@ const categoryOptions = Object.entries(categoryNames)
 const CreateRoomScreen: React.FC = () => {
   const { setScreen, createRoom } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
+  const { name, setName, avatar, persist } = useUserName('👤');
   
-  const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('👤');
   const [playerCount, setPlayerCount] = useState(4);
   const [imposterCount, setImposterCount] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState<Category[]>(['random']);
@@ -40,9 +40,10 @@ const CreateRoomScreen: React.FC = () => {
       presenceEnabled,
     });
 
-    if (!success) {
+    if (success) {
+      persist(name.trim(), avatar);
+    } else {
       setIsCreating(false);
-      // Handle error
     }
   };
 
