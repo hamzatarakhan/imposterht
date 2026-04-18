@@ -416,27 +416,29 @@ const HubScreen: React.FC = () => {
           <DialogContent className="w-[calc(100vw-2rem)] max-w-md rounded-3xl p-0 overflow-hidden max-h-[85vh] flex flex-col">
             {infoGame && (
               <>
-                {/* Hero header */}
-                <div className={`relative bg-gradient-to-br ${infoGame.gradient} border-b ${infoGame.border} px-5 pt-6 pb-4`}>
-                  <div className="flex flex-col items-center text-center gap-2">
-                    <div className="w-16 h-16 rounded-2xl bg-card/70 backdrop-blur flex items-center justify-center shadow-lg">
-                      <span className="text-4xl drop-shadow-lg">{infoGame.icon}</span>
+                {/* Compact hero header */}
+                <div className={`relative bg-gradient-to-br ${infoGame.gradient} border-b ${infoGame.border} px-4 pt-3 pb-2.5`}>
+                  <div className="flex items-center gap-3 text-right">
+                    <div className="w-11 h-11 rounded-xl bg-card/70 backdrop-blur flex items-center justify-center shrink-0">
+                      <span className="text-2xl">{infoGame.icon}</span>
                     </div>
-                    <DialogTitle className="text-xl font-black text-foreground">{infoGame.name}</DialogTitle>
-                    <p className="text-xs text-muted-foreground">{infoGame.description}</p>
+                    <div className="flex-1 min-w-0">
+                      <DialogTitle className="text-base font-black text-foreground leading-tight">{infoGame.name}</DialogTitle>
+                      <p className="text-[11px] text-muted-foreground leading-snug mt-0.5 line-clamp-2">{infoGame.description}</p>
+                    </div>
                   </div>
 
                   {/* Subtle owner contact strip */}
                   <a
                     href="tel:0770706289"
                     onClick={() => { playSound('click'); vibrate(30); }}
-                    className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl bg-card/50 backdrop-blur border border-border/40 hover:bg-card/70 transition-colors"
+                    className="mt-2 w-full flex items-center justify-center gap-1.5 px-2 py-1 rounded-lg bg-card/50 backdrop-blur border border-border/40 hover:bg-card/70 transition-colors"
                   >
-                    <span className="text-xs">💬</span>
-                    <span className="text-[10.5px] text-muted-foreground leading-none">
-                      للاستفسار تواصل مع <span className="font-bold text-foreground" dir="ltr">Hamza Tarakhan</span>
+                    <span className="text-[10px]">💬</span>
+                    <span className="text-[10px] text-muted-foreground leading-none">
+                      للاستفسار: <span className="font-bold text-foreground" dir="ltr">Hamza Tarakhan</span>
                     </span>
-                    <span className="text-[10.5px] font-black text-primary leading-none" dir="ltr">0770706289</span>
+                    <span className="text-[10px] font-black text-primary leading-none" dir="ltr">0770706289</span>
                   </a>
                 </div>
 
