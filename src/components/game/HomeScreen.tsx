@@ -465,23 +465,24 @@ const HomeScreen: React.FC = () => {
         <p className="text-[11px] text-muted-foreground/80 tracking-wide">
           Powered by <span className="text-primary font-bold">Hamza Tarkhan</span>
         </p>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/40 border border-border/40 backdrop-blur-sm">
+        <div className="inline-flex items-center gap-2">
           <a
             href="mailto:Hamzatarakhan2000@gmail.com"
             aria-label="Email"
-            className="p-1.5 rounded-full text-muted-foreground hover:text-primary hover:bg-secondary/60 transition-colors"
+            className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-br from-blue-500/15 to-cyan-500/15 border border-blue-500/30 text-blue-600 dark:text-blue-400 hover:from-blue-500 hover:to-cyan-500 hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105 transition-all duration-300"
           >
-            <Mail size={14} />
+            <Mail size={13} />
+            <span className="text-[10px] font-bold tracking-wide">Email</span>
           </a>
-          <span className="w-px h-4 bg-border/60" />
           <a
             href="https://instagram.com/hamza_tarakhan_"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            className="p-1.5 rounded-full text-muted-foreground hover:text-primary hover:bg-secondary/60 transition-colors"
+            className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-br from-pink-500/15 via-fuchsia-500/15 to-orange-500/15 border border-pink-500/30 text-pink-600 dark:text-pink-400 hover:from-pink-500 hover:via-fuchsia-500 hover:to-orange-500 hover:text-white hover:border-transparent hover:shadow-lg hover:shadow-pink-500/30 hover:scale-105 transition-all duration-300"
           >
-            <Instagram size={14} />
+            <Instagram size={13} />
+            <span className="text-[10px] font-bold tracking-wide">Instagram</span>
           </a>
         </div>
       </div>
