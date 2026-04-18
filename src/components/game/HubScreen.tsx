@@ -180,7 +180,7 @@ const HubScreen: React.FC = () => {
     return "التثبيت على الكمبيوتر";
   };
 
-  const appUrl = "https://imposterht.lovable.app";
+  const appUrl = "https://imposter.my";
 
   const handleRemovePlayer = (e: React.MouseEvent, name: string) => {
     e.preventDefault();
