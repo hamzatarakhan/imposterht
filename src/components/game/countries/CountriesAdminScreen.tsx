@@ -75,6 +75,24 @@ const CountriesAdminScreen: React.FC = () => {
     setNewPlayerName('');
   };
 
+  const handleAddSavedName = async (name: string) => {
+    if (existingNames.has(name.toLowerCase())) return;
+    playSound('click'); vibrate(20);
+    await addPlayer(name);
+  };
+
+  const handleSelectGroup = async (members: SavedPlayer[]) => {
+    playSound('click'); vibrate(50);
+    let added = 0;
+    for (const m of members) {
+      if (!existingNames.has(m.name.toLowerCase())) {
+        await addPlayer(m.name);
+        added++;
+      }
+    }
+    toast.success(added > 0 ? `تمّت إضافة ${added} لاعبين` : 'كل اللاعبين موجودين');
+  };
+
   const handleAddCountry = async () => {
     if (!newCountryName.trim()) return;
     playSound('click'); vibrate(30);
