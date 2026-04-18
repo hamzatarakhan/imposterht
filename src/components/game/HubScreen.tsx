@@ -595,24 +595,27 @@ const HubScreen: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <div className="relative z-10 text-center py-4 space-y-2">
-        <p className="text-xs text-muted-foreground">
+      <div className="relative z-10 flex flex-col items-center py-5 gap-2.5">
+        <p className="text-[11px] text-muted-foreground/80 tracking-wide">
           Powered by <span className="text-primary font-bold">Hamza Tarkhan</span>
         </p>
-        <div className="flex flex-col items-center gap-1">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/40 border border-border/40 backdrop-blur-sm">
           <a
             href="mailto:Hamzatarakhan2000@gmail.com"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors"
+            aria-label="Email"
+            className="p-1.5 rounded-full text-muted-foreground hover:text-primary hover:bg-secondary/60 transition-colors"
           >
-            ✉️ Hamzatarakhan2000@gmail.com
+            <Mail size={14} />
           </a>
+          <span className="w-px h-4 bg-border/60" />
           <a
             href="https://instagram.com/hamza_tarakhan_"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground/70 hover:text-primary transition-colors"
+            aria-label="Instagram"
+            className="p-1.5 rounded-full text-muted-foreground hover:text-primary hover:bg-secondary/60 transition-colors"
           >
-            📸 @hamza_tarakhan_
+            <Instagram size={14} />
           </a>
         </div>
       </div>
