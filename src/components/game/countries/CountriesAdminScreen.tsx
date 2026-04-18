@@ -173,7 +173,7 @@ const CountriesAdminScreen: React.FC = () => {
           {activeTab === 'players' ? (
             <div className="space-y-4">
               {/* Add Player */}
-              <div className="p-3 rounded-2xl bg-secondary/30 border border-border/50">
+              <div className="p-3 rounded-2xl bg-secondary/30 border border-border/50 space-y-2.5">
                 <div className="flex gap-2">
                   <input
                     type="text" value={newPlayerName} onChange={(e) => setNewPlayerName(e.target.value.slice(0, 20))}
@@ -186,6 +186,34 @@ const CountriesAdminScreen: React.FC = () => {
                     أضف
                   </button>
                 </div>
+
+                {/* Pick from saved group */}
+                <button
+                  onClick={() => { playSound('click'); vibrate(30); setShowGroupsModal(true); }}
+                  className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-primary/10 border border-primary/30 text-primary font-bold text-xs hover:bg-primary/20 transition-colors"
+                >
+                  <Users size={14} />
+                  اختر مجموعة جاهزة
+                </button>
+
+                {/* Saved individual names */}
+                {availableSavedNames.length > 0 && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground mb-1.5">اضغط لإضافة لاعب محفوظ:</p>
+                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                      {availableSavedNames.map((s, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleAddSavedName(s.name)}
+                          className="px-2 py-1 rounded-lg bg-secondary hover:bg-primary/20 hover:text-primary border border-border/40 text-xs font-medium transition-colors flex items-center gap-1"
+                        >
+                          <Plus size={10} />
+                          {s.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Active Players */}
