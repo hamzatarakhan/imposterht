@@ -378,12 +378,12 @@ const HubScreen: React.FC = () => {
       {/* Main Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
         {/* Logo */}
-        <div className="text-center mb-10">
-          <div className="flex justify-center mb-3 animate-float">
-            <span className="text-6xl drop-shadow-2xl">🎮</span>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/40 border border-border/40 backdrop-blur-sm mb-3">
+            <span className="text-2xl">🎮</span>
+            <h1 className="text-xl font-black text-gradient">فعاليات</h1>
           </div>
-          <h1 className="text-4xl font-black text-gradient mb-2">فعاليات</h1>
-          <p className="text-muted-foreground text-sm">اختر لعبتك وابدأ المرح!</p>
+          <p className="text-xs text-muted-foreground">اختر لعبتك وابدأ المرح!</p>
         </div>
 
         {/* Games Row */}
