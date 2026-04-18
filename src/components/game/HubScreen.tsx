@@ -376,7 +376,7 @@ const HubScreen: React.FC = () => {
       </Dialog>
 
       {/* Main Content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center my-[32px]">
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/40 border border-border/40 backdrop-blur-sm mb-3">
