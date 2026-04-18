@@ -234,6 +234,24 @@ const HubScreen: React.FC = () => {
             <QrCode size={24} />
           </button>
         </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              playSound("click");
+              vibrate(30);
+              setShowGroupsModal(true);
+            }}
+            className="relative p-3 rounded-2xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="الأسماء والمجموعات"
+          >
+            <Users size={24} />
+            {(savedPlayers.length > 0 || groups.length > 0) && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                {savedPlayers.length + groups.length}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Modals */}

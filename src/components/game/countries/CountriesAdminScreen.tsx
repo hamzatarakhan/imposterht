@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useCountries } from '@/context/CountriesGameContext';
 import { useSettings } from '@/context/SettingsContext';
-import { Plus, Minus, X, ArrowLeftRight, LogOut, Share2, Search, Clock, History, ArrowDownAZ, ArrowUpAZ } from 'lucide-react';
+import { useSavedPlayers, SavedPlayer } from '@/hooks/useSavedPlayers';
+import { Plus, Minus, X, ArrowLeftRight, LogOut, Share2, Search, Clock, History, ArrowDownAZ, ArrowUpAZ, Users } from 'lucide-react';
+import GroupManagementModal from '../GroupManagementModal';
 
 type SortKey = 'newest' | 'oldest' | 'az' | 'za';
 import { toast } from 'sonner';
@@ -13,6 +15,7 @@ import {
 const CountriesAdminScreen: React.FC = () => {
   const { room, players, burned, addPlayer, removePlayer, updateLives, addBurned, removeBurned, swapPlayers, leaveRoom } = useCountries();
   const { playSound, vibrate } = useSettings();
+  const { savedPlayers } = useSavedPlayers();
 
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newCountryName, setNewCountryName] = useState('');
@@ -23,9 +26,14 @@ const CountriesAdminScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'players' | 'burned'>('players');
   const [sortKey, setSortKey] = useState<SortKey>('newest');
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [showGroupsModal, setShowGroupsModal] = useState(false);
 
   const activePlayers = players.filter(p => p.status === 'active');
   const eliminatedPlayers = players.filter(p => p.status === 'eliminated');
+
+  // Saved names not yet added as players
+  const existingNames = new Set(players.map(p => p.name.toLowerCase()));
+  const availableSavedNames = savedPlayers.filter(s => !existingNames.has(s.name.toLowerCase()));
 
   const sortOptions: { key: SortKey; label: string; icon: React.ReactNode }[] = [
     { key: 'newest', label: 'الأحدث أولاً', icon: <Clock size={14} /> },
@@ -65,6 +73,24 @@ const CountriesAdminScreen: React.FC = () => {
     playSound('click'); vibrate(30);
     await addPlayer(newPlayerName.trim());
     setNewPlayerName('');
+  };
+
+  const handleAddSavedName = async (name: string) => {
+    if (existingNames.has(name.toLowerCase())) return;
+    playSound('click'); vibrate(20);
+    await addPlayer(name);
+  };
+
+  const handleSelectGroup = async (members: SavedPlayer[]) => {
+    playSound('click'); vibrate(50);
+    let added = 0;
+    for (const m of members) {
+      if (!existingNames.has(m.name.toLowerCase())) {
+        await addPlayer(m.name);
+        added++;
+      }
+    }
+    toast.success(added > 0 ? `تمّت إضافة ${added} لاعبين` : 'كل اللاعبين موجودين');
   };
 
   const handleAddCountry = async () => {
@@ -147,7 +173,7 @@ const CountriesAdminScreen: React.FC = () => {
           {activeTab === 'players' ? (
             <div className="space-y-4">
               {/* Add Player */}
-              <div className="p-3 rounded-2xl bg-secondary/30 border border-border/50">
+              <div className="p-3 rounded-2xl bg-secondary/30 border border-border/50 space-y-2.5">
                 <div className="flex gap-2">
                   <input
                     type="text" value={newPlayerName} onChange={(e) => setNewPlayerName(e.target.value.slice(0, 20))}
@@ -160,6 +186,34 @@ const CountriesAdminScreen: React.FC = () => {
                     أضف
                   </button>
                 </div>
+
+                {/* Pick from saved group */}
+                <button
+                  onClick={() => { playSound('click'); vibrate(30); setShowGroupsModal(true); }}
+                  className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-primary/10 border border-primary/30 text-primary font-bold text-xs hover:bg-primary/20 transition-colors"
+                >
+                  <Users size={14} />
+                  اختر مجموعة جاهزة
+                </button>
+
+                {/* Saved individual names */}
+                {availableSavedNames.length > 0 && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground mb-1.5">اضغط لإضافة لاعب محفوظ:</p>
+                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                      {availableSavedNames.map((s, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleAddSavedName(s.name)}
+                          className="px-2 py-1 rounded-lg bg-secondary hover:bg-primary/20 hover:text-primary border border-border/40 text-xs font-medium transition-colors flex items-center gap-1"
+                        >
+                          <Plus size={10} />
+                          {s.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Active Players */}
@@ -352,6 +406,13 @@ const CountriesAdminScreen: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Saved Groups Modal */}
+      <GroupManagementModal
+        isOpen={showGroupsModal}
+        onClose={() => setShowGroupsModal(false)}
+        onSelectGroup={handleSelectGroup}
+      />
     </div>
   );
 };
