@@ -3,14 +3,14 @@ import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
+import { useUserName } from '@/hooks/useUserName';
 import OnlineRestartButton from './OnlineRestartButton';
 
 const JoinRoomScreen: React.FC = () => {
   const { setScreen, joinRoom, pendingJoinCode, clearPendingJoinCode } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
+  const { name, setName, avatar, persist } = useUserName('👤');
   
-  const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('👤');
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [isJoining, setIsJoining] = useState(false);
@@ -35,7 +35,9 @@ const JoinRoomScreen: React.FC = () => {
 
     const result = await joinRoom(code.trim(), name.trim(), avatar);
 
-    if (!result.success) {
+    if (result.success) {
+      persist(name.trim(), avatar);
+    } else {
       setError(result.error || 'فشل الانضمام');
       setIsJoining(false);
       vibrate(100);

@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
+import { useUserName } from '@/hooks/useUserName';
 import { GUESSING_CATEGORIES, GuessingCategory } from '@/data/guessingWords';
 import { ArrowRight, Shuffle, Mic, Eye } from 'lucide-react';
 
 const GuessingCreateRoomScreen: React.FC = () => {
   const { createRoom, setScreen } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
+  const { name, setName, avatar, setAvatar, persist } = useUserName('👤');
 
-  const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('👤');
   const [categories, setCategories] = useState<GuessingCategory[]>(['random']);
   const [totalRounds, setTotalRounds] = useState(5);
   
@@ -27,7 +27,8 @@ const GuessingCreateRoomScreen: React.FC = () => {
     setLoading(true);
     playSound('click'); vibrate(50);
     const success = await createRoom(name.trim(), avatar, { categories, totalRounds, voiceChatEnabled, presenceEnabled });
-    if (!success) setLoading(false);
+    if (success) persist(name.trim(), avatar);
+    else setLoading(false);
   };
 
   return (

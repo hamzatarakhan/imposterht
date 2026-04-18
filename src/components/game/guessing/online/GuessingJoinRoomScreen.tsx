@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
+import { useUserName } from '@/hooks/useUserName';
 import { ArrowRight } from 'lucide-react';
 
 const GuessingJoinRoomScreen: React.FC = () => {
   const { joinRoom, setScreen, pendingJoinCode, clearPendingJoinCode } = useOnlineGuessing();
   const { playSound, vibrate } = useSettings();
+  const { name, setName, avatar, setAvatar, persist } = useUserName('👤');
 
   const [code, setCode] = useState(pendingJoinCode || '');
-  const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState('👤');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,6 +20,7 @@ const GuessingJoinRoomScreen: React.FC = () => {
     playSound('click'); vibrate(50);
     const result = await joinRoom(code.trim(), name.trim(), avatar);
     if (!result.success) { setError(result.error || 'فشل الانضمام'); setLoading(false); }
+    else { persist(name.trim(), avatar); }
     clearPendingJoinCode();
   };
 
