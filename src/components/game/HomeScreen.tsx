@@ -386,10 +386,10 @@ const HomeScreen: React.FC = () => {
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
         {/* Logo with Icon */}
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-2 animate-float">
-            <span className="text-5xl drop-shadow-2xl">😈</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/40 border border-border/40 backdrop-blur-sm mb-3">
+            <span className="text-2xl">😈</span>
+            <h1 className="text-xl font-black text-gradient">IMPOSTER</h1>
           </div>
-          <h1 className="text-3xl font-black text-gradient mb-1">IMPOSTER</h1>
           <p className="text-xs text-muted-foreground">لعبة الإمبوستر الجماعية</p>
         </div>
 
