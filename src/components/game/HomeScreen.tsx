@@ -385,12 +385,12 @@ const HomeScreen: React.FC = () => {
       {/* Main Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center">
         {/* Logo with Icon */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-4 animate-float">
-            <span className="text-7xl drop-shadow-2xl">😈</span>
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-2 animate-float">
+            <span className="text-5xl drop-shadow-2xl">😈</span>
           </div>
-          <h1 className="text-5xl font-black text-gradient mb-2">IMPOSTER</h1>
-          <p className="text-muted-foreground">لعبة الإمبوستر الجماعية</p>
+          <h1 className="text-3xl font-black text-gradient mb-1">IMPOSTER</h1>
+          <p className="text-xs text-muted-foreground">لعبة الإمبوستر الجماعية</p>
         </div>
 
         {/* Buttons */}
