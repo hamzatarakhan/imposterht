@@ -18,8 +18,16 @@ const GuessingCreateRoomScreen: React.FC = () => {
   const [presenceEnabled, setPresenceEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const selectCategory = (cat: GuessingCategory) => {
-    setCategories([cat]);
+  const toggleCategory = (cat: GuessingCategory) => {
+    if (cat === 'random') { setCategories(['random']); return; }
+    setCategories(prev => {
+      const withoutRandom = prev.filter(c => c !== 'random');
+      if (withoutRandom.includes(cat)) {
+        const next = withoutRandom.filter(c => c !== cat);
+        return next.length === 0 ? ['random'] : next;
+      }
+      return [...withoutRandom, cat];
+    });
   };
 
   const handleCreate = async () => {
@@ -80,17 +88,18 @@ const GuessingCreateRoomScreen: React.FC = () => {
 
         {/* Categories */}
         <div className="card-game">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-1">
             <Shuffle size={20} className="text-primary" />
-            <h2 className="font-bold">الفئة</h2>
+            <h2 className="font-bold">الفئات</h2>
           </div>
+          <p className="text-xs text-muted-foreground mb-3">اختر فئة أو أكثر — كل مواجهة بتاخد فئة منهم 🎯</p>
           <div className="grid grid-cols-3 gap-2">
             {GUESSING_CATEGORIES.map(cat => {
-              const isSelected = categories[0] === cat.id;
+              const isSelected = categories.includes(cat.id);
               return (
                 <button
                   key={cat.id}
-                  onClick={() => { playSound('click'); vibrate(20); selectCategory(cat.id); }}
+                  onClick={() => { playSound('click'); vibrate(20); toggleCategory(cat.id); }}
                   className={`flex flex-col items-center gap-1 px-2 py-3 rounded-xl text-xs font-bold transition-all ${
                     isSelected
                       ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]'

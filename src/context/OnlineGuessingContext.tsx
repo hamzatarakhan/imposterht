@@ -210,7 +210,9 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     if (!state.room || !state.isHost) return false;
     let categories: GuessingCategory[] = ['random'];
     try { categories = JSON.parse(state.room.categories || '["random"]'); } catch {}
-    return guessingService.startGuessingGame(state.room.id, categories);
+    // Round 1 uses categories[0]
+    const roundCat = categories[0] || 'random';
+    return guessingService.startGuessingGame(state.room.id, [roundCat]);
   }, [state.room, state.isHost]);
 
   const markWinner = useCallback(async (winnerPlayerId: string) => {
@@ -227,14 +229,20 @@ export const OnlineGuessingProvider: React.FC<{ children: ReactNode }> = ({ chil
     if (!state.room || !state.isHost) return false;
     let categories: GuessingCategory[] = ['random'];
     try { categories = JSON.parse(state.room.categories || '["random"]'); } catch {}
-    return guessingService.nextGuessingRound(state.room.id, categories);
+    // Next round index = current_round (since we're advancing). Cycle through categories.
+    const nextRoundIdx = state.room.current_round; // 0-based for the next round
+    const roundCat = categories[nextRoundIdx % categories.length] || 'random';
+    return guessingService.nextGuessingRound(state.room.id, [roundCat]);
   }, [state.room, state.isHost]);
 
   const changeWords = useCallback(async () => {
     if (!state.room || !state.isHost) return false;
     let categories: GuessingCategory[] = ['random'];
     try { categories = JSON.parse(state.room.categories || '["random"]'); } catch {}
-    return guessingService.changeGuessingWords(state.room.id, categories);
+    // Stay on same category for current round
+    const roundIdx = (state.room.current_round - 1);
+    const roundCat = categories[roundIdx % categories.length] || 'random';
+    return guessingService.changeGuessingWords(state.room.id, [roundCat]);
   }, [state.room, state.isHost]);
 
   const replayRoom = useCallback(async (newCategories?: GuessingCategory[]) => {
