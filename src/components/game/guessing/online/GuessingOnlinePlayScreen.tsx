@@ -84,13 +84,13 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     return (
       <div className="min-h-[100dvh] flex flex-col">
         <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background pointer-events-none" />
-        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md px-3 py-2.5 flex items-center gap-2">
           <button onClick={async () => { playSound('click'); await leaveRoom(); }}
-            className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+            className="shrink-0 p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowRight size={20} />
           </button>
-          <h1 className="text-xl font-black flex-1">⚔️ المواجهة</h1>
-          {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
+          <h1 className="text-base font-black flex-1 truncate">⚔️ المواجهة</h1>
+          {room && <SpectatorShareButton roomCode={room.code} variant="compact" />}
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative z-10">
           <div className="w-full max-w-sm space-y-5">
@@ -113,13 +113,13 @@ const GuessingOnlinePlayScreen: React.FC = () => {
     return (
       <div className="min-h-[100dvh] flex flex-col">
         <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background pointer-events-none" />
-        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md px-3 py-2.5 flex items-center gap-2">
           <button onClick={async () => { playSound('click'); await leaveRoom(); }}
-            className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+            className="shrink-0 p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowRight size={20} />
           </button>
-          <h1 className="text-xl font-black flex-1">⚔️ المواجهة</h1>
-          {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
+          <h1 className="text-base font-black flex-1 truncate">⚔️ المواجهة</h1>
+          {room && <SpectatorShareButton roomCode={room.code} variant="compact" />}
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative z-10">
           <div className="w-full max-w-sm space-y-5">
@@ -145,25 +145,28 @@ const GuessingOnlinePlayScreen: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background pointer-events-none" />
 
       {/* Header */}
-      <div className="relative z-20 bg-background/80 backdrop-blur-md px-4 py-2.5 flex items-center gap-2">
+      <div className="relative z-20 bg-background/80 backdrop-blur-md px-3 py-2 flex items-center gap-2">
         <button onClick={async () => { playSound('click'); await leaveRoom(); }}
-          className="p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+          className="shrink-0 p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowRight size={18} />
         </button>
-        <h1 className="text-sm font-black">⚔️ {room.current_round}/{room.total_rounds}</h1>
         {(() => {
           const catId = getRoundCategoryId(room.categories, room.current_round);
           const cat = getCategoryMeta(catId);
           return (
-            <div className="flex-1 flex justify-center">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/15 border border-primary/30">
-                <span className="text-sm">{cat.icon}</span>
-                <span className="text-xs font-bold text-primary">{cat.label}</span>
+            <div className="flex-1 min-w-0 flex items-center gap-1.5">
+              <div className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary/60 border border-border/50">
+                <span className="text-xs">⚔️</span>
+                <span className="text-[11px] font-black text-foreground">{room.current_round}<span className="text-muted-foreground">/{room.total_rounds}</span></span>
+              </div>
+              <div className="min-w-0 flex-1 inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-primary/15 border border-primary/30">
+                <span className="text-sm shrink-0">{cat.icon}</span>
+                <span className="text-[11px] font-bold text-primary truncate">{cat.label}</span>
               </div>
             </div>
           );
         })()}
-        {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
+        {room && <SpectatorShareButton roomCode={room.code} variant="compact" />}
       </div>
 
       {/* Main Content */}
