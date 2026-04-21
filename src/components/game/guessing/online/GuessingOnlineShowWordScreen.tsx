@@ -24,9 +24,19 @@ const GuessingOnlineShowWordScreen: React.FC = () => {
       </div>
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
         <div className="w-full max-w-sm">
-          <div className="text-sm text-muted-foreground font-bold mb-4">
+          <div className="text-sm text-muted-foreground font-bold mb-2">
             المواجهة {room.current_round} / {room.total_rounds}
           </div>
+          {(() => {
+            const catId = getRoundCategoryId(room.categories, room.current_round);
+            const cat = getCategoryMeta(catId);
+            return (
+              <div className="mb-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/15 border border-primary/30">
+                <span className="text-lg">{cat.icon}</span>
+                <span className="text-sm font-bold text-primary">مواجهة {cat.label}</span>
+              </div>
+            );
+          })()}
           <div className="card-game text-center">
             <div className="text-5xl mb-4">{currentPlayer.avatar}</div>
             <h2 className="text-xl font-black mb-2">{currentPlayer.name}</h2>
