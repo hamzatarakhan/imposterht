@@ -150,6 +150,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
           <ArrowRight size={18} />
         </button>
         <h1 className="text-base font-black flex-1">⚔️ المواجهة {room.current_round}/{room.total_rounds}</h1>
+        {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
       </div>
 
       {/* Main Content */}
