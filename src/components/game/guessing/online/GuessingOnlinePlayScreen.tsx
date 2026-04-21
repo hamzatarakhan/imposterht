@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ArrowRight } from 'lucide-react';
 import PresenceDot from '@/components/game/PresenceDot';
 import SpectatorShareButton from './SpectatorShareButton';
+import { getRoundCategoryId, getCategoryMeta } from '@/lib/guessingRoundCategory';
 
 const GuessingOnlinePlayScreen: React.FC = () => {
   const { room, players, isHost, markWinner, markDraw, changeWords, currentPlayer, leaveRoom } = useOnlineGuessing();
