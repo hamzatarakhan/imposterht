@@ -52,13 +52,18 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background pointer-events-none" />
 
       {/* Header */}
-      <div className="relative z-20 bg-background/80 backdrop-blur-md px-4 py-2.5 flex items-center gap-3">
+      <div className="relative z-20 bg-background/80 backdrop-blur-md px-3 py-2.5 flex items-center gap-2">
         <button onClick={async () => { playSound('click'); await leaveRoom(); }}
-          className="p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+          className="shrink-0 p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowRight size={18} />
         </button>
-        <h1 className="text-lg font-black flex-1">📊 نتيجة الجولة</h1>
-        {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          <h1 className="text-base font-black truncate">📊 نتيجة الجولة</h1>
+          <div className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-secondary/60 border border-border/50">
+            <span className="text-[11px] font-black text-foreground">{room.current_round}<span className="text-muted-foreground">/{room.total_rounds}</span></span>
+          </div>
+        </div>
+        {room && <SpectatorShareButton roomCode={room.code} variant="compact" />}
       </div>
 
       {/* Content */}
