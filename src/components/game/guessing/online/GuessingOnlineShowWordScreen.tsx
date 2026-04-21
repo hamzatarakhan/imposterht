@@ -18,7 +18,8 @@ const GuessingOnlineShowWordScreen: React.FC = () => {
           className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowRight size={20} />
         </button>
-        <h1 className="text-xl font-black">🤔 كلمتك</h1>
+        <h1 className="text-xl font-black flex-1">🤔 كلمتك</h1>
+        {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
       </div>
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
         <div className="w-full max-w-sm">
