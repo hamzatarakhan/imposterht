@@ -18,8 +18,16 @@ const GuessingCreateRoomScreen: React.FC = () => {
   const [presenceEnabled, setPresenceEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const selectCategory = (cat: GuessingCategory) => {
-    setCategories([cat]);
+  const toggleCategory = (cat: GuessingCategory) => {
+    if (cat === 'random') { setCategories(['random']); return; }
+    setCategories(prev => {
+      const withoutRandom = prev.filter(c => c !== 'random');
+      if (withoutRandom.includes(cat)) {
+        const next = withoutRandom.filter(c => c !== cat);
+        return next.length === 0 ? ['random'] : next;
+      }
+      return [...withoutRandom, cat];
+    });
   };
 
   const handleCreate = async () => {
