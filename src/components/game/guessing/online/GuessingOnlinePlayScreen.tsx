@@ -145,12 +145,24 @@ const GuessingOnlinePlayScreen: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-background via-card/30 to-background pointer-events-none" />
 
       {/* Header */}
-      <div className="relative z-20 bg-background/80 backdrop-blur-md px-4 py-2.5 flex items-center gap-3">
+      <div className="relative z-20 bg-background/80 backdrop-blur-md px-4 py-2.5 flex items-center gap-2">
         <button onClick={async () => { playSound('click'); await leaveRoom(); }}
           className="p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowRight size={18} />
         </button>
-        <h1 className="text-base font-black flex-1">⚔️ المواجهة {room.current_round}/{room.total_rounds}</h1>
+        <h1 className="text-sm font-black">⚔️ {room.current_round}/{room.total_rounds}</h1>
+        {(() => {
+          const catId = getRoundCategoryId(room.categories, room.current_round);
+          const cat = getCategoryMeta(catId);
+          return (
+            <div className="flex-1 flex justify-center">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/15 border border-primary/30">
+                <span className="text-sm">{cat.icon}</span>
+                <span className="text-xs font-bold text-primary">{cat.label}</span>
+              </div>
+            </div>
+          );
+        })()}
         {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
       </div>
 
