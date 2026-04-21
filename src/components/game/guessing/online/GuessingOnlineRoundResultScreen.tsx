@@ -57,7 +57,8 @@ const GuessingOnlineRoundResultScreen: React.FC = () => {
           className="p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowRight size={18} />
         </button>
-        <h1 className="text-lg font-black">📊 نتيجة الجولة</h1>
+        <h1 className="text-lg font-black flex-1">📊 نتيجة الجولة</h1>
+        {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
       </div>
 
       {/* Content */}
