@@ -5,6 +5,7 @@ import * as guessingService from '@/services/guessingRoomService';
 import WordImage from '../WordImage';
 import { ArrowRight } from 'lucide-react';
 import PresenceDot from '@/components/game/PresenceDot';
+import SpectatorShareButton from './SpectatorShareButton';
 
 const GuessingOnlineRoundResultScreen: React.FC = () => {
   const { room, players, isHost, nextRound, leaveRoom } = useOnlineGuessing();
