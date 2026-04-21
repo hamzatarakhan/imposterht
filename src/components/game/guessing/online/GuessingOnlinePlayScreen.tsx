@@ -104,6 +104,9 @@ const GuessingOnlinePlayScreen: React.FC = () => {
             </button>
           </div>
         </div>
+      </div>
+    );
+  }
 
   if (!bothReady) {
     return (
