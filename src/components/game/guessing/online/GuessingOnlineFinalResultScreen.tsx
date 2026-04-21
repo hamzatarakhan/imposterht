@@ -8,7 +8,7 @@ import SpectatorShareButton from './SpectatorShareButton';
 import { GUESSING_CATEGORIES, GuessingCategory } from '@/data/guessingWords';
 
 const GuessingOnlineFinalResultScreen: React.FC = () => {
-  const { players, isHost, leaveRoom, resetOnlineGuessing, replayRoom, setScreen } = useOnlineGuessing();
+  const { room, players, isHost, leaveRoom, resetOnlineGuessing, replayRoom, setScreen } = useOnlineGuessing();
   const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
   const [loading, setLoading] = useState(false);
