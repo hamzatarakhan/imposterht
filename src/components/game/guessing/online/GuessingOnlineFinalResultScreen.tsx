@@ -4,10 +4,11 @@ import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Loader2, X } from 'lucide-react';
 import PresenceDot from '@/components/game/PresenceDot';
+import SpectatorShareButton from './SpectatorShareButton';
 import { GUESSING_CATEGORIES, GuessingCategory } from '@/data/guessingWords';
 
 const GuessingOnlineFinalResultScreen: React.FC = () => {
-  const { players, isHost, leaveRoom, resetOnlineGuessing, replayRoom, setScreen } = useOnlineGuessing();
+  const { room, players, isHost, leaveRoom, resetOnlineGuessing, replayRoom, setScreen } = useOnlineGuessing();
   const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
   const [loading, setLoading] = useState(false);
@@ -83,7 +84,8 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
           className="p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowRight size={18} />
         </button>
-        <h1 className="text-lg font-black">🏆 النتيجة النهائية</h1>
+        <h1 className="text-lg font-black flex-1">🏆 النتيجة النهائية</h1>
+        {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
       </div>
 
       {/* Content */}

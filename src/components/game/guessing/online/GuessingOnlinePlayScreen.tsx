@@ -5,6 +5,7 @@ import * as guessingService from '@/services/guessingRoomService';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowRight } from 'lucide-react';
 import PresenceDot from '@/components/game/PresenceDot';
+import SpectatorShareButton from './SpectatorShareButton';
 
 const GuessingOnlinePlayScreen: React.FC = () => {
   const { room, players, isHost, markWinner, markDraw, changeWords, currentPlayer, leaveRoom } = useOnlineGuessing();
@@ -87,7 +88,8 @@ const GuessingOnlinePlayScreen: React.FC = () => {
             className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowRight size={20} />
           </button>
-          <h1 className="text-xl font-black">⚔️ المواجهة</h1>
+          <h1 className="text-xl font-black flex-1">⚔️ المواجهة</h1>
+          {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative z-10">
           <div className="w-full max-w-sm space-y-5">
@@ -115,7 +117,8 @@ const GuessingOnlinePlayScreen: React.FC = () => {
             className="p-2 rounded-xl bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowRight size={20} />
           </button>
-          <h1 className="text-xl font-black">⚔️ المواجهة</h1>
+          <h1 className="text-xl font-black flex-1">⚔️ المواجهة</h1>
+          {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
         </div>
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative z-10">
           <div className="w-full max-w-sm space-y-5">
@@ -147,6 +150,7 @@ const GuessingOnlinePlayScreen: React.FC = () => {
           <ArrowRight size={18} />
         </button>
         <h1 className="text-base font-black flex-1">⚔️ المواجهة {room.current_round}/{room.total_rounds}</h1>
+        {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
       </div>
 
       {/* Main Content */}
