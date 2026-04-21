@@ -91,6 +91,10 @@ const GuessingOnlinePlayScreen: React.FC = () => {
           <h1 className="text-xl font-black flex-1">⚔️ المواجهة</h1>
           {room && <SpectatorShareButton roomCode={room.code} variant="icon" />}
         </div>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative z-10">
+          <div className="w-full max-w-sm space-y-5">
+            <div className="card-game text-center space-y-4">
+              <div className="text-5xl">😢</div>
               <p className="text-lg font-black">الخصم انقطع!</p>
               <p className="text-sm text-muted-foreground">يبدو إنه طلع من اللعبة</p>
             </div>
@@ -100,9 +104,6 @@ const GuessingOnlinePlayScreen: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
-    );
-  }
 
   if (!bothReady) {
     return (
