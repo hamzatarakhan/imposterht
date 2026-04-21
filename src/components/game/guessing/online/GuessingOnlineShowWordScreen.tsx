@@ -2,6 +2,7 @@ import React from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight } from 'lucide-react';
+import SpectatorShareButton from './SpectatorShareButton';
 
 const GuessingOnlineShowWordScreen: React.FC = () => {
   const { room, currentPlayer, setScreen, leaveRoom } = useOnlineGuessing();
