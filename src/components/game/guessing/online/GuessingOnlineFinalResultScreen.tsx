@@ -4,6 +4,7 @@ import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
 import { ArrowRight, Loader2, X } from 'lucide-react';
 import PresenceDot from '@/components/game/PresenceDot';
+import SpectatorShareButton from './SpectatorShareButton';
 import { GUESSING_CATEGORIES, GuessingCategory } from '@/data/guessingWords';
 
 const GuessingOnlineFinalResultScreen: React.FC = () => {
