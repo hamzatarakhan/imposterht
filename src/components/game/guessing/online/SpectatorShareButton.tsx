@@ -1,11 +1,11 @@
 import React from 'react';
-import { Eye } from 'lucide-react';
+import { Eye, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSettings } from '@/context/SettingsContext';
 
 interface Props {
   roomCode: string;
-  variant?: 'full' | 'icon';
+  variant?: 'full' | 'icon' | 'compact';
   className?: string;
 }
 
@@ -35,6 +35,21 @@ const SpectatorShareButton: React.FC<Props> = ({ roomCode, variant = 'full', cla
         className={`p-1.5 rounded-lg bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors ${className}`}
       >
         <Eye size={18} />
+      </button>
+    );
+  }
+
+  // Compact: واضح بالنص لكن صغير عشان يندمج بالهيدر
+  if (variant === 'compact') {
+    return (
+      <button
+        onClick={handleShare}
+        title="شارك رابط المتفرجين"
+        className={`shrink-0 inline-flex items-center gap-1.5 py-1.5 px-2.5 rounded-full bg-primary/10 border border-primary/30 text-primary font-bold text-[11px] hover:bg-primary/20 active:scale-95 transition-all ${className}`}
+      >
+        <Eye size={13} />
+        <span>متفرجين</span>
+        <Share2 size={11} className="opacity-70" />
       </button>
     );
   }
