@@ -13,9 +13,25 @@ interface SubmitFeedbackPayload {
   rounds_completed?: number | null;
 }
 
+const RATING_META: Record<FeedbackRating, { label: string; emoji: string }> = {
+  amazing: { label: 'رائع', emoji: '✨' },
+  more_amazing: { label: 'أكثر من رائع', emoji: '🔥' },
+  khoz3boli: { label: 'خُزعبلي', emoji: '🤯' },
+  salat_nabi: { label: 'صلاة النبي ما عليه حكي', emoji: '🤲' },
+  needs_improvement: { label: 'بدك الصحيح بده شوية تحسين', emoji: '🛠️' },
+};
+
 const getUserId = (): string | null => {
   try {
     return localStorage.getItem('user_id');
+  } catch {
+    return null;
+  }
+};
+
+const getUserName = (): string | null => {
+  try {
+    return localStorage.getItem('user_name');
   } catch {
     return null;
   }
@@ -32,22 +48,87 @@ const getAppVersion = async (): Promise<string | null> => {
   }
 };
 
+const formatTimestamp = (): string => {
+  try {
+    const d = new Date();
+    return d.toLocaleString('ar-JO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return new Date().toISOString();
+  }
+};
+
+const sendFeedbackNotification = async (payload: Record<string, unknown>) => {
+  const response = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-transactional-email`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    },
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '');
+    throw new Error(`Feedback email notification failed: ${response.status} ${errorText}`);
+  }
+};
+
 export const submitFeedback = async ({
   rating,
   improvement_text,
   rounds_completed,
 }: SubmitFeedbackPayload) => {
   const user_id = getUserId();
+  const playerName = getUserName();
   const app_version = await getAppVersion();
+  const trimmedImprovement = improvement_text?.trim() || null;
 
-  const { error } = await supabase.from('app_feedback').insert({
-    rating,
-    improvement_text: improvement_text?.trim() || null,
-    rounds_completed: rounds_completed ?? null,
-    app_version,
-    user_id: user_id || null,
-  });
+  const { data: inserted, error } = await supabase
+    .from('app_feedback')
+    .insert({
+      rating,
+      improvement_text: trimmedImprovement,
+      rounds_completed: rounds_completed ?? null,
+      app_version,
+      user_id: user_id || null,
+    })
+    .select('id')
+    .maybeSingle();
 
   if (error) throw error;
+
+  const meta = RATING_META[rating];
+  const ratingId = inserted?.id ?? crypto.randomUUID();
+
+  void sendFeedbackNotification({
+    templateName: 'feedback-notification',
+    recipientEmail: 'Hamzatarakhan2000@gmail.com',
+    idempotencyKey: `feedback-${ratingId}`,
+    templateData: {
+      ratingLabel: meta.label,
+      ratingEmoji: meta.emoji,
+      ratingId: rating,
+      improvementText: trimmedImprovement,
+      playerName: playerName?.trim() || null,
+      roundsCompleted: rounds_completed ?? null,
+      appVersion: app_version,
+      userId: user_id,
+      submittedAt: formatTimestamp(),
+    },
+  }).catch((e) => {
+    console.warn('Feedback email notification failed', e);
+  });
+
   return true;
 };
