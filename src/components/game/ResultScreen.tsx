@@ -52,8 +52,8 @@ const ResultScreen: React.FC = () => {
         vibrate([200, 100, 200]);
       }
       hasPlayedSoundRef.current = true;
-      // Trigger mandatory feedback prompt after first round, then every 5
-      notifyRoundCompleted(`local-imposter-${roundNumber}-${secretWord ?? ''}`);
+      // Trigger feedback prompt (rules: returning users on first open, then every 3 days; new users after first game)
+      notifyRoundCompleted(`local-imposter-${roundNumber}-${secretWord ?? ''}`, 'imposter');
     }
   }, [playersWon, playSound, vibrate, notifyRoundCompleted, roundNumber, secretWord]);
 

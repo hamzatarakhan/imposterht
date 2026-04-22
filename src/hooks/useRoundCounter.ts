@@ -1,25 +1,44 @@
 import { useCallback } from 'react';
 
-const STORAGE_KEY = 'feedback_state_v1';
+const STORAGE_KEY_V1 = 'feedback_state_v1';
+const STORAGE_KEY = 'feedback_state_v2';
 const SESSION_FLAG_PREFIX = 'feedback_round_counted_';
+const USER_NAME_KEY = 'user_name';
+
+const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+const GUESSING_ROUNDS_THRESHOLD = 18;
+
+export type GameType = 'imposter' | 'guessing' | 'countries';
 
 interface FeedbackState {
-  rounds_completed: number;
-  last_feedback_at_round: number | null;
+  rounds_completed: number; // imposter + countries
+  guessing_rounds_completed: number;
+  guessing_rounds_at_last_feedback: number;
+  last_feedback_at: number | null; // timestamp ms
+  is_returning_user: boolean;
+  classified: boolean;
 }
+
+const defaultState = (): FeedbackState => ({
+  rounds_completed: 0,
+  guessing_rounds_completed: 0,
+  guessing_rounds_at_last_feedback: 0,
+  last_feedback_at: null,
+  is_returning_user: false,
+  classified: false,
+});
 
 const readState = (): FeedbackState => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { rounds_completed: 0, last_feedback_at_round: null };
+    if (!raw) return defaultState();
     const parsed = JSON.parse(raw);
     return {
-      rounds_completed: typeof parsed.rounds_completed === 'number' ? parsed.rounds_completed : 0,
-      last_feedback_at_round:
-        typeof parsed.last_feedback_at_round === 'number' ? parsed.last_feedback_at_round : null,
+      ...defaultState(),
+      ...parsed,
     };
   } catch {
-    return { rounds_completed: 0, last_feedback_at_round: null };
+    return defaultState();
   }
 };
 
@@ -31,42 +50,122 @@ const writeState = (state: FeedbackState) => {
   }
 };
 
+const readLegacyV1 = (): { rounds_completed: number; last_feedback_at_round: number | null } | null => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_V1);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return {
+      rounds_completed: typeof parsed.rounds_completed === 'number' ? parsed.rounds_completed : 0,
+      last_feedback_at_round:
+        typeof parsed.last_feedback_at_round === 'number' ? parsed.last_feedback_at_round : null,
+    };
+  } catch {
+    return null;
+  }
+};
+
 export const useRoundCounter = () => {
-  const incrementRound = useCallback((sessionKey: string): number => {
-    // Prevent double-counting the same finished round
-    const flagKey = `${SESSION_FLAG_PREFIX}${sessionKey}`;
+  /**
+   * Classify user as returning vs new on first run after this update.
+   * Returning = had a saved name OR had legacy feedback state.
+   * Idempotent — safe to call on every mount.
+   */
+  const classifyUserOnce = useCallback(() => {
+    const current = readState();
+    if (current.classified) return;
+
+    let isReturning = false;
     try {
-      if (sessionStorage.getItem(flagKey)) {
-        return readState().rounds_completed;
-      }
-      sessionStorage.setItem(flagKey, '1');
+      const savedName = localStorage.getItem(USER_NAME_KEY);
+      if (savedName && savedName.trim().length > 0) isReturning = true;
     } catch {
       // ignore
     }
 
-    const current = readState();
+    const legacy = readLegacyV1();
+    if (legacy) {
+      isReturning = true;
+    }
+
     const next: FeedbackState = {
       ...current,
-      rounds_completed: current.rounds_completed + 1,
+      // Migrate legacy round counter so we don't lose history
+      rounds_completed: legacy ? legacy.rounds_completed : current.rounds_completed,
+      is_returning_user: isReturning,
+      classified: true,
+      // For returning users, leave last_feedback_at = null so the modal shows on first open after the update.
+      last_feedback_at: null,
     };
     writeState(next);
-    return next.rounds_completed;
   }, []);
 
+  const incrementRound = useCallback(
+    (sessionKey: string, gameType: GameType, count: number = 1): number => {
+      // Prevent double-counting the same finished session
+      const flagKey = `${SESSION_FLAG_PREFIX}${sessionKey}`;
+      try {
+        if (sessionStorage.getItem(flagKey)) {
+          return readState().rounds_completed;
+        }
+        sessionStorage.setItem(flagKey, '1');
+      } catch {
+        // ignore
+      }
+
+      const current = readState();
+      const next: FeedbackState = { ...current };
+      if (gameType === 'guessing') {
+        next.guessing_rounds_completed = current.guessing_rounds_completed + Math.max(1, count);
+      } else {
+        next.rounds_completed = current.rounds_completed + Math.max(1, count);
+      }
+      writeState(next);
+      return next.rounds_completed + next.guessing_rounds_completed;
+    },
+    [],
+  );
+
   const shouldShowFeedback = useCallback((): boolean => {
-    const { rounds_completed, last_feedback_at_round } = readState();
-    if (rounds_completed >= 1 && last_feedback_at_round === null) return true;
-    if (last_feedback_at_round !== null && rounds_completed - last_feedback_at_round >= 5)
-      return true;
+    const s = readState();
+    const now = Date.now();
+    const totalRounds = s.rounds_completed + s.guessing_rounds_completed;
+
+    // Returning user, hasn't seen feedback yet after the new system → show immediately
+    if (s.is_returning_user && s.last_feedback_at === null) return true;
+
+    // New user finished at least one full game (any type) → show
+    if (!s.is_returning_user && totalRounds >= 1 && s.last_feedback_at === null) return true;
+
+    // 3 days since last feedback
+    if (s.last_feedback_at !== null && now - s.last_feedback_at >= THREE_DAYS_MS) return true;
+
+    // Heavy guessing player: 18 guessing rounds since last feedback
+    const guessingSinceLast = s.guessing_rounds_completed - s.guessing_rounds_at_last_feedback;
+    if (guessingSinceLast >= GUESSING_ROUNDS_THRESHOLD) return true;
+
     return false;
   }, []);
 
   const markFeedbackGiven = useCallback(() => {
     const current = readState();
-    writeState({ ...current, last_feedback_at_round: current.rounds_completed });
+    writeState({
+      ...current,
+      last_feedback_at: Date.now(),
+      guessing_rounds_at_last_feedback: current.guessing_rounds_completed,
+    });
   }, []);
 
-  const getRoundsCompleted = useCallback((): number => readState().rounds_completed, []);
+  const getRoundsCompleted = useCallback((): number => {
+    const s = readState();
+    return s.rounds_completed + s.guessing_rounds_completed;
+  }, []);
 
-  return { incrementRound, shouldShowFeedback, markFeedbackGiven, getRoundsCompleted };
+  return {
+    classifyUserOnce,
+    incrementRound,
+    shouldShowFeedback,
+    markFeedbackGiven,
+    getRoundsCompleted,
+  };
 };

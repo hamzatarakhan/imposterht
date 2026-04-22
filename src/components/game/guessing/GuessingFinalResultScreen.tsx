@@ -5,7 +5,7 @@ import { useSettings } from '@/context/SettingsContext';
 import { useFeedbackTrigger } from '@/context/FeedbackContext';
 
 const GuessingFinalResultScreen: React.FC = () => {
-  const { players, resetGame } = useGuessingGame();
+  const { players, resetGame, totalRounds } = useGuessingGame();
   const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
   const { notifyRoundCompleted } = useFeedbackTrigger();
@@ -14,9 +14,9 @@ const GuessingFinalResultScreen: React.FC = () => {
   useEffect(() => {
     if (!triggeredRef.current && players.length >= 2) {
       triggeredRef.current = true;
-      notifyRoundCompleted(`local-guessing-${Date.now()}`);
+      notifyRoundCompleted(`local-guessing-${Date.now()}`, 'guessing', totalRounds || 1);
     }
-  }, [players.length, notifyRoundCompleted]);
+  }, [players.length, notifyRoundCompleted, totalRounds]);
 
   if (players.length < 2) return null;
 

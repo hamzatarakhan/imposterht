@@ -98,7 +98,7 @@ const OnlineResultScreen: React.FC = () => {
       }
       if (!feedbackTriggeredRef.current && room?.id) {
         feedbackTriggeredRef.current = true;
-        notifyRoundCompleted(`online-imposter-${room.id}`);
+        notifyRoundCompleted(`online-imposter-${room.id}`, 'imposter');
       }
     }
   }, [isWinner, playSound, vibrate, imposters.length, notifyRoundCompleted, room?.id]);

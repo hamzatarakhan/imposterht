@@ -1,10 +1,15 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { useRoundCounter } from '@/hooks/useRoundCounter';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useRoundCounter, GameType } from '@/hooks/useRoundCounter';
 import FeedbackModal from '@/components/feedback/FeedbackModal';
 
 interface FeedbackContextValue {
-  /** Call when a full game round completes. `sessionKey` should be unique per round (e.g. roomId + roundNumber, or local timestamp). */
-  notifyRoundCompleted: (sessionKey: string) => void;
+  /**
+   * Call when a full game round/match completes.
+   * `sessionKey` should be unique per session (e.g. roomId or local timestamp).
+   * `gameType` distinguishes which counter bucket to increment.
+   * `count` (optional) — number of rounds played in this session (used for guessing matches with multiple rounds).
+   */
+  notifyRoundCompleted: (sessionKey: string, gameType: GameType, count?: number) => void;
 }
 
 const FeedbackContext = createContext<FeedbackContextValue>({
@@ -14,26 +19,36 @@ const FeedbackContext = createContext<FeedbackContextValue>({
 export const useFeedbackTrigger = () => useContext(FeedbackContext);
 
 export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { incrementRound, shouldShowFeedback, markFeedbackGiven, getRoundsCompleted } =
-    useRoundCounter();
+  const {
+    classifyUserOnce,
+    incrementRound,
+    shouldShowFeedback,
+    markFeedbackGiven,
+    getRoundsCompleted,
+  } = useRoundCounter();
   const [open, setOpen] = useState(false);
   const [roundsAtTrigger, setRoundsAtTrigger] = useState(0);
-  const [skipMarkOnSubmit, setSkipMarkOnSubmit] = useState(false);
+  const onMountCheckedRef = useRef(false);
 
+  // On first mount: classify user, then check if we should show the feedback modal immediately
+  // (returning users post-update, or anyone whose 3-day window has elapsed).
   useEffect(() => {
-    setRoundsAtTrigger(getRoundsCompleted());
-    setSkipMarkOnSubmit(true);
-    setOpen(true);
-  }, [getRoundsCompleted]);
+    if (onMountCheckedRef.current) return;
+    onMountCheckedRef.current = true;
+    classifyUserOnce();
+    if (shouldShowFeedback()) {
+      setRoundsAtTrigger(getRoundsCompleted());
+      setOpen(true);
+    }
+  }, [classifyUserOnce, shouldShowFeedback, getRoundsCompleted]);
 
   const notifyRoundCompleted = useCallback(
-    (sessionKey: string) => {
-      incrementRound(sessionKey);
+    (sessionKey: string, gameType: GameType, count: number = 1) => {
+      incrementRound(sessionKey, gameType, count);
       // Defer slightly so the result UI renders first
       setTimeout(() => {
         if (shouldShowFeedback()) {
           setRoundsAtTrigger(getRoundsCompleted());
-          setSkipMarkOnSubmit(false);
           setOpen(true);
         }
       }, 600);
@@ -42,12 +57,9 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 
   const handleSubmitted = useCallback(() => {
-    if (!skipMarkOnSubmit) {
-      markFeedbackGiven();
-    }
-    setSkipMarkOnSubmit(false);
+    markFeedbackGiven();
     setOpen(false);
-  }, [markFeedbackGiven, skipMarkOnSubmit]);
+  }, [markFeedbackGiven]);
 
   return (
     <FeedbackContext.Provider value={{ notifyRoundCompleted }}>
