@@ -34,6 +34,14 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [roundsAtTrigger, setRoundsAtTrigger] = useState(0);
   const onMountCheckedRef = useRef(false);
 
+  // Update notification UI only renders in standalone (PWA) mode.
+  // For browser users, `updateAvailable` will be true but no UI exists to apply
+  // the update — so we must NOT block the feedback modal in that case.
+  const isStandalone =
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(display-mode: standalone)')?.matches;
+  const updateBlocksFeedback = updateAvailable && isStandalone;
+
   // Classify user once on mount (cheap, no UI side effect).
   useEffect(() => {
     classifyUserOnce();
@@ -45,35 +53,35 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     if (onMountCheckedRef.current) return;
     if (screen === 'splash') return;
-    if (updateAvailable) return; // update prompt always wins
+    if (updateBlocksFeedback) return; // update prompt always wins (PWA only)
     onMountCheckedRef.current = true;
     if (shouldShowFeedback()) {
       setRoundsAtTrigger(getRoundsCompleted());
       setOpen(true);
     }
-  }, [screen, updateAvailable, shouldShowFeedback, getRoundsCompleted]);
+  }, [screen, updateBlocksFeedback, shouldShowFeedback, getRoundsCompleted]);
 
   // If an update appears while the feedback modal is open, hide it (without marking feedback as given).
   useEffect(() => {
-    if (updateAvailable && open) {
+    if (updateBlocksFeedback && open) {
       setOpen(false);
     }
-  }, [updateAvailable, open]);
+  }, [updateBlocksFeedback, open]);
 
   const notifyRoundCompleted = useCallback(
     (sessionKey: string, gameType: GameType, count: number = 1) => {
       incrementRound(sessionKey, gameType, count);
       // Defer slightly so the result UI renders first
       setTimeout(() => {
-        // Update prompt wins — never overlay feedback on top of it
-        if (updateAvailable) return;
+        // Update prompt wins — never overlay feedback on top of it (PWA only)
+        if (updateBlocksFeedback) return;
         if (shouldShowFeedback()) {
           setRoundsAtTrigger(getRoundsCompleted());
           setOpen(true);
         }
       }, 600);
     },
-    [incrementRound, shouldShowFeedback, getRoundsCompleted, updateAvailable],
+    [incrementRound, shouldShowFeedback, getRoundsCompleted, updateBlocksFeedback],
   );
 
   const handleSubmitted = useCallback(() => {
@@ -85,7 +93,7 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     <FeedbackContext.Provider value={{ notifyRoundCompleted }}>
       {children}
       <FeedbackModal
-        open={open && !updateAvailable}
+        open={open && !updateBlocksFeedback}
         roundsCompleted={roundsAtTrigger}
         onSubmitted={handleSubmitted}
       />
