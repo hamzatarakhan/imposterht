@@ -16,7 +16,7 @@ const RATINGS: { id: FeedbackRating; label: string; icon: string }[] = [
   { id: "amazing", label: "رائع", icon: "✨" },
   { id: "more_amazing", label: "أكثر من رائع", icon: "🔥" },
   { id: "khoz3boli", label: "خُزعبلي", icon: "🤯" },
-  { id: "salat_nabi", label: "صلاة النبي ما عليه حكي", icon: "🤲" },
+  { id: "salat_nabi", label: "فوق أي تقييم", icon: "🤲" },
   { id: "needs_improvement", label: "بدك الصحيح بده شوية تحسين", icon: "🛠️" },
 ];
 
