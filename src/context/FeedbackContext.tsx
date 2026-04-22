@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useRoundCounter, GameType } from '@/hooks/useRoundCounter';
 import { useServiceWorkerUpdate } from '@/hooks/useServiceWorkerUpdate';
+import { useGame } from '@/context/GameContext';
 import FeedbackModal from '@/components/feedback/FeedbackModal';
 
 interface FeedbackContextValue {
