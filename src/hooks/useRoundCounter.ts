@@ -4,6 +4,7 @@ const STORAGE_KEY_V1 = 'feedback_state_v1';
 const STORAGE_KEY = 'feedback_state_v2';
 const SESSION_FLAG_PREFIX = 'feedback_round_counted_';
 const USER_NAME_KEY = 'user_name';
+const APP_VERSION_KEY = 'app_build_version';
 
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const GUESSING_ROUNDS_THRESHOLD = 18;
@@ -15,6 +16,7 @@ interface FeedbackState {
   guessing_rounds_completed: number;
   guessing_rounds_at_last_feedback: number;
   last_feedback_at: number | null; // timestamp ms
+  last_feedback_app_version: string | null; // app version when feedback was last given
   is_returning_user: boolean;
   classified: boolean;
 }
@@ -24,9 +26,18 @@ const defaultState = (): FeedbackState => ({
   guessing_rounds_completed: 0,
   guessing_rounds_at_last_feedback: 0,
   last_feedback_at: null,
+  last_feedback_app_version: null,
   is_returning_user: false,
   classified: false,
 });
+
+const getCurrentAppVersion = (): string | null => {
+  try {
+    return localStorage.getItem(APP_VERSION_KEY);
+  } catch {
+    return null;
+  }
+};
 
 const readState = (): FeedbackState => {
   try {
