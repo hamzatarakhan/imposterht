@@ -22,6 +22,7 @@ export type Database = {
           improvement_text: string | null
           rating: string
           rounds_completed: number | null
+          submitter_name: string | null
           user_id: string | null
         }
         Insert: {
@@ -31,6 +32,7 @@ export type Database = {
           improvement_text?: string | null
           rating: string
           rounds_completed?: number | null
+          submitter_name?: string | null
           user_id?: string | null
         }
         Update: {
@@ -40,6 +42,7 @@ export type Database = {
           improvement_text?: string | null
           rating?: string
           rounds_completed?: number | null
+          submitter_name?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -789,6 +792,7 @@ export type Database = {
           improvement_text: string | null
           rating: string
           rounds_completed: number | null
+          submitter_name: string | null
           user_id: string | null
         }[]
         SetofOptions: {

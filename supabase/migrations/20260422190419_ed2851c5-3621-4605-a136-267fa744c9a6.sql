@@ -1,0 +1,1 @@
+ALTER TABLE public.app_feedback ADD COLUMN submitter_name text;
