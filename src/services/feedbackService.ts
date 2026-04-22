@@ -87,11 +87,13 @@ export const submitFeedback = async ({
 
   if (error) throw error;
 
-  // Fire-and-forget email notification — never block UX on this
+  // Send email notification — await with a short timeout so the request
+  // actually completes before the modal unmounts (which would cancel an
+  // un-awaited fetch). Failures are swallowed: feedback is already saved.
   try {
     const meta = RATING_META[rating];
     const ratingId = inserted?.id ?? crypto.randomUUID();
-    void supabase.functions.invoke('send-transactional-email', {
+    const emailPromise = supabase.functions.invoke('send-transactional-email', {
       body: {
         templateName: 'feedback-notification',
         recipientEmail: 'Hamzatarakhan2000@gmail.com',
@@ -109,6 +111,11 @@ export const submitFeedback = async ({
         },
       },
     });
+    // Race against a 4s timeout so a slow network never blocks the UI thanks screen
+    await Promise.race([
+      emailPromise,
+      new Promise((resolve) => setTimeout(resolve, 4000)),
+    ]);
   } catch (e) {
     // Silent — feedback is already saved in DB
     console.warn('Feedback email notification failed', e);
