@@ -1,0 +1,2 @@
+ALTER TABLE public.app_feedback DROP CONSTRAINT IF EXISTS app_feedback_improvement_length;
+ALTER TABLE public.app_feedback ADD CONSTRAINT app_feedback_improvement_length CHECK (improvement_text IS NULL OR (char_length(improvement_text) >= 1 AND char_length(improvement_text) <= 1000));
