@@ -40,14 +40,32 @@ export const submitFeedback = async ({
   const user_id = getUserId();
   const app_version = await getAppVersion();
 
+  const trimmedImprovement = improvement_text?.trim() || null;
+
   const { error } = await supabase.from('app_feedback').insert({
     rating,
-    improvement_text: improvement_text?.trim() || null,
+    improvement_text: trimmedImprovement,
     rounds_completed: rounds_completed ?? null,
     app_version,
     user_id: user_id || null,
   });
 
   if (error) throw error;
+
+  // Fire-and-forget email notification (don't block UX if it fails)
+  supabase.functions
+    .invoke('notify-feedback', {
+      body: {
+        rating,
+        improvement_text: trimmedImprovement,
+        app_version,
+        rounds_completed: rounds_completed ?? null,
+        created_at: new Date().toISOString(),
+      },
+    })
+    .catch((err) => {
+      console.warn('notify-feedback failed (non-blocking):', err);
+    });
+
   return true;
 };
