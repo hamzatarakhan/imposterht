@@ -47,13 +47,12 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
 
   const needsText = selected === "needs_improvement";
   const trimmedLen = improvement.trim().length;
-  const canSubmit = !!selected && (!needsText || (trimmedLen >= 10 && trimmedLen <= 1000)) && !submitting;
+  const canSubmit = !!selected && (!needsText || (trimmedLen >= 1 && trimmedLen <= 1000)) && !submitting;
 
   const handleSelect = (id: FeedbackRating) => {
     playSound("click");
     vibrate(30);
     setSelected(id);
-    if (id !== "needs_improvement") setImprovement("");
   };
 
   const handleSubmit = async () => {
@@ -62,7 +61,7 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
     try {
       await submitFeedback({
         rating: selected,
-        improvement_text: needsText ? improvement : null,
+        improvement_text: trimmedLen > 0 ? improvement : null,
         rounds_completed: roundsCompleted,
       });
       playSound("win");
@@ -120,22 +119,30 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
           })}
         </div>
 
-        {needsText && (
-          <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2">
-            <Textarea
-              value={improvement}
-              onChange={(e) => setImprovement(e.target.value.slice(0, 1000))}
-              placeholder="يلا هات احكيلي شو التحسينات ؟ تخيل رح تكون جزء من تطوير الابليكيشن "
-              className="min-h-[110px] text-sm resize-none"
-              dir="rtl"
-              disabled={submitting}
-            />
-            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-              <span>{trimmedLen < 10 ? `لازم على الأقل ${10 - trimmedLen} حرف كمان` : "تمام ✓"}</span>
-              <span>{improvement.length}/1000</span>
-            </div>
+        <div className="space-y-1.5">
+          <Textarea
+            value={improvement}
+            onChange={(e) => setImprovement(e.target.value.slice(0, 1000))}
+            placeholder={
+              needsText
+                ? "يلا هات احكيلي شو التحسينات ؟ تخيل رح تكون جزء من تطوير الابليكيشن "
+                : "امدحنا شوي عشان نستمر 💛 (اختياري)"
+            }
+            className="min-h-[110px] text-sm resize-none"
+            dir="rtl"
+            disabled={submitting}
+          />
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>
+              {needsText
+                ? trimmedLen < 1
+                  ? "اكتبلي ولو حرف 🙏"
+                  : "تمام ✓"
+                : "اختياري — بس رأيك بفرق"}
+            </span>
+            <span>{improvement.length}/1000</span>
           </div>
-        )}
+        </div>
 
         <button
           onClick={handleSubmit}
