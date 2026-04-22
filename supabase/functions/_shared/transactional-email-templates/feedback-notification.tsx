@@ -35,6 +35,7 @@ export const FeedbackNotificationEmail = ({
   createdAt,
   userId,
   userName,
+  submitterName,
   userAvatar,
   userAgent,
   language,
@@ -46,7 +47,9 @@ export const FeedbackNotificationEmail = ({
       })
     : 'now'
 
-  const displayName = userName?.trim() || 'مستخدم بدون اسم'
+  const trimmedSubmitter = submitterName?.trim() || null
+  const trimmedUserName = userName?.trim() || null
+  const displayName = trimmedSubmitter || trimmedUserName || 'مستخدم بدون اسم'
 
   return (
     <Html>
@@ -62,6 +65,16 @@ export const FeedbackNotificationEmail = ({
             <Text style={userTitle}>
               {userAvatar ?? '👤'} {displayName}
             </Text>
+            {trimmedSubmitter && (
+              <Text style={userMeta}>
+                <strong>✍️ كتب اسمه بالتقييم:</strong> {trimmedSubmitter}
+              </Text>
+            )}
+            {trimmedUserName && trimmedUserName !== trimmedSubmitter && (
+              <Text style={userMeta}>
+                <strong>اسم الحساب:</strong> {trimmedUserName}
+              </Text>
+            )}
             {userId && (
               <Text style={userMeta}>
                 <strong>ID:</strong> <span style={mono}>{userId}</span>
