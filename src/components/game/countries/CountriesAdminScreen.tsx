@@ -16,7 +16,13 @@ import {
 const CountriesAdminScreen: React.FC = () => {
   const { room, players, burned, addPlayer, removePlayer, updateLives, addBurned, removeBurned, swapPlayers, leaveRoom } = useCountries();
   const { playSound, vibrate } = useSettings();
+  const { notifyRoundCompleted } = useFeedbackTrigger();
   const { savedPlayers } = useSavedPlayers();
+
+  const handleConfirmLeave = () => {
+    if (room?.id) notifyRoundCompleted(`countries-${room.id}`);
+    leaveRoom();
+  };
 
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newCountryName, setNewCountryName] = useState('');
