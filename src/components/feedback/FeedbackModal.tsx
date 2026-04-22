@@ -125,7 +125,7 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
             <Textarea
               value={improvement}
               onChange={(e) => setImprovement(e.target.value.slice(0, 1000))}
-              placeholder="يلا تفضل اهرج، شو التحسينات؟ شو مشكلتك عشان نرستكلك الأمور 🛠️"
+              placeholder="يلا تفضل اهرج، شو التحسينات؟ أوصفلنا شو مشكلتك عشان نرستكلك الأمور 🛠️"
               className="min-h-[110px] text-sm resize-none"
               dir="rtl"
               disabled={submitting}
