@@ -7,6 +7,14 @@ export type FeedbackRating =
   | 'salat_nabi'
   | 'needs_improvement';
 
+const RATING_LABELS: Record<FeedbackRating, string> = {
+  amazing: 'رائع',
+  more_amazing: 'أكثر من رائع',
+  khoz3boli: 'خُزعبلي',
+  salat_nabi: 'فوق أي تقييم',
+  needs_improvement: 'في عندي شوية اقتراحات ممكن توخد الابليكيشن بحتة تانية',
+};
+
 interface SubmitFeedbackPayload {
   rating: FeedbackRating;
   improvement_text?: string | null;
@@ -74,7 +82,8 @@ export const submitFeedback = async ({
   supabase.functions
     .invoke('notify-feedback', {
       body: {
-        rating,
+        rating: RATING_LABELS[rating] ?? rating,
+        rating_id: rating,
         improvement_text: trimmedImprovement,
         app_version,
         rounds_completed: rounds_completed ?? null,
