@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useFeedbackTrigger } from '@/context/FeedbackContext';
 import { RotateCcw, Home, Trophy, Medal } from 'lucide-react';
 
 const ResultScreen: React.FC = () => {
   const { players, winner, secretWord, playAgain, resetGame, getLeaderboard, roundNumber, resetScores } = useGame();
   const { playSound, vibrate } = useSettings();
+  const { notifyRoundCompleted } = useFeedbackTrigger();
   const hasPlayedSoundRef = useRef(false);
   
   const imposters = players.filter(p => p.isImposter);
@@ -50,8 +52,10 @@ const ResultScreen: React.FC = () => {
         vibrate([200, 100, 200]);
       }
       hasPlayedSoundRef.current = true;
+      // Trigger mandatory feedback prompt after first round, then every 5
+      notifyRoundCompleted(`local-imposter-${roundNumber}-${secretWord ?? ''}`);
     }
-  }, [playersWon, playSound, vibrate]);
+  }, [playersWon, playSound, vibrate, notifyRoundCompleted, roundNumber, secretWord]);
 
   const handlePlayAgain = () => {
     playSound('click');
