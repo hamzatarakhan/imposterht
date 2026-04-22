@@ -1,5 +1,5 @@
 // Bump this to force all clients to refresh cached assets on the next visit.
-const CACHE_NAME = 'imposter-v3';
+const CACHE_NAME = 'imposter-v4';
 
 // Minimal precache for offline boot.
 const urlsToCache = ['/', '/index.html', '/favicon.png', '/manifest.json'];
