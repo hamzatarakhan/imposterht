@@ -82,7 +82,8 @@ export const submitFeedback = async ({
   supabase.functions
     .invoke('notify-feedback', {
       body: {
-        rating,
+        rating: RATING_LABELS[rating] ?? rating,
+        rating_id: rating,
         improvement_text: trimmedImprovement,
         app_version,
         rounds_completed: rounds_completed ?? null,
