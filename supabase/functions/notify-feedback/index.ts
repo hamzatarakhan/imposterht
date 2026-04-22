@@ -1,9 +1,8 @@
-import { createClient } from 'npm:@supabase/supabase-js@2'
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
+    'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 }
 
 Deno.serve(async (req) => {
@@ -13,7 +12,6 @@ Deno.serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
     const body = await req.json().catch(() => ({}))
     const {
@@ -31,12 +29,17 @@ Deno.serve(async (req) => {
       })
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    const internalToken = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-    const { data, error } = await supabase.functions.invoke(
-      'send-transactional-email',
+    const response = await fetch(
+      `${supabaseUrl}/functions/v1/send-transactional-email`,
       {
-        body: {
+        method: 'POST',
+        headers: {
+          'x-internal-token': internalToken,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           templateName: 'feedback-notification',
           recipientEmail: 'Hamzatarakhan2000@gmail.com',
           templateData: {
@@ -46,13 +49,19 @@ Deno.serve(async (req) => {
             roundsCompleted: rounds_completed ?? null,
             createdAt: created_at ?? new Date().toISOString(),
           },
-        },
+        }),
       }
     )
 
-    if (error) {
-      console.error('send-transactional-email failed', error)
-      return new Response(JSON.stringify({ error: error.message }), {
+    const raw = await response.text()
+    const data = raw ? JSON.parse(raw) : null
+
+    if (!response.ok) {
+      console.error('send-transactional-email failed', {
+        status: response.status,
+        data,
+      })
+      return new Response(JSON.stringify({ error: data?.error ?? 'Email send failed' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -71,3 +80,5 @@ Deno.serve(async (req) => {
     })
   }
 })
+
+
