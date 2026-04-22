@@ -20,6 +20,7 @@ interface FeedbackEmailProps {
   createdAt?: string
   userId?: string | null
   userName?: string | null
+  submitterName?: string | null
   userAvatar?: string | null
   userAgent?: string | null
   language?: string | null
