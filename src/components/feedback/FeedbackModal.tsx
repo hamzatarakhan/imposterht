@@ -47,13 +47,12 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
 
   const needsText = selected === "needs_improvement";
   const trimmedLen = improvement.trim().length;
-  const canSubmit = !!selected && (!needsText || (trimmedLen >= 10 && trimmedLen <= 1000)) && !submitting;
+  const canSubmit = !!selected && (!needsText || (trimmedLen >= 1 && trimmedLen <= 1000)) && !submitting;
 
   const handleSelect = (id: FeedbackRating) => {
     playSound("click");
     vibrate(30);
     setSelected(id);
-    if (id !== "needs_improvement") setImprovement("");
   };
 
   const handleSubmit = async () => {
@@ -62,7 +61,7 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
     try {
       await submitFeedback({
         rating: selected,
-        improvement_text: needsText ? improvement : null,
+        improvement_text: trimmedLen > 0 ? improvement : null,
         rounds_completed: roundsCompleted,
       });
       playSound("win");
