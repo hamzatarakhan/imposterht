@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useRoundCounter, GameType } from '@/hooks/useRoundCounter';
+import { useServiceWorkerUpdate } from '@/hooks/useServiceWorkerUpdate';
 import FeedbackModal from '@/components/feedback/FeedbackModal';
 
 interface FeedbackContextValue {
@@ -26,34 +27,50 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     markFeedbackGiven,
     getRoundsCompleted,
   } = useRoundCounter();
+  const { updateAvailable } = useServiceWorkerUpdate();
   const [open, setOpen] = useState(false);
   const [roundsAtTrigger, setRoundsAtTrigger] = useState(0);
   const onMountCheckedRef = useRef(false);
+  const pendingMountCheckRef = useRef(false);
 
-  // On first mount: classify user, then check if we should show the feedback modal immediately
-  // (returning users post-update, or anyone whose 3-day window has elapsed).
+  // On first mount: classify user. Defer the shouldShow check until we're sure no update is pending,
+  // so the UPDATE prompt always wins over the feedback prompt.
   useEffect(() => {
     if (onMountCheckedRef.current) return;
-    onMountCheckedRef.current = true;
     classifyUserOnce();
+    if (updateAvailable) {
+      // Wait — update modal must take precedence
+      pendingMountCheckRef.current = true;
+      return;
+    }
+    onMountCheckedRef.current = true;
     if (shouldShowFeedback()) {
       setRoundsAtTrigger(getRoundsCompleted());
       setOpen(true);
     }
-  }, [classifyUserOnce, shouldShowFeedback, getRoundsCompleted]);
+  }, [classifyUserOnce, shouldShowFeedback, getRoundsCompleted, updateAvailable]);
+
+  // If an update appears while the feedback modal is open, hide it (without marking feedback as given).
+  useEffect(() => {
+    if (updateAvailable && open) {
+      setOpen(false);
+    }
+  }, [updateAvailable, open]);
 
   const notifyRoundCompleted = useCallback(
     (sessionKey: string, gameType: GameType, count: number = 1) => {
       incrementRound(sessionKey, gameType, count);
       // Defer slightly so the result UI renders first
       setTimeout(() => {
+        // Update prompt wins — never overlay feedback on top of it
+        if (updateAvailable) return;
         if (shouldShowFeedback()) {
           setRoundsAtTrigger(getRoundsCompleted());
           setOpen(true);
         }
       }, 600);
     },
-    [incrementRound, shouldShowFeedback, getRoundsCompleted],
+    [incrementRound, shouldShowFeedback, getRoundsCompleted, updateAvailable],
   );
 
   const handleSubmitted = useCallback(() => {
@@ -64,7 +81,11 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   return (
     <FeedbackContext.Provider value={{ notifyRoundCompleted }}>
       {children}
-      <FeedbackModal open={open} roundsCompleted={roundsAtTrigger} onSubmitted={handleSubmitted} />
+      <FeedbackModal
+        open={open && !updateAvailable}
+        roundsCompleted={roundsAtTrigger}
+        onSubmitted={handleSubmitted}
+      />
     </FeedbackContext.Provider>
   );
 };
