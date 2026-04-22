@@ -1,9 +1,6 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { bootstrapSessionTracking } from "./services/sessionTrackingService";
-
-bootstrapSessionTracking();
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
