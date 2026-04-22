@@ -143,12 +143,10 @@ export const useRoundCounter = () => {
     const totalRounds = s.rounds_completed + s.guessing_rounds_completed;
     const currentVersion = getCurrentAppVersion();
 
-    // App was updated since last feedback → show again on first qualifying open
-    // (returning users immediately; new users after they've played at least one round)
-    const versionChanged =
-      currentVersion !== null &&
-      s.last_feedback_app_version !== null &&
-      currentVersion !== s.last_feedback_app_version;
+    // App was updated since last feedback → show again on first qualifying open.
+    // If the stored feedback version is missing (older state before this field existed),
+    // treat it as stale too so existing users still get prompted after this publish.
+    const versionChanged = currentVersion !== null && currentVersion !== s.last_feedback_app_version;
     if (versionChanged) {
       // Returning users see it immediately after an update
       if (s.is_returning_user) return true;
