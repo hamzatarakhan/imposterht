@@ -57,6 +57,7 @@ Deno.serve(async (req) => {
             createdAt: created_at ?? new Date().toISOString(),
             userId: user_id ?? null,
             userName: user_name ?? null,
+            submitterName: submitter_name ?? null,
             userAvatar: user_avatar ?? null,
             userAgent: user_agent ?? null,
             language: language ?? null,
