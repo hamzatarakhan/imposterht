@@ -1,6 +1,6 @@
 ---
 name: App Feedback System
-description: Time-based + first-game feedback modal. Returning users see it on first open after update, new users after first finished game. Recurs every 3 days, with extra trigger every 18 guessing rounds. Stored in app_feedback table. 5 Jordanian rating options + conditional improvement textarea + post-submit thank-you with share for positive ratings.
+description: Time-based + first-game + per-update feedback modal. Returning users see it on first open after each app update, new users after first finished game post-update. Recurs every 3 days, with extra trigger every 18 guessing rounds. Stored in app_feedback table. 5 Jordanian rating options + conditional improvement textarea + optional submitter name + post-submit thank-you with share for positive ratings.
 type: feature
 ---
 نظام تقييم للتطبيق يعتمد على **الوقت + نوع المستخدم** (مش عدد الجولات الثابت).
