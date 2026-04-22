@@ -141,6 +141,20 @@ export const useRoundCounter = () => {
     const s = readState();
     const now = Date.now();
     const totalRounds = s.rounds_completed + s.guessing_rounds_completed;
+    const currentVersion = getCurrentAppVersion();
+
+    // App was updated since last feedback → show again on first qualifying open
+    // (returning users immediately; new users after they've played at least one round)
+    const versionChanged =
+      currentVersion !== null &&
+      s.last_feedback_app_version !== null &&
+      currentVersion !== s.last_feedback_app_version;
+    if (versionChanged) {
+      // Returning users see it immediately after an update
+      if (s.is_returning_user) return true;
+      // New users see it after at least one finished round post-update
+      if (totalRounds >= 1) return true;
+    }
 
     // Returning user, hasn't seen feedback yet after the new system → show immediately
     if (s.is_returning_user && s.last_feedback_at === null) return true;
@@ -163,6 +177,7 @@ export const useRoundCounter = () => {
     writeState({
       ...current,
       last_feedback_at: Date.now(),
+      last_feedback_app_version: getCurrentAppVersion(),
       guessing_rounds_at_last_feedback: current.guessing_rounds_completed,
     });
   }, []);
