@@ -19,6 +19,7 @@ interface SubmitFeedbackPayload {
   rating: FeedbackRating;
   improvement_text?: string | null;
   rounds_completed?: number | null;
+  submitter_name?: string | null;
 }
 
 const getUserId = (): string | null => {
@@ -60,6 +61,7 @@ export const submitFeedback = async ({
   rating,
   improvement_text,
   rounds_completed,
+  submitter_name,
 }: SubmitFeedbackPayload) => {
   const user_id = getUserId();
   const user_name = getUserName();
@@ -67,6 +69,7 @@ export const submitFeedback = async ({
   const app_version = await getAppVersion();
 
   const trimmedImprovement = improvement_text?.trim() || null;
+  const trimmedSubmitter = submitter_name?.trim() || null;
 
   const { error } = await supabase.from('app_feedback').insert({
     rating,
@@ -74,6 +77,7 @@ export const submitFeedback = async ({
     rounds_completed: rounds_completed ?? null,
     app_version,
     user_id: user_id || null,
+    submitter_name: trimmedSubmitter,
   });
 
   if (error) throw error;
@@ -89,7 +93,8 @@ export const submitFeedback = async ({
         rounds_completed: rounds_completed ?? null,
         created_at: new Date().toISOString(),
         user_id: user_id || null,
-        user_name: user_name || null,
+        user_name: trimmedSubmitter || user_name || null,
+        submitter_name: trimmedSubmitter,
         user_avatar: user_avatar || null,
         user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
         language: typeof navigator !== 'undefined' ? navigator.language : null,
