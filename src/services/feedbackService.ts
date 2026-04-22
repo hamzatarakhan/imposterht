@@ -83,6 +83,9 @@ export const submitFeedback = async ({
   if (error) throw error;
 
   // Fire-and-forget email notification (don't block UX if it fails)
+  // NOTE: We intentionally DO NOT touch localStorage `user_name` here — the
+  // submitter_name is only used for this single feedback submission and must
+  // not overwrite the saved identity used across games.
   supabase.functions
     .invoke('notify-feedback', {
       body: {
@@ -93,8 +96,12 @@ export const submitFeedback = async ({
         rounds_completed: rounds_completed ?? null,
         created_at: new Date().toISOString(),
         user_id: user_id || null,
-        user_name: trimmedSubmitter || user_name || null,
+        // Saved identity (never overwritten by feedback form)
+        saved_user_name: user_name || null,
+        // Name typed in the feedback form (may equal saved name or differ)
         submitter_name: trimmedSubmitter,
+        // Backwards-compat field consumed by the email template
+        user_name: trimmedSubmitter || user_name || null,
         user_avatar: user_avatar || null,
         user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
         language: typeof navigator !== 'undefined' ? navigator.language : null,
