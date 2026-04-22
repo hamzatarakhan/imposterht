@@ -29,27 +29,29 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     getRoundsCompleted,
   } = useRoundCounter();
   const { updateAvailable } = useServiceWorkerUpdate();
+  const { screen } = useGame();
   const [open, setOpen] = useState(false);
   const [roundsAtTrigger, setRoundsAtTrigger] = useState(0);
   const onMountCheckedRef = useRef(false);
-  const pendingMountCheckRef = useRef(false);
 
-  // On first mount: classify user. Defer the shouldShow check until we're sure no update is pending,
-  // so the UPDATE prompt always wins over the feedback prompt.
+  // Classify user once on mount (cheap, no UI side effect).
+  useEffect(() => {
+    classifyUserOnce();
+  }, [classifyUserOnce]);
+
+  // Defer the on-mount auto-open until the user has actually left the splash screen
+  // AND no service-worker update is pending. This prevents the modal from popping
+  // over the splash (especially in browsers where the splash is the first thing seen).
   useEffect(() => {
     if (onMountCheckedRef.current) return;
-    classifyUserOnce();
-    if (updateAvailable) {
-      // Wait — update modal must take precedence
-      pendingMountCheckRef.current = true;
-      return;
-    }
+    if (screen === 'splash') return;
+    if (updateAvailable) return; // update prompt always wins
     onMountCheckedRef.current = true;
     if (shouldShowFeedback()) {
       setRoundsAtTrigger(getRoundsCompleted());
       setOpen(true);
     }
-  }, [classifyUserOnce, shouldShowFeedback, getRoundsCompleted, updateAvailable]);
+  }, [screen, updateAvailable, shouldShowFeedback, getRoundsCompleted]);
 
   // If an update appears while the feedback modal is open, hide it (without marking feedback as given).
   useEffect(() => {
