@@ -63,27 +63,6 @@ const formatTimestamp = (): string => {
   }
 };
 
-const sendFeedbackNotification = async (payload: Record<string, unknown>) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-transactional-email`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-      },
-      body: JSON.stringify(payload),
-      keepalive: true,
-    },
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => '');
-    throw new Error(`Feedback email notification failed: ${response.status} ${errorText}`);
-  }
-};
-
 export const submitFeedback = async ({
   rating,
   improvement_text,
@@ -108,27 +87,32 @@ export const submitFeedback = async ({
 
   if (error) throw error;
 
-  const meta = RATING_META[rating];
-  const ratingId = inserted?.id ?? crypto.randomUUID();
-
-  void sendFeedbackNotification({
-    templateName: 'feedback-notification',
-    recipientEmail: 'Hamzatarakhan2000@gmail.com',
-    idempotencyKey: `feedback-${ratingId}`,
-    templateData: {
-      ratingLabel: meta.label,
-      ratingEmoji: meta.emoji,
-      ratingId: rating,
-      improvementText: trimmedImprovement,
-      playerName: playerName?.trim() || null,
-      roundsCompleted: rounds_completed ?? null,
-      appVersion: app_version,
-      userId: user_id,
-      submittedAt: formatTimestamp(),
-    },
-  }).catch((e) => {
+  // Fire-and-forget email notification — never block UX on this
+  try {
+    const meta = RATING_META[rating];
+    const ratingId = inserted?.id ?? crypto.randomUUID();
+    void supabase.functions.invoke('send-transactional-email', {
+      body: {
+        templateName: 'feedback-notification',
+        recipientEmail: 'Hamzatarakhan2000@gmail.com',
+        idempotencyKey: `feedback-${ratingId}`,
+        templateData: {
+          ratingLabel: meta.label,
+          ratingEmoji: meta.emoji,
+          ratingId: rating,
+          improvementText: trimmedImprovement,
+          playerName: playerName?.trim() || null,
+          roundsCompleted: rounds_completed ?? null,
+          appVersion: app_version,
+          userId: user_id,
+          submittedAt: formatTimestamp(),
+        },
+      },
+    });
+  } catch (e) {
+    // Silent — feedback is already saved in DB
     console.warn('Feedback email notification failed', e);
-  });
+  }
 
   return true;
 };
