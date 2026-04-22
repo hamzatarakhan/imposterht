@@ -17,7 +17,7 @@ const RATINGS: { id: FeedbackRating; label: string; icon: string }[] = [
   { id: "more_amazing", label: "أكثر من رائع", icon: "🔥" },
   { id: "khoz3boli", label: "خُزعبلي", icon: "🤯" },
   { id: "salat_nabi", label: "فوق أي تقييم", icon: "💯" },
-  { id: "needs_improvement", label: "بدك الصحيح بده شوية تحسين", icon: "🛠️" },
+  { id: "needs_improvement", label: "في عندي شوية اقتراحات ممكن توخد الابليكيشن بحتة تانية ", icon: "🛠️" },
 ];
 
 const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) => {
