@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useRoundCounter } from '@/hooks/useRoundCounter';
 import FeedbackModal from '@/components/feedback/FeedbackModal';
 
@@ -18,6 +18,13 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     useRoundCounter();
   const [open, setOpen] = useState(false);
   const [roundsAtTrigger, setRoundsAtTrigger] = useState(0);
+  const [skipMarkOnSubmit, setSkipMarkOnSubmit] = useState(false);
+
+  useEffect(() => {
+    setRoundsAtTrigger(getRoundsCompleted());
+    setSkipMarkOnSubmit(true);
+    setOpen(true);
+  }, [getRoundsCompleted]);
 
   const notifyRoundCompleted = useCallback(
     (sessionKey: string) => {
@@ -26,6 +33,7 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setTimeout(() => {
         if (shouldShowFeedback()) {
           setRoundsAtTrigger(getRoundsCompleted());
+          setSkipMarkOnSubmit(false);
           setOpen(true);
         }
       }, 600);
@@ -34,9 +42,12 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 
   const handleSubmitted = useCallback(() => {
-    markFeedbackGiven();
+    if (!skipMarkOnSubmit) {
+      markFeedbackGiven();
+    }
+    setSkipMarkOnSubmit(false);
     setOpen(false);
-  }, [markFeedbackGiven]);
+  }, [markFeedbackGiven, skipMarkOnSubmit]);
 
   return (
     <FeedbackContext.Provider value={{ notifyRoundCompleted }}>
