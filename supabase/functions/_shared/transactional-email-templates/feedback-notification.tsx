@@ -20,6 +20,7 @@ interface FeedbackEmailProps {
   createdAt?: string
   userId?: string | null
   userName?: string | null
+  submitterName?: string | null
   userAvatar?: string | null
   userAgent?: string | null
   language?: string | null
@@ -34,6 +35,7 @@ export const FeedbackNotificationEmail = ({
   createdAt,
   userId,
   userName,
+  submitterName,
   userAvatar,
   userAgent,
   language,
@@ -45,7 +47,9 @@ export const FeedbackNotificationEmail = ({
       })
     : 'now'
 
-  const displayName = userName?.trim() || 'مستخدم بدون اسم'
+  const trimmedSubmitter = submitterName?.trim() || null
+  const trimmedUserName = userName?.trim() || null
+  const displayName = trimmedSubmitter || trimmedUserName || 'مستخدم بدون اسم'
 
   return (
     <Html>
@@ -61,6 +65,16 @@ export const FeedbackNotificationEmail = ({
             <Text style={userTitle}>
               {userAvatar ?? '👤'} {displayName}
             </Text>
+            {trimmedSubmitter && (
+              <Text style={userMeta}>
+                <strong>✍️ كتب اسمه بالتقييم:</strong> {trimmedSubmitter}
+              </Text>
+            )}
+            {trimmedUserName && trimmedUserName !== trimmedSubmitter && (
+              <Text style={userMeta}>
+                <strong>اسم الحساب:</strong> {trimmedUserName}
+              </Text>
+            )}
             {userId && (
               <Text style={userMeta}>
                 <strong>ID:</strong> <span style={mono}>{userId}</span>
@@ -205,7 +219,7 @@ const footer = {
 export const template: TemplateEntry = {
   component: FeedbackNotificationEmail,
   subject: (data: FeedbackEmailProps) =>
-    `⚡ تقييم جديد من ${data.userName?.trim() || 'مستخدم'}: ${data.rating ?? 'غير محدد'}`,
+    `⚡ تقييم جديد من ${data.submitterName?.trim() || data.userName?.trim() || 'مستخدم'}: ${data.rating ?? 'غير محدد'}`,
   displayName: 'Feedback Notification',
   to: 'Hamzatarakhan2000@gmail.com',
   previewData: {
@@ -216,6 +230,7 @@ export const template: TemplateEntry = {
     createdAt: new Date().toISOString(),
     userId: '00000000-0000-0000-0000-000000000000',
     userName: 'حمزة',
+    submitterName: 'أبو حمزة',
     userAvatar: '🦊',
     userAgent: 'Mozilla/5.0 (iPhone) AppleWebKit/605.1.15',
     language: 'ar',
