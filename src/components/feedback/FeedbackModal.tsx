@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Loader2, Send, Share2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/context/SettingsContext";
@@ -28,6 +29,7 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
   const { toast } = useToast();
   const [selected, setSelected] = useState<FeedbackRating | null>(null);
   const [improvement, setImprovement] = useState("");
+  const [submitterName, setSubmitterName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submittedRating, setSubmittedRating] = useState<FeedbackRating | null>(null);
 
@@ -36,6 +38,12 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
 
     setSelected(null);
     setImprovement("");
+    // Pre-fill name from saved identity if available
+    let savedName = "";
+    try {
+      savedName = localStorage.getItem("user_name") || "";
+    } catch {}
+    setSubmitterName(savedName);
     setSubmitting(false);
     setSubmittedRating(null);
     vibrate(50);
@@ -68,6 +76,7 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
         rating: selected,
         improvement_text: trimmedLen > 0 ? improvement : null,
         rounds_completed: roundsCompleted,
+        submitter_name: submitterName.trim() || null,
       });
       playSound("win");
       vibrate(80);
