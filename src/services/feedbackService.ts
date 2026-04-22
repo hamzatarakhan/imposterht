@@ -7,6 +7,14 @@ export type FeedbackRating =
   | 'salat_nabi'
   | 'needs_improvement';
 
+const RATING_LABELS: Record<FeedbackRating, string> = {
+  amazing: 'رائع',
+  more_amazing: 'أكثر من رائع',
+  khoz3boli: 'خُزعبلي',
+  salat_nabi: 'فوق أي تقييم',
+  needs_improvement: 'في عندي شوية اقتراحات ممكن توخد الابليكيشن بحتة تانية',
+};
+
 interface SubmitFeedbackPayload {
   rating: FeedbackRating;
   improvement_text?: string | null;
