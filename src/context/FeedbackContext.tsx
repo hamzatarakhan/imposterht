@@ -34,6 +34,14 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [roundsAtTrigger, setRoundsAtTrigger] = useState(0);
   const onMountCheckedRef = useRef(false);
 
+  // Update notification UI only renders in standalone (PWA) mode.
+  // For browser users, `updateAvailable` will be true but no UI exists to apply
+  // the update — so we must NOT block the feedback modal in that case.
+  const isStandalone =
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(display-mode: standalone)')?.matches;
+  const updateBlocksFeedback = updateAvailable && isStandalone;
+
   // Classify user once on mount (cheap, no UI side effect).
   useEffect(() => {
     classifyUserOnce();
