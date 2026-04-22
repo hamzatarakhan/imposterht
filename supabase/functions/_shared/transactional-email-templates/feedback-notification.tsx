@@ -27,6 +27,23 @@ interface FeedbackEmailProps {
   pageUrl?: string | null
 }
 
+// Map raw rating keys to friendly Arabic labels + emoji + accent color.
+const RATING_META: Record<
+  string,
+  { label: string; emoji: string; color: string; bg: string }
+> = {
+  amazing: { label: 'حلو', emoji: '✨', color: '#1d4ed8', bg: '#dbeafe' },
+  more_amazing: { label: 'كتير حلو', emoji: '🔥', color: '#c2410c', bg: '#ffedd5' },
+  khoz3boli: { label: 'خزعبلي', emoji: '🤯', color: '#7c3aed', bg: '#ede9fe' },
+  salat_nabi: { label: 'صلّي عالنبي', emoji: '💯', color: '#15803d', bg: '#dcfce7' },
+  needs_improvement: {
+    label: 'بدها شغل',
+    emoji: '🛠️',
+    color: '#b91c1c',
+    bg: '#fee2e2',
+  },
+}
+
 export const FeedbackNotificationEmail = ({
   rating = 'غير محدد',
   improvementText,
@@ -45,81 +62,146 @@ export const FeedbackNotificationEmail = ({
     ? new Date(createdAt).toLocaleString('en-GB', {
         timeZone: 'Asia/Amman',
       })
-    : 'now'
+    : '—'
 
   const trimmedSubmitter = submitterName?.trim() || null
   const trimmedUserName = userName?.trim() || null
   const displayName = trimmedSubmitter || trimmedUserName || 'مستخدم بدون اسم'
+  const avatar = userAvatar || '👤'
+
+  const ratingMeta = RATING_META[rating] || {
+    label: rating,
+    emoji: '⭐',
+    color: '#0f172a',
+    bg: '#f1f5f9',
+  }
+
+  const hasImprovement = !!(improvementText && improvementText.trim().length > 0)
+  const namesDiffer =
+    trimmedSubmitter && trimmedUserName && trimmedSubmitter !== trimmedUserName
+  const isNegative = rating === 'needs_improvement'
 
   return (
-    <Html>
+    <Html lang="ar" dir="rtl">
       <Head />
       <Preview>
-        تقييم جديد من {displayName}: {rating}
+        {ratingMeta.emoji} تقييم جديد من {displayName} — {ratingMeta.label}
       </Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>⚡ تقييم جديد وصل!</Heading>
-
-          <Section style={userCard}>
-            <Text style={userTitle}>
-              {userAvatar ?? '👤'} {displayName}
+          {/* Header */}
+          <Section style={header}>
+            <Text style={brand}>⚡ فعاليات</Text>
+            <Heading style={h1}>تقييم جديد وصل!</Heading>
+            <Text style={subHeader}>
+              {isNegative
+                ? 'في ملاحظة للتحسين 👇'
+                : 'الناس مبسوطة بالتطبيق 🎉'}
             </Text>
+          </Section>
+
+          {/* Rating badge */}
+          <Section style={{ textAlign: 'center', margin: '0 0 20px' }}>
+            <div
+              style={{
+                display: 'inline-block',
+                backgroundColor: ratingMeta.bg,
+                color: ratingMeta.color,
+                fontSize: '20px',
+                fontWeight: 700,
+                padding: '14px 24px',
+                borderRadius: '12px',
+                lineHeight: 1,
+              }}
+            >
+              {ratingMeta.emoji} {ratingMeta.label}
+            </div>
+          </Section>
+
+          {/* User card */}
+          <Section style={card}>
+            <Text style={cardLabel}>المستخدم</Text>
+            <Text style={userTitle}>
+              {avatar} {displayName}
+            </Text>
+
             {trimmedSubmitter && (
-              <Text style={userMeta}>
-                <strong>✍️ كتب اسمه بالتقييم:</strong> {trimmedSubmitter}
-              </Text>
+              <div style={infoRow}>
+                <span style={infoKey}>✍️ كتب اسمه بالتقييم</span>
+                <span style={infoVal}>{trimmedSubmitter}</span>
+              </div>
             )}
-            {trimmedUserName && trimmedUserName !== trimmedSubmitter && (
-              <Text style={userMeta}>
-                <strong>اسم الحساب:</strong> {trimmedUserName}
-              </Text>
+            {namesDiffer && (
+              <div style={infoRow}>
+                <span style={infoKey}>👤 اسم الحساب</span>
+                <span style={infoVal}>{trimmedUserName}</span>
+              </div>
+            )}
+            {!trimmedSubmitter && trimmedUserName && (
+              <div style={infoRow}>
+                <span style={infoKey}>👤 اسم الحساب</span>
+                <span style={infoVal}>{trimmedUserName}</span>
+              </div>
             )}
             {userId && (
-              <Text style={userMeta}>
-                <strong>ID:</strong> <span style={mono}>{userId}</span>
-              </Text>
+              <div style={infoRow}>
+                <span style={infoKey}>🆔 المعرّف</span>
+                <span style={{ ...infoVal, ...mono }}>{userId}</span>
+              </div>
             )}
           </Section>
 
-          <Section style={section}>
-            <Text style={label}>التقييم:</Text>
-            <Text style={ratingStyle}>{rating}</Text>
-          </Section>
-
-          {improvementText && improvementText.trim().length > 0 && (
-            <Section style={section}>
-              <Text style={label}>اقتراحات / ملاحظات:</Text>
+          {/* Improvement text — only if needs_improvement */}
+          {hasImprovement && (
+            <Section style={improvementCard}>
+              <Text style={cardLabel}>💬 الاقتراحات / الملاحظات</Text>
               <Text style={comment}>{improvementText}</Text>
             </Section>
           )}
 
-          <Hr style={hr} />
+          {/* Meta details */}
+          <Section style={metaCard}>
+            <Text style={cardLabel}>📊 تفاصيل الجلسة</Text>
 
-          <Section style={metaSection}>
-            <Text style={meta}>
-              <strong>الجولات المكتملة:</strong>{' '}
-              {roundsCompleted ?? 'غير معروف'}
-            </Text>
-            <Text style={meta}>
-              <strong>إصدار التطبيق:</strong> {appVersion ?? 'غير معروف'}
-            </Text>
-            <Text style={meta}>
-              <strong>اللغة:</strong> {language ?? 'غير معروف'}
-            </Text>
+            <div style={infoRow}>
+              <span style={infoKey}>🎮 الجولات المكتملة</span>
+              <span style={infoVal}>{roundsCompleted ?? '—'}</span>
+            </div>
+            <div style={infoRow}>
+              <span style={infoKey}>📦 إصدار التطبيق</span>
+              <span style={infoVal}>{appVersion ?? '—'}</span>
+            </div>
+            <div style={infoRow}>
+              <span style={infoKey}>🌐 اللغة</span>
+              <span style={infoVal}>{language ?? '—'}</span>
+            </div>
+            <div style={infoRow}>
+              <span style={infoKey}>🕒 الوقت (عمّان)</span>
+              <span style={infoVal}>{formattedDate}</span>
+            </div>
             {pageUrl && (
-              <Text style={meta}>
-                <strong>الصفحة:</strong> {pageUrl}
-              </Text>
+              <div style={infoRow}>
+                <span style={infoKey}>🔗 الصفحة</span>
+                <span style={{ ...infoVal, wordBreak: 'break-all' as const }}>
+                  {pageUrl}
+                </span>
+              </div>
             )}
             {userAgent && (
-              <Text style={metaSmall}>
-                <strong>الجهاز:</strong> {userAgent}
-              </Text>
+              <div style={{ ...infoRow, alignItems: 'flex-start' }}>
+                <span style={infoKey}>📱 الجهاز</span>
+                <span
+                  style={{
+                    ...infoVal,
+                    fontSize: '11px',
+                    color: '#64748b',
+                    wordBreak: 'break-all' as const,
+                  }}
+                >
+                  {userAgent}
+                </span>
+              </div>
             )}
-            <Text style={meta}>
-              <strong>الوقت (عمّان):</strong> {formattedDate}
-            </Text>
           </Section>
 
           <Hr style={hr} />
@@ -136,81 +218,111 @@ const main = {
   backgroundColor: '#ffffff',
   fontFamily:
     '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,sans-serif',
+  padding: '24px 12px',
 }
 const container = {
   backgroundColor: '#ffffff',
   margin: '0 auto',
-  padding: '24px',
+  padding: '0',
   maxWidth: '560px',
-  borderRadius: '8px',
+}
+const header = {
+  textAlign: 'center' as const,
+  margin: '0 0 24px',
+}
+const brand = {
+  color: '#1e40af',
+  fontSize: '14px',
+  fontWeight: 700,
+  letterSpacing: '0.5px',
+  margin: '0 0 8px',
 }
 const h1 = {
-  color: '#1a1a1a',
-  fontSize: '22px',
-  fontWeight: '700',
+  color: '#0f172a',
+  fontSize: '24px',
+  fontWeight: 800,
   textAlign: 'center' as const,
-  margin: '0 0 16px',
+  margin: '0 0 6px',
 }
-const section = { padding: '8px 0' }
-const userCard = {
-  backgroundColor: '#eef2ff',
-  border: '1px solid #c7d2fe',
-  borderRadius: '8px',
-  padding: '12px 14px',
-  margin: '0 0 12px',
+const subHeader = {
+  color: '#64748b',
+  fontSize: '13px',
+  margin: '0',
+}
+const card = {
+  backgroundColor: '#f8fafc',
+  border: '1px solid #e2e8f0',
+  borderRadius: '12px',
+  padding: '16px',
+  margin: '0 0 14px',
+}
+const improvementCard = {
+  backgroundColor: '#fffbeb',
+  border: '1px solid #fde68a',
+  borderRadius: '12px',
+  padding: '16px',
+  margin: '0 0 14px',
+}
+const metaCard = {
+  backgroundColor: '#ffffff',
+  border: '1px solid #e2e8f0',
+  borderRadius: '12px',
+  padding: '16px',
+  margin: '0 0 14px',
+}
+const cardLabel = {
+  color: '#64748b',
+  fontSize: '11px',
+  fontWeight: 700,
+  letterSpacing: '0.5px',
+  textTransform: 'uppercase' as const,
+  margin: '0 0 10px',
 }
 const userTitle = {
-  color: '#1e293b',
-  fontSize: '17px',
-  fontWeight: '700',
-  margin: '0 0 4px',
+  color: '#0f172a',
+  fontSize: '18px',
+  fontWeight: 700,
+  margin: '0 0 12px',
 }
-const userMeta = {
+const infoRow = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: '12px',
+  padding: '6px 0',
+  borderTop: '1px solid #f1f5f9',
+}
+const infoKey = {
   color: '#475569',
-  fontSize: '12px',
-  margin: '0',
+  fontSize: '13px',
+  fontWeight: 600,
+  flexShrink: 0,
+}
+const infoVal = {
+  color: '#0f172a',
+  fontSize: '13px',
+  fontWeight: 500,
+  textAlign: 'left' as const,
 }
 const mono = {
   fontFamily: 'ui-monospace,SFMono-Regular,Menlo,monospace',
   fontSize: '11px',
   color: '#334155',
 }
-const label = {
-  color: '#6b7280',
-  fontSize: '13px',
-  margin: '0 0 4px',
-  fontWeight: '600',
-}
-const ratingStyle = {
-  color: '#0f172a',
-  fontSize: '20px',
-  fontWeight: '700',
-  margin: '0',
-}
 const comment = {
   color: '#1f2937',
   fontSize: '15px',
-  lineHeight: '1.6',
-  backgroundColor: '#f3f4f6',
-  padding: '12px',
-  borderRadius: '6px',
+  lineHeight: '1.7',
+  backgroundColor: '#ffffff',
+  border: '1px solid #fde68a',
+  padding: '14px',
+  borderRadius: '8px',
   margin: '0',
+  whiteSpace: 'pre-wrap' as const,
 }
-const metaSection = { padding: '8px 0' }
-const meta = {
-  color: '#374151',
-  fontSize: '13px',
-  margin: '4px 0',
-}
-const metaSmall = {
-  color: '#6b7280',
-  fontSize: '11px',
-  margin: '4px 0',
-  wordBreak: 'break-all' as const,
-}
-const hr = { borderColor: '#e5e7eb', margin: '16px 0' }
+const hr = { borderColor: '#e5e7eb', margin: '20px 0 12px' }
 const footer = {
-  color: '#9ca3af',
+  color: '#94a3b8',
   fontSize: '12px',
   textAlign: 'center' as const,
   margin: '0',
@@ -218,12 +330,16 @@ const footer = {
 
 export const template: TemplateEntry = {
   component: FeedbackNotificationEmail,
-  subject: (data: FeedbackEmailProps) =>
-    `⚡ تقييم جديد من ${data.submitterName?.trim() || data.userName?.trim() || 'مستخدم'}: ${data.rating ?? 'غير محدد'}`,
+  subject: (data: FeedbackEmailProps) => {
+    const meta = RATING_META[data.rating ?? '']
+    const ratingLabel = meta ? `${meta.emoji} ${meta.label}` : (data.rating ?? 'غير محدد')
+    const name = data.submitterName?.trim() || data.userName?.trim() || 'مستخدم'
+    return `⚡ تقييم جديد من ${name} — ${ratingLabel}`
+  },
   displayName: 'Feedback Notification',
   to: 'Hamzatarakhan2000@gmail.com',
   previewData: {
-    rating: 'رائع',
+    rating: 'more_amazing',
     improvementText: 'حلو كتير بس بدنا ألعاب أكثر',
     appVersion: '1.0.0',
     roundsCompleted: 5,
