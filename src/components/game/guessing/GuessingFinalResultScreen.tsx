@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useGuessingGame } from '@/context/GuessingGameContext';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useFeedbackTrigger } from '@/context/FeedbackContext';
 
 const GuessingFinalResultScreen: React.FC = () => {
   const { players, resetGame } = useGuessingGame();
   const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
+  const { notifyRoundCompleted } = useFeedbackTrigger();
+  const triggeredRef = useRef(false);
+
+  useEffect(() => {
+    if (!triggeredRef.current && players.length >= 2) {
+      triggeredRef.current = true;
+      notifyRoundCompleted(`local-guessing-${Date.now()}`);
+    }
+  }, [players.length, notifyRoundCompleted]);
 
   if (players.length < 2) return null;
 
