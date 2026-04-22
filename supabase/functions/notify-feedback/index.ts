@@ -20,6 +20,12 @@ Deno.serve(async (req) => {
       app_version,
       rounds_completed,
       created_at,
+      user_id,
+      user_name,
+      user_avatar,
+      user_agent,
+      language,
+      page_url,
     } = body
 
     if (!rating) {
@@ -48,6 +54,12 @@ Deno.serve(async (req) => {
             appVersion: app_version ?? null,
             roundsCompleted: rounds_completed ?? null,
             createdAt: created_at ?? new Date().toISOString(),
+            userId: user_id ?? null,
+            userName: user_name ?? null,
+            userAvatar: user_avatar ?? null,
+            userAgent: user_agent ?? null,
+            language: language ?? null,
+            pageUrl: page_url ?? null,
           },
         }),
       }

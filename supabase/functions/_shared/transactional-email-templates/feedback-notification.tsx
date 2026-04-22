@@ -18,6 +18,12 @@ interface FeedbackEmailProps {
   appVersion?: string | null
   roundsCompleted?: number | null
   createdAt?: string
+  userId?: string | null
+  userName?: string | null
+  userAvatar?: string | null
+  userAgent?: string | null
+  language?: string | null
+  pageUrl?: string | null
 }
 
 export const FeedbackNotificationEmail = ({
@@ -26,6 +32,12 @@ export const FeedbackNotificationEmail = ({
   appVersion,
   roundsCompleted,
   createdAt,
+  userId,
+  userName,
+  userAvatar,
+  userAgent,
+  language,
+  pageUrl,
 }: FeedbackEmailProps) => {
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleString('en-GB', {
@@ -33,13 +45,28 @@ export const FeedbackNotificationEmail = ({
       })
     : 'now'
 
+  const displayName = userName?.trim() || 'مستخدم بدون اسم'
+
   return (
     <Html>
       <Head />
-      <Preview>تقييم جديد للتطبيق: {rating}</Preview>
+      <Preview>
+        تقييم جديد من {displayName}: {rating}
+      </Preview>
       <Body style={main}>
         <Container style={container}>
           <Heading style={h1}>⚡ تقييم جديد وصل!</Heading>
+
+          <Section style={userCard}>
+            <Text style={userTitle}>
+              {userAvatar ?? '👤'} {displayName}
+            </Text>
+            {userId && (
+              <Text style={userMeta}>
+                <strong>ID:</strong> <span style={mono}>{userId}</span>
+              </Text>
+            )}
+          </Section>
 
           <Section style={section}>
             <Text style={label}>التقييم:</Text>
@@ -48,7 +75,7 @@ export const FeedbackNotificationEmail = ({
 
           {improvementText && improvementText.trim().length > 0 && (
             <Section style={section}>
-              <Text style={label}>اقتراحات التحسين:</Text>
+              <Text style={label}>اقتراحات / ملاحظات:</Text>
               <Text style={comment}>{improvementText}</Text>
             </Section>
           )}
@@ -64,7 +91,20 @@ export const FeedbackNotificationEmail = ({
               <strong>إصدار التطبيق:</strong> {appVersion ?? 'غير معروف'}
             </Text>
             <Text style={meta}>
-              <strong>الوقت:</strong> {formattedDate}
+              <strong>اللغة:</strong> {language ?? 'غير معروف'}
+            </Text>
+            {pageUrl && (
+              <Text style={meta}>
+                <strong>الصفحة:</strong> {pageUrl}
+              </Text>
+            )}
+            {userAgent && (
+              <Text style={metaSmall}>
+                <strong>الجهاز:</strong> {userAgent}
+              </Text>
+            )}
+            <Text style={meta}>
+              <strong>الوقت (عمّان):</strong> {formattedDate}
             </Text>
           </Section>
 
@@ -79,7 +119,7 @@ export const FeedbackNotificationEmail = ({
 }
 
 const main = {
-  backgroundColor: '#f6f9fc',
+  backgroundColor: '#ffffff',
   fontFamily:
     '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,sans-serif',
 }
@@ -98,6 +138,29 @@ const h1 = {
   margin: '0 0 16px',
 }
 const section = { padding: '8px 0' }
+const userCard = {
+  backgroundColor: '#eef2ff',
+  border: '1px solid #c7d2fe',
+  borderRadius: '8px',
+  padding: '12px 14px',
+  margin: '0 0 12px',
+}
+const userTitle = {
+  color: '#1e293b',
+  fontSize: '17px',
+  fontWeight: '700',
+  margin: '0 0 4px',
+}
+const userMeta = {
+  color: '#475569',
+  fontSize: '12px',
+  margin: '0',
+}
+const mono = {
+  fontFamily: 'ui-monospace,SFMono-Regular,Menlo,monospace',
+  fontSize: '11px',
+  color: '#334155',
+}
 const label = {
   color: '#6b7280',
   fontSize: '13px',
@@ -125,6 +188,12 @@ const meta = {
   fontSize: '13px',
   margin: '4px 0',
 }
+const metaSmall = {
+  color: '#6b7280',
+  fontSize: '11px',
+  margin: '4px 0',
+  wordBreak: 'break-all' as const,
+}
 const hr = { borderColor: '#e5e7eb', margin: '16px 0' }
 const footer = {
   color: '#9ca3af',
@@ -136,7 +205,7 @@ const footer = {
 export const template: TemplateEntry = {
   component: FeedbackNotificationEmail,
   subject: (data: FeedbackEmailProps) =>
-    `⚡ تقييم جديد: ${data.rating ?? 'غير محدد'}`,
+    `⚡ تقييم جديد من ${data.userName?.trim() || 'مستخدم'}: ${data.rating ?? 'غير محدد'}`,
   displayName: 'Feedback Notification',
   to: 'Hamzatarakhan2000@gmail.com',
   previewData: {
@@ -145,5 +214,11 @@ export const template: TemplateEntry = {
     appVersion: '1.0.0',
     roundsCompleted: 5,
     createdAt: new Date().toISOString(),
+    userId: '00000000-0000-0000-0000-000000000000',
+    userName: 'حمزة',
+    userAvatar: '🦊',
+    userAgent: 'Mozilla/5.0 (iPhone) AppleWebKit/605.1.15',
+    language: 'ar',
+    pageUrl: 'https://imposter.my/',
   },
 }
