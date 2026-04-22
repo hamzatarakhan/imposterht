@@ -92,7 +92,28 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
         </div>
 
         <div className="space-y-2">
-          {RATINGS.map((r) => {
+          <div className="grid grid-cols-2 gap-2">
+            {RATINGS.slice(0, 4).map((r) => {
+              const active = selected === r.id;
+              return (
+                <button
+                  key={r.id}
+                  onClick={() => handleSelect(r.id)}
+                  disabled={submitting}
+                  className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl text-center transition-all border min-h-[88px] ${
+                    active
+                      ? "bg-primary text-primary-foreground border-primary scale-[1.02]"
+                      : "bg-secondary/50 hover:bg-secondary/80 border-border/50"
+                  }`}
+                >
+                  <span className="text-2xl">{r.icon}</span>
+                  <span className="font-bold text-xs leading-tight">{r.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {RATINGS.slice(4).map((r) => {
             const active = selected === r.id;
             return (
               <button
