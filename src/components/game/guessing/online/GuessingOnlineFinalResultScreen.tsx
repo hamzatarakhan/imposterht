@@ -22,9 +22,10 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
   useEffect(() => {
     if (!triggeredRef.current && players.length >= 2 && room?.id) {
       triggeredRef.current = true;
-      notifyRoundCompleted(`online-guessing-${room.id}`);
+      const roundsInMatch = room?.total_rounds || 1;
+      notifyRoundCompleted(`online-guessing-${room.id}`, 'guessing', roundsInMatch);
     }
-  }, [players.length, room?.id, notifyRoundCompleted]);
+  }, [players.length, room?.id, room?.total_rounds, notifyRoundCompleted]);
 
   if (players.length < 2) {
     return (

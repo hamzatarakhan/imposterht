@@ -20,7 +20,7 @@ const CountriesAdminScreen: React.FC = () => {
   const { savedPlayers } = useSavedPlayers();
 
   const handleConfirmLeave = () => {
-    if (room?.id) notifyRoundCompleted(`countries-${room.id}`);
+    if (room?.id) notifyRoundCompleted(`countries-${room.id}`, 'countries');
     leaveRoom();
   };
 
