@@ -22,6 +22,7 @@ Deno.serve(async (req) => {
       created_at,
       user_id,
       user_name,
+      submitter_name,
       user_avatar,
       user_agent,
       language,
