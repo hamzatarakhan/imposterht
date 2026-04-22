@@ -157,7 +157,7 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
             <span>
               {needsText
                 ? trimmedLen < 1
-                  ? "اكتبلي ولو حرف 🙏"
+                  ? "اكتب يا فنان اكتب"
                   : "تمام ✓"
                 : "اختياري — بس رأيك بفرق"}
             </span>
