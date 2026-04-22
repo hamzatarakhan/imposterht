@@ -219,7 +219,7 @@ const footer = {
 export const template: TemplateEntry = {
   component: FeedbackNotificationEmail,
   subject: (data: FeedbackEmailProps) =>
-    `⚡ تقييم جديد من ${data.userName?.trim() || 'مستخدم'}: ${data.rating ?? 'غير محدد'}`,
+    `⚡ تقييم جديد من ${data.submitterName?.trim() || data.userName?.trim() || 'مستخدم'}: ${data.rating ?? 'غير محدد'}`,
   displayName: 'Feedback Notification',
   to: 'Hamzatarakhan2000@gmail.com',
   previewData: {
@@ -230,6 +230,7 @@ export const template: TemplateEntry = {
     createdAt: new Date().toISOString(),
     userId: '00000000-0000-0000-0000-000000000000',
     userName: 'حمزة',
+    submitterName: 'أبو حمزة',
     userAvatar: '🦊',
     userAgent: 'Mozilla/5.0 (iPhone) AppleWebKit/605.1.15',
     language: 'ar',
