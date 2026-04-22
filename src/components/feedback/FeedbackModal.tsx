@@ -28,9 +28,14 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
   const [submitting, setSubmitting] = useState(false);
   const [thanks, setThanks] = useState(false);
 
+  // Reset internal state whenever the modal opens fresh
   useEffect(() => {
     if (open) {
       vibrate(50);
+      setSelected(null);
+      setImprovement('');
+      setSubmitting(false);
+      setThanks(false);
       // lock background scroll
       const prev = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
