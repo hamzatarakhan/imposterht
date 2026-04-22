@@ -89,7 +89,7 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
       <div className="card-game w-full max-w-md my-auto space-y-4 max-h-[95vh] overflow-y-auto">
         <div className="text-center space-y-1.5">
           <h2 className="text-xl font-black">رأيك بهمني فوق ما تتصور</h2>
-          <p className="text-sm text-muted-foreground">أتظمن فش مهرب بدك تعطينا رأيك يعني بدك تعطينا </p>
+          <p className="text-sm text-muted-foreground">أتطمن فش مهرب بدك تعطينا رأيك يعني بدك تعطينا </p>
         </div>
 
         <div className="space-y-2">
