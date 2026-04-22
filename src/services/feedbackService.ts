@@ -21,6 +21,22 @@ const getUserId = (): string | null => {
   }
 };
 
+const getUserName = (): string | null => {
+  try {
+    return localStorage.getItem('user_name');
+  } catch {
+    return null;
+  }
+};
+
+const getUserAvatar = (): string | null => {
+  try {
+    return localStorage.getItem('user_avatar');
+  } catch {
+    return null;
+  }
+};
+
 const getAppVersion = async (): Promise<string | null> => {
   try {
     const res = await fetch('/version.json', { cache: 'no-store' });
@@ -38,6 +54,8 @@ export const submitFeedback = async ({
   rounds_completed,
 }: SubmitFeedbackPayload) => {
   const user_id = getUserId();
+  const user_name = getUserName();
+  const user_avatar = getUserAvatar();
   const app_version = await getAppVersion();
 
   const trimmedImprovement = improvement_text?.trim() || null;
@@ -61,6 +79,12 @@ export const submitFeedback = async ({
         app_version,
         rounds_completed: rounds_completed ?? null,
         created_at: new Date().toISOString(),
+        user_id: user_id || null,
+        user_name: user_name || null,
+        user_avatar: user_avatar || null,
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+        language: typeof navigator !== 'undefined' ? navigator.language : null,
+        page_url: typeof window !== 'undefined' ? window.location.href : null,
       },
     })
     .catch((err) => {
