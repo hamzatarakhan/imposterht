@@ -22,6 +22,7 @@ Deno.serve(async (req) => {
       created_at,
       user_id,
       user_name,
+      saved_user_name,
       submitter_name,
       user_avatar,
       user_agent,
@@ -37,6 +38,11 @@ Deno.serve(async (req) => {
     }
 
     const internalToken = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+
+    // Prefer the explicit `saved_user_name` (the localStorage identity) for
+    // the "account name" field. Fall back to legacy `user_name` for
+    // backwards compatibility with older clients.
+    const accountName = saved_user_name ?? user_name ?? null
 
     const response = await fetch(
       `${supabaseUrl}/functions/v1/send-transactional-email`,
@@ -56,7 +62,7 @@ Deno.serve(async (req) => {
             roundsCompleted: rounds_completed ?? null,
             createdAt: created_at ?? new Date().toISOString(),
             userId: user_id ?? null,
-            userName: user_name ?? null,
+            userName: accountName,
             submitterName: submitter_name ?? null,
             userAvatar: user_avatar ?? null,
             userAgent: user_agent ?? null,
