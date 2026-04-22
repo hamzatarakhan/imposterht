@@ -26,14 +26,11 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
   const [selected, setSelected] = useState<FeedbackRating | null>(null);
   const [improvement, setImprovement] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [thanks, setThanks] = useState(false);
 
-  // Reset internal state whenever the modal opens fresh
   useEffect(() => {
     if (open) {
       vibrate(50);
-      setSelected(null);
-      setImprovement('');
-      setSubmitting(false);
       // lock background scroll
       const prev = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
@@ -68,7 +65,10 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
       });
       playSound('win');
       vibrate(80);
-      onSubmitted();
+      setThanks(true);
+      setTimeout(() => {
+        onSubmitted();
+      }, 1500);
     } catch (err) {
       console.error('Feedback submit failed', err);
       toast({
@@ -88,75 +88,84 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
       onClick={(e) => e.stopPropagation()}
     >
       <div className="card-game w-full max-w-md my-auto space-y-4 max-h-[95vh] overflow-y-auto">
-        <div className="text-center space-y-1.5">
-          <h2 className="text-xl font-black">🌟 قيّم تجربتك بفعاليات</h2>
-          <p className="text-sm text-muted-foreground">رأيك بيهمنا، اختار اللي بحس فيه</p>
-        </div>
-
-        <div className="space-y-2">
-          {RATINGS.map((r) => {
-            const active = selected === r.id;
-            return (
-              <button
-                key={r.id}
-                onClick={() => handleSelect(r.id)}
-                disabled={submitting}
-                className={`w-full flex items-center gap-3 p-3 rounded-2xl text-right transition-all border ${
-                  active
-                    ? 'bg-primary text-primary-foreground border-primary scale-[1.02]'
-                    : 'bg-secondary/50 hover:bg-secondary/80 border-border/50'
-                }`}
-              >
-                <span className="text-2xl shrink-0">{r.icon}</span>
-                <span className="flex-1 font-bold text-sm">{r.label}</span>
-                <span
-                  className={`shrink-0 w-5 h-5 rounded-full border-2 ${
-                    active ? 'border-primary-foreground bg-primary-foreground/20' : 'border-muted-foreground/40'
-                  }`}
-                >
-                  {active && (
-                    <span className="block w-full h-full rounded-full bg-primary-foreground/90 scale-50" />
-                  )}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {needsText && (
-          <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2">
-            <Textarea
-              value={improvement}
-              onChange={(e) => setImprovement(e.target.value.slice(0, 1000))}
-              placeholder="يلا تفضل اهرج، شو التحسينات؟ شو مشكلتك عشان نرستكلك الأمور 🛠️"
-              className="min-h-[110px] text-sm resize-none"
-              dir="rtl"
-              disabled={submitting}
-            />
-            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-              <span>{trimmedLen < 10 ? `لازم على الأقل ${10 - trimmedLen} حرف كمان` : 'تمام ✓'}</span>
-              <span>{improvement.length}/1000</span>
-            </div>
+        {thanks ? (
+          <div className="py-8 text-center space-y-3">
+            <div className="text-6xl animate-float">🙏</div>
+            <p className="text-xl font-black">شكراً، رأيك وصلنا!</p>
           </div>
-        )}
+        ) : (
+          <>
+            <div className="text-center space-y-1.5">
+              <h2 className="text-xl font-black">🌟 قيّم تجربتك بفعاليات</h2>
+              <p className="text-sm text-muted-foreground">رأيك بيهمنا، اختار اللي بحس فيه</p>
+            </div>
 
-        <button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          className="w-full btn-primary-game flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {submitting ? (
-            <>
-              <Loader2 size={18} className="animate-spin" />
-              جاري الإرسال...
-            </>
-          ) : (
-            <>
-              <Send size={18} />
-              إرسال
-            </>
-          )}
-        </button>
+            <div className="space-y-2">
+              {RATINGS.map((r) => {
+                const active = selected === r.id;
+                return (
+                  <button
+                    key={r.id}
+                    onClick={() => handleSelect(r.id)}
+                    disabled={submitting}
+                    className={`w-full flex items-center gap-3 p-3 rounded-2xl text-right transition-all border ${
+                      active
+                        ? 'bg-primary text-primary-foreground border-primary scale-[1.02]'
+                        : 'bg-secondary/50 hover:bg-secondary/80 border-border/50'
+                    }`}
+                  >
+                    <span className="text-2xl shrink-0">{r.icon}</span>
+                    <span className="flex-1 font-bold text-sm">{r.label}</span>
+                    <span
+                      className={`shrink-0 w-5 h-5 rounded-full border-2 ${
+                        active ? 'border-primary-foreground bg-primary-foreground/20' : 'border-muted-foreground/40'
+                      }`}
+                    >
+                      {active && (
+                        <span className="block w-full h-full rounded-full bg-primary-foreground/90 scale-50" />
+                      )}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {needsText && (
+              <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2">
+                <Textarea
+                  value={improvement}
+                  onChange={(e) => setImprovement(e.target.value.slice(0, 1000))}
+                  placeholder="يلا تفضل اهرج، شو التحسينات؟ شو مشكلتك عشان نرستكلك الأمور 🛠️"
+                  className="min-h-[110px] text-sm resize-none"
+                  dir="rtl"
+                  disabled={submitting}
+                />
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>{trimmedLen < 10 ? `لازم على الأقل ${10 - trimmedLen} حرف كمان` : 'تمام ✓'}</span>
+                  <span>{improvement.length}/1000</span>
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              className="w-full btn-primary-game flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  جاري الإرسال...
+                </>
+              ) : (
+                <>
+                  <Send size={18} />
+                  إرسال
+                </>
+              )}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
