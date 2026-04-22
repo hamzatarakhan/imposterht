@@ -219,6 +219,21 @@ const FeedbackModal: React.FC<Props> = ({ open, roundsCompleted, onSubmitted }) 
               </div>
             </div>
 
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-muted-foreground block px-1">
+                اسمك (اختياري) — عشان أعرف مين العبقري 🌟
+              </label>
+              <Input
+                value={submitterName}
+                onChange={(e) => setSubmitterName(e.target.value.slice(0, 50))}
+                placeholder="مثلاً: حمزة"
+                className="text-sm"
+                dir="rtl"
+                disabled={submitting}
+                maxLength={50}
+              />
+            </div>
+
             <button
               onClick={handleSubmit}
               disabled={!canSubmit}
