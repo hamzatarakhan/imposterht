@@ -44,6 +44,54 @@ export type Database = {
         }
         Relationships: []
       }
+      app_sessions: {
+        Row: {
+          app_version: string | null
+          created_at: string
+          game_played: string | null
+          id: string
+          is_pwa: boolean | null
+          language: string | null
+          last_seen_at: string
+          referrer: string | null
+          session_key: string
+          user_agent: string | null
+          user_avatar: string | null
+          user_id: string | null
+          user_name: string | null
+        }
+        Insert: {
+          app_version?: string | null
+          created_at?: string
+          game_played?: string | null
+          id?: string
+          is_pwa?: boolean | null
+          language?: string | null
+          last_seen_at?: string
+          referrer?: string | null
+          session_key: string
+          user_agent?: string | null
+          user_avatar?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          app_version?: string | null
+          created_at?: string
+          game_played?: string | null
+          id?: string
+          is_pwa?: boolean | null
+          language?: string | null
+          last_seen_at?: string
+          referrer?: string | null
+          session_key?: string
+          user_agent?: string | null
+          user_avatar?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Relationships: []
+      }
       countries_burned: {
         Row: {
           country_name: string
@@ -732,6 +780,48 @@ export type Database = {
         Args: { p_host_id: string; p_name: string; p_room_id: string }
         Returns: string
       }
+      admin_read_feedback: {
+        Args: { p_limit?: number; p_pin: string }
+        Returns: {
+          app_version: string | null
+          created_at: string
+          id: string
+          improvement_text: string | null
+          rating: string
+          rounds_completed: number | null
+          user_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "app_feedback"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_read_sessions: {
+        Args: { p_limit?: number; p_pin: string }
+        Returns: {
+          app_version: string | null
+          created_at: string
+          game_played: string | null
+          id: string
+          is_pwa: boolean | null
+          language: string | null
+          last_seen_at: string
+          referrer: string | null
+          session_key: string
+          user_agent: string | null
+          user_avatar: string | null
+          user_id: string | null
+          user_name: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "app_sessions"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       calculate_winner_secure:
         | { Args: { p_room_id: string }; Returns: string }
         | {
@@ -813,6 +903,21 @@ export type Database = {
       leave_room_secure: {
         Args: { p_player_id: string; p_room_id: string }
         Returns: boolean
+      }
+      log_app_session: {
+        Args: {
+          p_app_version?: string
+          p_game_played?: string
+          p_is_pwa?: boolean
+          p_language?: string
+          p_referrer?: string
+          p_session_key: string
+          p_user_agent?: string
+          p_user_avatar?: string
+          p_user_id?: string
+          p_user_name?: string
+        }
+        Returns: string
       }
       mark_guessing_draw: {
         Args: { p_host_player_id: string; p_room_id: string }
