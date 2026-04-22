@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useOnlineGame } from '@/context/OnlineGameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useFeedbackTrigger } from '@/context/FeedbackContext';
 import { Trophy, Skull, Home, RotateCcw, Medal } from 'lucide-react';
 import * as roomService from '@/services/roomService';
 import PresenceDot from '@/components/game/PresenceDot';
@@ -26,9 +27,11 @@ interface ImposterInfo {
 const OnlineResultScreen: React.FC = () => {
   const { room, players, currentPlayer, leaveRoom, restartGame, isHost } = useOnlineGame();
   const { playSound, vibrate } = useSettings();
+  const { notifyRoundCompleted } = useFeedbackTrigger();
   const [secretWord, setSecretWord] = useState<string | null>(null);
   const [imposters, setImposters] = useState<ImposterInfo[]>([]);
   const [isRestarting, setIsRestarting] = useState(false);
+  const feedbackTriggeredRef = useRef(false);
 
   // Fetch secret word and imposters when game is finished
   useEffect(() => {
@@ -93,8 +96,12 @@ const OnlineResultScreen: React.FC = () => {
         playSound('lose');
         vibrate(200);
       }
+      if (!feedbackTriggeredRef.current && room?.id) {
+        feedbackTriggeredRef.current = true;
+        notifyRoundCompleted(`online-imposter-${room.id}`);
+      }
     }
-  }, [isWinner, playSound, vibrate, imposters.length]);
+  }, [isWinner, playSound, vibrate, imposters.length, notifyRoundCompleted, room?.id]);
 
   const handlePlayAgain = async () => {
     if (!isHost) return;

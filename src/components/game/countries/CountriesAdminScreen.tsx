@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useCountries } from '@/context/CountriesGameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useFeedbackTrigger } from '@/context/FeedbackContext';
 import { useSavedPlayers, SavedPlayer } from '@/hooks/useSavedPlayers';
 import { Plus, Minus, X, ArrowLeftRight, LogOut, Share2, Search, Clock, History, ArrowDownAZ, ArrowUpAZ, Users } from 'lucide-react';
 import GroupManagementModal from '../GroupManagementModal';
@@ -15,7 +16,13 @@ import {
 const CountriesAdminScreen: React.FC = () => {
   const { room, players, burned, addPlayer, removePlayer, updateLives, addBurned, removeBurned, swapPlayers, leaveRoom } = useCountries();
   const { playSound, vibrate } = useSettings();
+  const { notifyRoundCompleted } = useFeedbackTrigger();
   const { savedPlayers } = useSavedPlayers();
+
+  const handleConfirmLeave = () => {
+    if (room?.id) notifyRoundCompleted(`countries-${room.id}`);
+    leaveRoom();
+  };
 
   const [newPlayerName, setNewPlayerName] = useState('');
   const [newCountryName, setNewCountryName] = useState('');
@@ -400,7 +407,7 @@ const CountriesAdminScreen: React.FC = () => {
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row gap-3 justify-center">
             <AlertDialogCancel className="flex-1 m-0">إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={leaveRoom} className="flex-1 bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction onClick={handleConfirmLeave} className="flex-1 bg-destructive text-destructive-foreground hover:bg-destructive/90">
               نعم، طلّعني
             </AlertDialogAction>
           </AlertDialogFooter>

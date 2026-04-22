@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { useGame } from '@/context/GameContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useFeedbackTrigger } from '@/context/FeedbackContext';
 import { ArrowRight, Loader2, X } from 'lucide-react';
 import PresenceDot from '@/components/game/PresenceDot';
 import SpectatorShareButton from './SpectatorShareButton';
@@ -11,10 +12,19 @@ const GuessingOnlineFinalResultScreen: React.FC = () => {
   const { room, players, isHost, leaveRoom, resetOnlineGuessing, replayRoom, setScreen } = useOnlineGuessing();
   const { setScreen: setMainScreen } = useGame();
   const { playSound, vibrate } = useSettings();
+  const { notifyRoundCompleted } = useFeedbackTrigger();
   const [loading, setLoading] = useState(false);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [newCategories, setNewCategories] = useState<GuessingCategory[]>(['random']);
   const [replayLoading, setReplayLoading] = useState(false);
+  const triggeredRef = useRef(false);
+
+  useEffect(() => {
+    if (!triggeredRef.current && players.length >= 2 && room?.id) {
+      triggeredRef.current = true;
+      notifyRoundCompleted(`online-guessing-${room.id}`);
+    }
+  }, [players.length, room?.id, notifyRoundCompleted]);
 
   if (players.length < 2) {
     return (

@@ -5,6 +5,7 @@ import { SettingsProvider } from '@/context/SettingsContext';
 import { GuessingGameProvider } from '@/context/GuessingGameContext';
 import { OnlineGuessingProvider, useOnlineGuessing } from '@/context/OnlineGuessingContext';
 import { CountriesProvider, useCountries } from '@/context/CountriesGameContext';
+import { FeedbackProvider } from '@/context/FeedbackContext';
 import SplashScreen from './SplashScreen';
 import HubScreen from './HubScreen';
 import HomeScreen from './HomeScreen';
@@ -89,7 +90,9 @@ const Game: React.FC = () => (
         <GuessingGameProvider>
           <OnlineGuessingProvider>
             <CountriesProvider>
-              <GameContent />
+              <FeedbackProvider>
+                <GameContent />
+              </FeedbackProvider>
             </CountriesProvider>
           </OnlineGuessingProvider>
         </GuessingGameProvider>
