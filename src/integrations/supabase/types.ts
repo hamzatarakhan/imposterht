@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_feedback: {
+        Row: {
+          app_version: string | null
+          created_at: string
+          id: string
+          improvement_text: string | null
+          rating: string
+          rounds_completed: number | null
+          user_id: string | null
+        }
+        Insert: {
+          app_version?: string | null
+          created_at?: string
+          id?: string
+          improvement_text?: string | null
+          rating: string
+          rounds_completed?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          app_version?: string | null
+          created_at?: string
+          id?: string
+          improvement_text?: string | null
+          rating?: string
+          rounds_completed?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       countries_burned: {
         Row: {
           country_name: string
