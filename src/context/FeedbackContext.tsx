@@ -34,6 +34,20 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [roundsAtTrigger, setRoundsAtTrigger] = useState(0);
   const onMountCheckedRef = useRef(false);
 
+  const syncAppBuildVersion = useCallback(async () => {
+    try {
+      const response = await fetch(`/version.json?t=${Date.now()}`, { cache: 'no-store' });
+      if (!response.ok) return;
+
+      const data = await response.json();
+      if (typeof data?.version === 'string' && data.version.trim().length > 0) {
+        localStorage.setItem('app_build_version', data.version);
+      }
+    } catch {
+      // ignore version sync failures
+    }
+  }, []);
+
   // Update notification UI only renders in standalone (PWA) mode.
   // For browser users, `updateAvailable` will be true but no UI exists to apply
   // the update — so we must NOT block the feedback modal in that case.
@@ -54,12 +68,26 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (onMountCheckedRef.current) return;
     if (screen === 'splash') return;
     if (updateBlocksFeedback) return; // update prompt always wins (PWA only)
-    onMountCheckedRef.current = true;
-    if (shouldShowFeedback()) {
-      setRoundsAtTrigger(getRoundsCompleted());
-      setOpen(true);
-    }
-  }, [screen, updateBlocksFeedback, shouldShowFeedback, getRoundsCompleted]);
+
+    let cancelled = false;
+
+    const runInitialFeedbackCheck = async () => {
+      await syncAppBuildVersion();
+      if (cancelled) return;
+
+      onMountCheckedRef.current = true;
+      if (shouldShowFeedback()) {
+        setRoundsAtTrigger(getRoundsCompleted());
+        setOpen(true);
+      }
+    };
+
+    void runInitialFeedbackCheck();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [screen, updateBlocksFeedback, shouldShowFeedback, getRoundsCompleted, syncAppBuildVersion]);
 
   // If an update appears while the feedback modal is open, hide it (without marking feedback as given).
   useEffect(() => {
@@ -73,15 +101,18 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       incrementRound(sessionKey, gameType, count);
       // Defer slightly so the result UI renders first
       setTimeout(() => {
-        // Update prompt wins — never overlay feedback on top of it (PWA only)
-        if (updateBlocksFeedback) return;
-        if (shouldShowFeedback()) {
-          setRoundsAtTrigger(getRoundsCompleted());
-          setOpen(true);
-        }
+        void (async () => {
+          await syncAppBuildVersion();
+          // Update prompt wins — never overlay feedback on top of it (PWA only)
+          if (updateBlocksFeedback) return;
+          if (shouldShowFeedback()) {
+            setRoundsAtTrigger(getRoundsCompleted());
+            setOpen(true);
+          }
+        })();
       }, 600);
     },
-    [incrementRound, shouldShowFeedback, getRoundsCompleted, updateBlocksFeedback],
+    [incrementRound, shouldShowFeedback, getRoundsCompleted, syncAppBuildVersion, updateBlocksFeedback],
   );
 
   const handleSubmitted = useCallback(() => {
