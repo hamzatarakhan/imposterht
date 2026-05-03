@@ -3,7 +3,7 @@
  * 6 فئات: أشياء، رياضة (لاعبين مشهورين)، دول، أكل، حيوانات، مسلسلات
  */
 
-export type GuessingCategory = "random" | "things" | "sportPlayers" | "countries" | "food" | "animals" | "series";
+export type GuessingCategory = "random" | "things" | "sportPlayers" | "countries" | "food" | "animals" | "series" | "fruitsVegs";
 
 export const GUESSING_CATEGORIES: { id: GuessingCategory; label: string; icon: string }[] = [
   { id: "random", label: "الكل", icon: "🎲" },
