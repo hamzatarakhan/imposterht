@@ -13,6 +13,7 @@ export const GUESSING_CATEGORIES: { id: GuessingCategory; label: string; icon: s
   { id: "food", label: "أكل", icon: "🍕" },
   { id: "animals", label: "حيوانات", icon: "🐾" },
   { id: "series", label: "مسلسلات", icon: "🎬" },
+  { id: "fruitsVegs", label: "فواكه وخضار", icon: "🍎" },
 ];
 
 export const guessingWords: Record<Exclude<GuessingCategory, "random">, string[]> = {
