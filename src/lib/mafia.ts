@@ -51,6 +51,15 @@ export function resolveNight(kill: number | null, protect: number | null): numbe
   return kill !== null && kill !== protect ? kill : null;
 }
 
+/** Vote result: the single most-voted player, or null on a tie / no votes. */
+export function voteResult(votes: Record<string, number>): number | null {
+  const counts: Record<number, number> = {};
+  for (const t of Object.values(votes)) counts[t] = (counts[t] ?? 0) + 1;
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  if (!sorted.length || (sorted[1] && sorted[1][1] === sorted[0][1])) return null;
+  return Number(sorted[0][0]);
+}
+
 export function winner(players: MafiaPlayer[]): 'mafia' | 'town' | null {
   const alive = players.filter((p) => p.alive);
   const m = alive.filter(isMafia).length;
@@ -100,7 +109,7 @@ export interface MafiaState {
 export type MafiaAction =
   | { type: 'beginNight' }
   | { type: 'pick'; key: Exclude<StepKey, 'intro'>; idx: number }
-  | { type: 'nextStep' }
+  | { type: 'nextStep'; force?: boolean } // force: move on even if nobody picked (auto narrator timeout)
   | { type: 'continue' }
   | { type: 'toVote' }
   | { type: 'voteOut'; idx: number | null }
@@ -111,7 +120,7 @@ export const STEP_INFO: Record<StepKey, { icon: string; who: string; line: strin
   kill: { icon: '🔪', who: 'المافيا', line: 'المافيا تفتح… مين بدكم تقتلوا؟', role: 'anyMafia' },
   silence: { icon: '✂️', who: 'قص المافيا', line: 'قص المافيا يفتح… مين بدك تسكّت بكرا؟', role: 'silencer' },
   check: { icon: '🕵️', who: 'الشيخ', line: 'الشيخ يفتح… عن مين بدك تسأل؟', role: 'sheikh' },
-  protect: { icon: '💉', who: 'البنت', line: 'البنت تفتح… مين بدك تحمي؟', role: 'girl' },
+  protect: { icon: '💉', who: 'البنت', line: 'البنت تفتح… مين بدّك تحمي؟', role: 'girl' },
 };
 
 export function nightSteps(s: Pick<MafiaState, 'players' | 'night'>): StepKey[] {
@@ -151,7 +160,7 @@ export function mafiaReducer(s: MafiaState, a: MafiaAction): MafiaState {
       if (ph.t !== 'night') return s;
       const steps = nightSteps(s);
       const key = steps[ph.step];
-      if (key !== 'intro' && s.picks[key] === null) return s;
+      if (key !== 'intro' && s.picks[key] === null && !a.force) return s;
       if (ph.step < steps.length - 1) return { ...s, phase: { t: 'night', step: ph.step + 1 } };
       if (s.night === 1) return { ...s, night: 2, silenced: null, lastKilled: null, saved: false, phase: { t: 'day' } };
       const dead = resolveNight(s.picks.kill, s.picks.protect);

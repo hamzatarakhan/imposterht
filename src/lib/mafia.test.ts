@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  suggestRoles, resolveNight, winner, ROLE_INFO, MafiaPlayer, MafiaRole, MafiaState, mafiaReducer, MafiaAction, mafiaDecision,
+  suggestRoles, resolveNight, winner, ROLE_INFO, MafiaPlayer, MafiaRole, MafiaState, mafiaReducer, MafiaAction, mafiaDecision, voteResult,
 } from './mafia';
 
 const mafiaCount = (roles: MafiaRole[]) => roles.filter((r) => ROLE_INFO[r].team === 'mafia').length;
@@ -33,6 +33,19 @@ describe('mafia', () => {
     expect(winner(mk([['mafia', false], ['citizen', true], ['sheikh', true]]))).toBe('town');
     expect(winner(mk([['mafia', true], ['citizen', true], ['sheikh', false]]))).toBe('mafia');
     expect(winner(mk([['mafia', true], ['citizen', true], ['girl', true]]))).toBeNull();
+  });
+
+  it('vote result needs a single top player', () => {
+    expect(voteResult({ a: 1, b: 1, c: 2 })).toBe(1);
+    expect(voteResult({ a: 1, b: 2 })).toBeNull();
+    expect(voteResult({})).toBeNull();
+  });
+
+  it('forced nextStep moves on without a pick (no kill)', () => {
+    let s = run(game(['mafia', 'citizen', 'citizen', 'citizen', 'citizen']), { type: 'beginNight' }, { type: 'nextStep' }, { type: 'toVote' }, { type: 'voteOut', idx: null });
+    s = run(s, { type: 'nextStep', force: true });
+    expect(s.phase).toEqual({ t: 'day' });
+    expect(s.players.every((p) => p.alive)).toBe(true);
   });
 
   it('godfather breaks mafia ties', () => {
