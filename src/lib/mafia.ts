@@ -13,20 +13,23 @@ export const ROLE_INFO: Record<MafiaRole, { name: string; icon: string; team: 'm
 export const MIN_PLAYERS = 5;
 
 /** Suggested role list for n players (any size >= MIN_PLAYERS). */
+export const MAFIA_SPECIALS: MafiaRole[] = ['godfather', 'silencer'];
+export const TOWN_SPECIALS: MafiaRole[] = ['sheikh', 'girl', 'boy'];
+
 export function suggestRoles(n: number): MafiaRole[] {
   const mafiaCount = n <= 6 ? 1 : n <= 10 ? 2 : n <= 13 ? 3 : Math.floor(n / 4);
-  const town: MafiaRole[] = ['sheikh', 'girl'];
-  if (n >= 9) town.push('boy');
-  return buildRoles(n, mafiaCount, town);
+  const specials: MafiaRole[] = ['sheikh', 'girl'];
+  if (mafiaCount >= 2) specials.push('godfather');
+  if (mafiaCount >= 2 && n >= 9) specials.push('silencer');
+  if (n >= 9) specials.push('boy');
+  return buildRoles(n, mafiaCount, specials);
 }
 
-/** Mafia specials are filled in order (godfather, silencer) as the mafia count allows. */
-export function buildRoles(n: number, mafiaCount: number, townSpecials: MafiaRole[]): MafiaRole[] {
-  const mafia: MafiaRole[] = [];
-  if (mafiaCount >= 2) mafia.push('godfather');
-  if (mafiaCount >= 3 || (mafiaCount >= 2 && n >= 9)) mafia.push('silencer');
+/** Every special role is optional. Mafia specials take mafia seats (as many as fit); the rest are plain mafia / citizens. */
+export function buildRoles(n: number, mafiaCount: number, specials: MafiaRole[]): MafiaRole[] {
+  const mafia = MAFIA_SPECIALS.filter((r) => specials.includes(r)).slice(0, mafiaCount);
   while (mafia.length < mafiaCount) mafia.push('mafia');
-  const roles = [...mafia.slice(0, mafiaCount), ...townSpecials];
+  const roles = [...mafia, ...TOWN_SPECIALS.filter((r) => specials.includes(r))];
   while (roles.length < n) roles.push('citizen');
   return roles.slice(0, n);
 }

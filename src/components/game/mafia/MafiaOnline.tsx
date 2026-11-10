@@ -8,17 +8,49 @@ import {
   MafiaAction, MafiaRole, MIN_PLAYERS, STEP_INFO, isMafia, mafiaDecision, mafiaReducer, newGame, nightSteps, suggestRoles, voteResult,
 } from '@/lib/mafia';
 import QRCodeModal from '../QRCodeModal';
-import { DayInfo, EndView, NarratorView, OutCard, PlayerGrid, RoleCard, RoleEditor, SheikhAnswer, Shell, useTap } from './ui';
+import { DayInfo, EndView, NarratorView, OutCard, PlayerGrid, RoleCard, RoleEditor, SheikhAnswer, Shell, VoiceBanner, useTap } from './ui';
 import { Lobbyist, Snapshot, unlockSpeech, useAutoNarrator } from './autoNarrator';
 
 // ponytail: the room creator's phone holds the whole game and talks to players over a Supabase Realtime channel
 // (no tables). Roles travel in the broadcast, so a player poking at devtools could peek; move dealing to an
 // edge function if that ever matters. If the creator's phone refreshes mid-game, sessionStorage restores it.
 
-interface HostSnap extends Snapshot { auto: Lobbyist | null } // auto = the creator plays and the phone narrates
+interface HostSnap extends Snapshot {
+  auto: Lobbyist | null; // the creator plays and the phone narrates
+  bots: Lobbyist[]; // 🧪 test players run by the creator's phone
+}
 interface Act { from: string; kind: 'seen' | 'pick' | 'vote' | 'boy'; idx?: number }
 
-const emptySnap: HostSnap = { lobby: [], game: null, seen: [], votes: {}, mafiaPicks: {}, auto: null };
+const emptySnap: HostSnap = { lobby: [], game: null, seen: [], votes: {}, mafiaPicks: {}, auto: null, bots: [] };
+
+const BOTS: Lobbyist[] = Array.from({ length: 5 }, (_, i) => ({ id: `bot-${i + 1}`, name: `بوت ${i + 1}`, avatar: '🤖' }));
+
+/** What the 🧪 test bots would do right now: confirm cards, act on their night turn, vote, take someone if the boy. */
+function botActs(sn: Snapshot): Act[] {
+  const g = sn.game;
+  if (!g) return [];
+  const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+  const acts: Act[] = [];
+  g.players.forEach((p, i) => {
+    if (!p.id?.startsWith('bot-')) return;
+    const ph = g.phase;
+    const others = g.players.map((q, j) => ({ q, j })).filter((x) => x.q.alive && x.j !== i);
+    if (!others.length) return;
+    if (ph.t === 'reveal' && !sn.seen.includes(p.id)) acts.push({ from: p.id, kind: 'seen' });
+    if (ph.t === 'night' && p.alive) {
+      const key = nightSteps(g)[ph.step];
+      if (key === 'kill' && isMafia(p) && sn.mafiaPicks[p.id] === undefined) {
+        const town = others.filter((x) => !isMafia(x.q));
+        if (town.length) acts.push({ from: p.id, kind: 'pick', idx: pick(town).j });
+      } else if (key !== 'intro' && key !== 'kill' && STEP_INFO[key].role === p.role && g.picks[key] === null) {
+        acts.push({ from: p.id, kind: 'pick', idx: pick(others).j });
+      }
+    }
+    if (ph.t === 'vote' && p.alive && sn.votes[p.id] === undefined) acts.push({ from: p.id, kind: 'vote', idx: pick(others).j });
+    if (ph.t === 'boy' && p.role === 'boy') acts.push({ from: p.id, kind: 'boy', idx: pick(others).j });
+  });
+  return acts;
+}
 
 /** Per-tab player id: survives a refresh, but two tabs in one browser are two different players. */
 export const tabId = () => {
@@ -129,6 +161,17 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
   const dispatch = (a: MafiaAction) => setSnap((sn) => withAction(sn, a));
   const voice = useAutoNarrator(!!snap.auto && !!snap.game, snap, dispatch);
 
+  // 🧪 bots act one at a time, a moment apart, like slow humans
+  const hasBots = snap.bots.length > 0 && !!snap.game;
+  useEffect(() => {
+    if (!hasBots) return;
+    const t = setInterval(() => setSnap((sn) => {
+      const acts = botActs(sn);
+      return acts.length ? applyAct(sn, acts[Math.floor(Math.random() * acts.length)]) : sn;
+    }), 1200);
+    return () => clearInterval(t);
+  }, [hasBots]);
+
   const quit = () => { try { sessionStorage.removeItem(storeKey); } catch { /* ignore */ } onQuit(); };
   const restart = () => setSnap((sn) => ({ ...sn, game: null, seen: [], votes: {}, mafiaPicks: {} }));
   const link = `${window.location.origin}/?mafia=${code}`;
@@ -152,9 +195,7 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
     return (
       <PlayerView snap={snap} myId={snap.auto.id} connected={connected} onQuit={quit}
         act={(kind, idx) => { tap(); setSnap((sn) => applyAct(sn, { from: snap.auto!.id, kind, idx })); }}
-        banner={<div className="rounded-xl bg-primary/10 text-center py-2 px-3 text-sm font-bold">
-          🔊 {voice.count !== null ? <span className="text-2xl font-black text-primary">{voice.count}</span> : voice.line || 'الراوي الآلي شغّال'}
-        </div>}
+        banner={<VoiceBanner line={voice.line} count={voice.count} />}
         footer={controls} />
     );
   }
@@ -204,7 +245,7 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
 
   // Lobby
   const hostPlayer: Lobbyist | null = autoMode && myName.trim() ? { id: me.id, name: myName.trim(), avatar: myAvatar } : null;
-  const people = hostPlayer ? [hostPlayer, ...snap.lobby] : snap.lobby;
+  const people = [...(hostPlayer ? [hostPlayer] : []), ...snap.lobby, ...snap.bots];
   const n = people.length;
   const roleList = roles && roles.length === n ? roles : n >= MIN_PLAYERS ? suggestRoles(n) : [];
   const canStart = n >= MIN_PLAYERS && (!autoMode || !!hostPlayer);
@@ -260,6 +301,10 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
         {n === 0 ? <p className="text-sm text-muted-foreground">⏳ بانتظار اللاعبين…</p> : (
           <div className="flex flex-wrap gap-2">{people.map((p) => <span key={p.id} className="px-3 py-1.5 rounded-full bg-secondary text-sm font-bold">{p.avatar} {p.name}{p.id === me.id ? ' (إنت)' : ''}</span>)}</div>
         )}
+        <button onClick={() => { tap(); setRoles(null); setSnap((sn) => ({ ...sn, bots: sn.bots.length ? [] : BOTS })); }}
+          className="mt-3 w-full py-2.5 rounded-xl border-2 border-dashed border-border text-sm font-bold text-muted-foreground hover:text-foreground">
+          {snap.bots.length ? '🧪 شيل اللاعبين التجريبيين' : '🧪 تيست: ضيف 5 لاعبين تجريبيين'}
+        </button>
       </div>
       {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} />}
     </Shell>

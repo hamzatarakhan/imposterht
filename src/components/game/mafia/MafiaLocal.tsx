@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { unlockSpeech, useAutoNarrator } from './autoNarrator';
 import { Plus, X } from 'lucide-react';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import { MafiaAction, MafiaRole, MafiaState, MIN_PLAYERS, mafiaReducer, newGame, suggestRoles } from '@/lib/mafia';
-import { NarratorView, RoleCard, RoleEditor, Shell, useTap } from './ui';
+import { NarratorView, RoleCard, RoleEditor, Shell, VoiceBanner, useTap } from './ui';
 
 /** One phone, held by the narrator; cards are revealed by passing the phone around. */
 const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
@@ -14,13 +15,17 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
   const [roles, setRoles] = useState<MafiaRole[] | null>(null);
   const [game, setGame] = useState<MafiaState | null>(null);
   const [reveal, setReveal] = useState<{ i: number; shown: boolean } | null>(null);
+  const [auto, setAuto] = useState(false);
   const dispatch = (a: MafiaAction) => setGame((g) => g && mafiaReducer(g, a));
+  const snap = useMemo(() => ({ lobby: [], game, seen: [], votes: {}, mafiaPicks: {} }), [game]);
+  const voice = useAutoNarrator(auto && !!game && !reveal, snap, dispatch, { samePhone: true });
 
   const n = names.length;
   const roleList = roles && roles.length === n ? roles : n >= MIN_PLAYERS ? suggestRoles(n) : [];
 
   const start = () => {
     tap(50);
+    if (auto) unlockSpeech();
     setGame(newGame(names, roleList));
     setReveal({ i: 0, shown: false });
   };
@@ -47,7 +52,8 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
         </Shell>
       );
     }
-    return <NarratorView s={game} dispatch={dispatch} onQuit={onQuit} onRestart={() => { setGame(null); setRoles(null); }} />;
+    return <NarratorView s={game} dispatch={dispatch} onQuit={onQuit} onRestart={() => { setGame(null); setRoles(null); }}
+      banner={auto ? <VoiceBanner line={voice.line} count={voice.count} /> : undefined} />;
   }
 
   const add = () => {
@@ -61,9 +67,23 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
       footer={<button onClick={start} disabled={n < MIN_PLAYERS} className="w-full btn-primary-game text-xl disabled:opacity-50 disabled:cursor-not-allowed">
         {n < MIN_PLAYERS ? `بدنا ${MIN_PLAYERS} لاعبين على الأقل` : '🎴 وزّع الكروت'}
       </button>}>
+      <div className="card-game space-y-3">
+        <h2 className="font-bold">🎙️ مين الراوي؟</h2>
+        <div className="grid grid-cols-2 gap-2">
+          {[{ v: false, icon: '🎙️', t: 'في راوي', d: 'ماسك الجوال وما بيلعب' }, { v: true, icon: '🤖', t: 'بدون راوي', d: 'الجوال بيحكي والكل بيلعب' }].map((o) => (
+            <button key={o.t} onClick={() => { tap(); setAuto(o.v); }}
+              className={`p-3 rounded-2xl text-center border-2 ${auto === o.v ? 'border-primary bg-primary/10' : 'border-transparent bg-secondary/60'}`}>
+              <span className="block text-2xl">{o.icon}</span>
+              <span className="block font-bold text-sm">{o.t}</span>
+              <span className="block text-[11px] text-muted-foreground">{o.d}</span>
+            </button>
+          ))}
+        </div>
+        {auto && <p className="text-xs text-muted-foreground leading-relaxed">🔊 حطّوا الجوال بالنص وعلّوا الصوت. بالليل اللي إله دور بيفتّح وبيختار على الجوال، وبالنهار بتصوّتوا بإيديكم وحدا بيختار مين طلع</p>}
+      </div>
       <div className="card-game">
         <h2 className="font-bold mb-1">👥 اللاعبين ({n})</h2>
-        <p className="text-xs text-muted-foreground mb-3">الراوي ما بيلعب، هو اللي ماسك الجوال</p>
+        <p className="text-xs text-muted-foreground mb-3">{auto ? 'ضيف كل اللي رح يلعبوا' : 'الراوي ما بيلعب، ما تضيفه'}</p>
         <div className="flex gap-2 mb-3">
           <input value={newName} onChange={(e) => setNewName(e.target.value.slice(0, 20))} onKeyDown={(e) => e.key === 'Enter' && add()}
             placeholder="اسم اللاعب" className="flex-1 text-sm font-bold py-2.5 px-3 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none" />

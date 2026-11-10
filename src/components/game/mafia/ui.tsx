@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
 import {
-  MafiaPlayer, MafiaRole, MafiaState, MafiaAction, ROLE_INFO, STEP_INFO, isMafia, nightSteps, buildRoles, maxMafia,
+  MafiaPlayer, MafiaRole, MafiaState, MafiaAction, ROLE_INFO, STEP_INFO, isMafia, nightSteps, buildRoles, maxMafia, MAFIA_SPECIALS, TOWN_SPECIALS,
 } from '@/lib/mafia';
 
 export const useTap = () => {
@@ -10,7 +10,7 @@ export const useTap = () => {
   return (ms = 30) => { playSound('click'); vibrate(ms); };
 };
 
-export const Shell: React.FC<{ title?: string; onBack?: () => void; children: React.ReactNode; footer?: React.ReactNode }> = ({ title, onBack, children, footer }) => (
+export const Shell: React.FC<{ title?: string; onBack?: () => void; children: React.ReactNode; footer?: React.ReactNode; banner?: React.ReactNode }> = ({ title, onBack, children, footer, banner }) => (
   <div className="min-h-screen flex flex-col relative">
     <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md p-4 flex items-center gap-3">
       {onBack && (
@@ -20,7 +20,7 @@ export const Shell: React.FC<{ title?: string; onBack?: () => void; children: Re
       )}
       <h1 className="text-xl font-black">🔪 {title ?? 'المافيا'}</h1>
     </div>
-    <div className="flex-1 p-4 pb-32 space-y-4">{children}</div>
+    <div className="flex-1 p-4 pb-32 space-y-4">{banner}{children}</div>
     {footer && <div className="sticky bottom-0 p-4 bg-gradient-to-t from-background via-background to-transparent space-y-2">{footer}</div>}
   </div>
 );
@@ -47,28 +47,40 @@ export const PlayerGrid: React.FC<{
 export const RoleEditor: React.FC<{ n: number; roles: MafiaRole[]; setRoles: (r: MafiaRole[]) => void }> = ({ n, roles, setRoles }) => {
   const tap = useTap();
   const mafiaN = roles.filter((r) => ROLE_INFO[r].team === 'mafia').length;
-  const town: MafiaRole[] = roles.filter((r) => r === 'sheikh' || r === 'girl' || r === 'boy');
+  const specials = roles.filter((r) => MAFIA_SPECIALS.includes(r) || TOWN_SPECIALS.includes(r));
   const counts = roles.reduce<Record<string, number>>((a, r) => ({ ...a, [r]: (a[r] ?? 0) + 1 }), {});
+  const toggle = (r: MafiaRole) => {
+    tap();
+    // turning on a mafia special when every mafia seat is taken adds a seat if the game allows it
+    const on = !specials.includes(r);
+    const seatsNeeded = MAFIA_SPECIALS.filter((x) => x === r ? on : specials.includes(x)).length;
+    const m = on && MAFIA_SPECIALS.includes(r) ? Math.min(maxMafia(n), Math.max(mafiaN, seatsNeeded)) : mafiaN;
+    setRoles(buildRoles(n, m, on ? [...specials, r] : specials.filter((x) => x !== r)));
+  };
+  const Chip: React.FC<{ r: MafiaRole }> = ({ r }) => (
+    <button onClick={() => toggle(r)}
+      className={`px-3 py-2 rounded-xl text-sm font-bold ${specials.includes(r) ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground line-through'}`}>
+      {ROLE_INFO[r].icon} {ROLE_INFO[r].name}
+    </button>
+  );
   return (
     <div className="card-game space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-bold">🔪 عدد المافيا</h2>
         <div className="flex items-center gap-3">
-          <button onClick={() => { tap(); setRoles(buildRoles(n, Math.max(1, mafiaN - 1), town)); }} className="p-2 rounded-xl bg-secondary" aria-label="أقل"><Minus size={16} /></button>
+          <button onClick={() => { tap(); setRoles(buildRoles(n, Math.max(1, mafiaN - 1), specials)); }} className="p-2 rounded-xl bg-secondary" aria-label="أقل"><Minus size={16} /></button>
           <span className="text-2xl font-black text-primary w-6 text-center">{mafiaN}</span>
-          <button onClick={() => { tap(); setRoles(buildRoles(n, Math.min(maxMafia(n), mafiaN + 1), town)); }} className="p-2 rounded-xl bg-secondary" aria-label="أكثر"><Plus size={16} /></button>
+          <button onClick={() => { tap(); setRoles(buildRoles(n, Math.min(maxMafia(n), mafiaN + 1), specials)); }} className="p-2 rounded-xl bg-secondary" aria-label="أكثر"><Plus size={16} /></button>
         </div>
       </div>
+      <p className="text-xs text-muted-foreground">كل الأدوار اختيارية، اضغط لتشغيل أو إطفاء</p>
       <div>
-        <p className="text-xs text-muted-foreground mb-2">أدوار المواطنين (اضغط لتشغيل أو إطفاء)</p>
-        <div className="flex flex-wrap gap-2">
-          {(['sheikh', 'girl', 'boy'] as MafiaRole[]).map((r) => (
-            <button key={r} onClick={() => { tap(); setRoles(buildRoles(n, mafiaN, town.includes(r) ? town.filter((x) => x !== r) : [...town, r])); }}
-              className={`px-3 py-2 rounded-xl text-sm font-bold ${town.includes(r) ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
-              {ROLE_INFO[r].icon} {ROLE_INFO[r].name}
-            </button>
-          ))}
-        </div>
+        <p className="text-xs font-bold text-red-500 mb-2">أدوار المافيا</p>
+        <div className="flex flex-wrap gap-2">{MAFIA_SPECIALS.map((r) => <Chip key={r} r={r} />)}</div>
+      </div>
+      <div>
+        <p className="text-xs font-bold text-emerald-500 mb-2">أدوار المواطنين</p>
+        <div className="flex flex-wrap gap-2">{TOWN_SPECIALS.map((r) => <Chip key={r} r={r} />)}</div>
       </div>
       <p className="text-xs text-muted-foreground leading-relaxed">
         الكروت: {Object.entries(counts).map(([r, c]) => `${ROLE_INFO[r as MafiaRole].icon} ${ROLE_INFO[r as MafiaRole].name}${c > 1 ? ` ×${c}` : ''}`).join(' · ')}
@@ -150,6 +162,13 @@ export const EndView: React.FC<{ s: MafiaState }> = ({ s }) => {
   );
 };
 
+/** What the auto narrator is saying right now, or the big countdown number. */
+export const VoiceBanner: React.FC<{ line: string; count: number | null }> = ({ line, count }) => (
+  <div className="rounded-xl bg-primary/10 text-center py-2 px-3 text-sm font-bold">
+    🔊 {count !== null ? <span className="text-2xl font-black text-primary">{count}</span> : line || 'الراوي الآلي شغّال'}
+  </div>
+);
+
 export const SheikhAnswer: React.FC<{ p: MafiaPlayer }> = ({ p }) => (
   <div className={`card-game text-center text-xl font-black ${isMafia(p) ? 'text-red-500' : 'text-emerald-500'}`}>
     {p.name}: {isMafia(p) ? '👎 مافيا' : '👍 مواطن'}
@@ -163,19 +182,19 @@ export const SheikhAnswer: React.FC<{ p: MafiaPlayer }> = ({ p }) => (
 export const NarratorView: React.FC<{
   s: MafiaState; dispatch: (a: MafiaAction) => void; onQuit: () => void; onRestart: () => void;
   online?: { stepHint?: React.ReactNode; voteCounts?: Record<number, number>; revealFooter?: React.ReactNode; revealBody?: React.ReactNode };
-}> = ({ s, dispatch, onQuit, onRestart, online }) => {
-  const tap = useTap();
-  const go = (a: MafiaAction, ms = 30) => { tap(ms); dispatch(a); };
+  banner?: React.ReactNode;
+}> = ({ s, dispatch, onQuit, onRestart, online, banner }) => {
+  const tap = useTap();  const go = (a: MafiaAction, ms = 30) => { tap(ms); dispatch(a); };
   const ph = s.phase;
 
   if (ph.t === 'reveal') {
     return (
-      <Shell title="جاهزين؟" onBack={onQuit} footer={online?.revealFooter ?? <button onClick={() => go({ type: 'beginNight' }, 50)} className="w-full btn-primary-game text-xl">🌙 ابدأ الليل</button>}>
+      <Shell banner={banner} title="جاهزين؟" onBack={onQuit} footer={online?.revealFooter ?? <button onClick={() => go({ type: 'beginNight' }, 50)} className="w-full btn-primary-game text-xl">🌙 ابدأ الليل</button>}>
         {online?.revealBody ?? (
           <div className="card-game text-center">
             <div className="text-6xl mb-4">🎙️</div>
             <p className="text-lg font-bold">الكل شاف كرته</p>
-            <p className="text-muted-foreground mt-2">رجّعوا الجوال للراوي</p>
+            <p className="text-muted-foreground mt-2">{banner ? 'حطّوا الجوال بالنص وعلّوا الصوت' : 'رجّعوا الجوال للراوي'}</p>
           </div>
         )}
       </Shell>
@@ -189,7 +208,7 @@ export const NarratorView: React.FC<{
     const last = ph.step === steps.length - 1;
     const picked = key === 'intro' ? null : s.picks[key];
     return (
-      <Shell title={s.night === 1 ? 'ليلة التعارف' : `الليلة ${s.night - 1}`} onBack={onQuit}
+      <Shell banner={banner} title={s.night === 1 ? 'ليلة التعارف' : `الليلة ${s.night - 1}`} onBack={onQuit}
         footer={<button onClick={() => go({ type: 'nextStep' }, 50)} disabled={key !== 'intro' && picked === null} className="w-full btn-primary-game text-lg disabled:opacity-50">{last ? '☀️ الكل يفتح' : 'التالي'}</button>}>
         <div className="flex gap-1 justify-center">{steps.map((_, i) => <span key={i} className={`h-1.5 w-8 rounded-full ${i <= ph.step ? 'bg-primary' : 'bg-secondary'}`} />)}</div>
         <div className="card-game text-center">
@@ -211,7 +230,7 @@ export const NarratorView: React.FC<{
 
   if (ph.t === 'out') {
     return (
-      <Shell title={ph.by === 'vote' ? 'نتيجة التصويت' : 'صباح الخير'} onBack={onQuit}
+      <Shell banner={banner} title={ph.by === 'vote' ? 'نتيجة التصويت' : 'صباح الخير'} onBack={onQuit}
         footer={<button onClick={() => go({ type: 'continue' })} className="w-full btn-primary-game text-lg">كمّل</button>}>
         <OutCard s={s} />
       </Shell>
@@ -221,7 +240,7 @@ export const NarratorView: React.FC<{
   if (ph.t === 'boy') {
     const boy = s.players.find((p) => p.role === 'boy');
     return (
-      <Shell title="💣 الولد" onBack={onQuit}>
+      <Shell banner={banner} title="💣 الولد" onBack={onQuit}>
         <div className="card-game text-center">
           <p className="text-lg font-bold">{boy?.name} كان الولد!</p>
           <p className="text-muted-foreground">مين بدّه ياخد معه؟</p>
@@ -233,7 +252,7 @@ export const NarratorView: React.FC<{
 
   if (ph.t === 'day') {
     return (
-      <Shell title="النهار ☀️" onBack={onQuit} footer={<button onClick={() => go({ type: 'toVote' }, 50)} className="w-full btn-primary-game text-lg">🗳️ للتصويت</button>}>
+      <Shell banner={banner} title="النهار ☀️" onBack={onQuit} footer={<button onClick={() => go({ type: 'toVote' }, 50)} className="w-full btn-primary-game text-lg">🗳️ للتصويت</button>}>
         <DayInfo s={s} />
       </Shell>
     );
@@ -242,7 +261,7 @@ export const NarratorView: React.FC<{
   if (ph.t === 'vote') {
     const counts = online?.voteCounts;
     return (
-      <Shell title="التصويت 🗳️" onBack={onQuit}
+      <Shell banner={banner} title="التصويت 🗳️" onBack={onQuit}
         footer={<button onClick={() => go({ type: 'voteOut', idx: null })} className="w-full btn-secondary-game">ما حدا طلع، كمّلوا لليل 🌙</button>}>
         <div className="card-game text-center">
           <p className="font-bold">{counts ? 'الأصوات عم توصل من الموبايلات' : 'صوّتوا بإيديكم'}</p>
@@ -255,7 +274,7 @@ export const NarratorView: React.FC<{
   }
 
   return (
-    <Shell title="خلصت اللعبة" onBack={onQuit} footer={<button onClick={() => { tap(50); onRestart(); }} className="w-full btn-primary-game text-lg">🔄 العب مرة تانية</button>}>
+    <Shell banner={banner} title="خلصت اللعبة" onBack={onQuit} footer={<button onClick={() => { tap(50); onRestart(); }} className="w-full btn-primary-game text-lg">🔄 العب مرة تانية</button>}>
       <EndView s={s} />
     </Shell>
   );

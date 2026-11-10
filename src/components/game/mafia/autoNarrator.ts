@@ -55,7 +55,8 @@ const isOn = (cancelled: { v: boolean }) => !cancelled.v;
  * Runs the game by itself on the room creator's phone: speaks each step, counts 5..1 before eyes open/close,
  * waits for players to act on their phones, and advances. Re-runs its script whenever the phase changes.
  */
-export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: MafiaAction) => void) {
+export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: MafiaAction) => void, opts: { samePhone?: boolean } = {}) {
+  const samePhone = !!opts.samePhone; // one phone in the middle: no per-player "seen" or phone votes
   const [line, setLine] = useState<string>('');
   const [count, setCount] = useState<number | null>(null);
   const snapRef = useRef(snap);
@@ -89,8 +90,11 @@ export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: Maf
     (async () => {
       const ph = g.phase;
       if (ph.t === 'reveal') {
-        await speak('كل واحد يشوف كرته على موبايله');
-        await waitFor(() => cur().players.every((p) => p.id && snapRef.current.seen.includes(p.id)));
+        if (samePhone) await speak('حطّوا الموبايل بالنص، وعلّوا الصوت');
+        else {
+          await speak('كل واحد يشوف كرته على موبايله');
+          await waitFor(() => cur().players.every((p) => p.id && snapRef.current.seen.includes(p.id)));
+        }
         await speak('الكل ينام');
         await countdown('غمّضوا عيونكم');
         act({ type: 'beginNight' });
@@ -109,7 +113,7 @@ export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: Maf
         const v = VERBS[key];
         await speak(`${info.who}، ${v.ready}`);
         await countdown(v.open);
-        await speak(info.line.split('…')[1]?.trim() || info.line);
+        await speak((info.line.split('…')[1]?.trim() || info.line) + (samePhone ? '، اختار على الموبايل' : ''));
         await waitFor(() => cur().picks[key] !== null, PICK_TIMEOUT);
         await wait(2500);
         await countdown(v.close);
@@ -128,6 +132,8 @@ export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: Maf
         if (g.saved) await speak('المافيا حاولت تقتل، بس البنت أنقذته');
         if (g.silenced !== null && g.players[g.silenced]?.alive) await speak(`${g.players[g.silenced].name} مسكّت، ممنوع يحكي`);
         await speak('يلا ابدأوا النقاش');
+      } else if (ph.t === 'vote' && samePhone) {
+        await speak('صوّتوا بإيديكم، وبعدين اختاروا على الموبايل مين طلع');
       } else if (ph.t === 'vote') {
         await speak('صوّتوا هلأ على موبايلاتكم');
         const alive = () => cur().players.filter((p) => p.alive && p.id);
@@ -141,7 +147,7 @@ export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: Maf
     })();
 
     return () => { cancelled.v = true; setCount(null); try { speechSynthesis.cancel(); } catch { /* unsupported */ } };
-  }, [enabled, phaseKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [enabled, phaseKey, samePhone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { line, count };
 }
