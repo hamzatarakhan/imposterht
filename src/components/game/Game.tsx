@@ -24,10 +24,11 @@ import ModeSelectScreen from './online/ModeSelectScreen';
 import GuessingGame from './guessing/GuessingGame';
 import OnlineGuessingGame from './guessing/online/OnlineGuessingGame';
 import CountriesGame from './countries/CountriesGame';
-import MafiaGame from './mafia/MafiaGame';
+import MafiaGame, { shouldOpenMafia } from './mafia/MafiaGame';
 
 const GameContent: React.FC = () => {
-  const { screen } = useGame();
+  const { screen, setScreen } = useGame();
+  React.useEffect(() => { if (shouldOpenMafia()) setScreen('mafia'); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const { screen: onlineScreen, pendingJoinCode } = useOnlineGame();
   const { screen: guessingOnlineScreen } = useOnlineGuessing();
   const { screen: countriesScreen, pendingJoinCode: countriesPendingJoin } = useCountries();
