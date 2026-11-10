@@ -8,7 +8,7 @@ import {
   MafiaAction, MafiaRole, MIN_PLAYERS, STEP_INFO, isMafia, mafiaDecision, mafiaReducer, newGame, nightSteps, suggestRoles, voteResult,
 } from '@/lib/mafia';
 import QRCodeModal from '../QRCodeModal';
-import { DayInfo, EndView, NarratorView, OutCard, PlayerGrid, RoleCard, RoleEditor, SheikhAnswer, Shell, VoiceBanner, useTap } from './ui';
+import { DayInfo, EndView, NarratorView, OutCard, PlayerGrid, RoleCard, RoleEditor, SheikhAnswer, Shell, VoiceBanner, VoiceCheck, useTap } from './ui';
 import { Lobbyist, Snapshot, unlockSpeech, useAutoNarrator } from './autoNarrator';
 
 // ponytail: the room creator's phone holds the whole game and talks to players over a Supabase Realtime channel
@@ -292,6 +292,7 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
                 className="flex-1 text-sm font-bold py-2.5 px-3 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none" />
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">🔊 علّي صوت الموبايل وحطّه بالنص. رح يحكي ويعدّ ٥، ٤، ٣، ٢، ١ قبل ما تفتّحوا أو تغمّضوا</p>
+            <VoiceCheck />
           </>
         )}
       </div>

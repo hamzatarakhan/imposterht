@@ -4,6 +4,7 @@ import { useSettings } from '@/context/SettingsContext';
 import {
   MafiaPlayer, MafiaRole, MafiaState, MafiaAction, ROLE_INFO, STEP_INFO, isMafia, nightSteps, buildRoles, maxMafia, MAFIA_SPECIALS, TOWN_SPECIALS,
 } from '@/lib/mafia';
+import { hasArabicVoice, unlockSpeech } from './autoNarrator';
 
 export const useTap = () => {
   const { playSound, vibrate } = useSettings();
@@ -159,6 +160,37 @@ export const EndView: React.FC<{ s: MafiaState }> = ({ s }) => {
       </div>
       {s.log.length > 0 && <div className="card-game text-xs text-muted-foreground space-y-1">{s.log.map((l, i) => <p key={i}>{l}</p>)}</div>}
     </>
+  );
+};
+
+/** "Test the voice" button: plays a beep + an Arabic sentence and says how to fix it if the phone has no Arabic voice. */
+export const VoiceCheck: React.FC = () => {
+  const [status, setStatus] = React.useState<'idle' | 'ok' | 'noArabic' | 'noSpeech'>('idle');
+  const ua = navigator.userAgent;
+  const isIOS = /iphone|ipad|ipod/i.test(ua);
+  const steps = isIOS
+    ? 'الإعدادات ← تسهيلات الاستخدام ← المحتوى المنطوق ← الأصوات ← العربية ← نزّل صوت'
+    : /android/i.test(ua)
+      ? 'الإعدادات ← إدارة عامة / النظام ← تحويل النص إلى كلام ← المحرّك المفضّل: Google ← اللغة: العربية (ونزّل البيانات)'
+      : /mac/i.test(ua)
+        ? 'إعدادات النظام ← تسهيلات الاستخدام ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات ← العربية'
+        : 'إعدادات ويندوز ← الوقت واللغة ← الكلام ← إضافة أصوات ← العربية';
+  const test = async () => {
+    unlockSpeech('أهلا، الصوت شغّال. خمسة، أربعة، تلاتة');
+    if (!('speechSynthesis' in window)) return setStatus('noSpeech');
+    setStatus((await hasArabicVoice()) ? 'ok' : 'noArabic');
+  };
+  return (
+    <div className="space-y-2">
+      <button onClick={test} className="w-full py-2.5 rounded-xl bg-secondary font-bold text-sm">🔊 جرّب الصوت</button>
+      {status === 'ok' && <p className="text-xs text-emerald-500 leading-relaxed">✅ جهازك فيه صوت عربي. إذا ما سمعت شي: علّي الصوت{isIOS ? '، وشيل الآيفون عن الصامت (الزر الجانبي)' : ''}.</p>}
+      {status === 'noArabic' && (
+        <p className="text-xs text-amber-500 leading-relaxed">
+          ⚠️ جهازك ما فيه صوت عربي، فرح يعدّ بالبيب ويكتب الكلام على الشاشة بس. لتشغيل الحكي: {steps}، وبعدين سكّر المتصفح وارجع افتحه.
+        </p>
+      )}
+      {status === 'noSpeech' && <p className="text-xs text-amber-500">⚠️ هالمتصفح ما بيدعم الحكي. جرّب Chrome أو Safari.</p>}
+    </div>
   );
 };
 

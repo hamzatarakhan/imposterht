@@ -4,7 +4,7 @@ import { Plus, X } from 'lucide-react';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import { MafiaAction, MafiaRole, MafiaState, MIN_PLAYERS, mafiaReducer, newGame, suggestRoles } from '@/lib/mafia';
-import { NarratorView, RoleCard, RoleEditor, Shell, VoiceBanner, useTap } from './ui';
+import { NarratorView, RoleCard, RoleEditor, Shell, VoiceBanner, VoiceCheck, useTap } from './ui';
 
 /** One phone, held by the narrator; cards are revealed by passing the phone around. */
 const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
@@ -80,6 +80,7 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
           ))}
         </div>
         {auto && <p className="text-xs text-muted-foreground leading-relaxed">🔊 حطّوا الجوال بالنص وعلّوا الصوت. بالليل اللي إله دور بيفتّح وبيختار على الجوال، وبالنهار بتصوّتوا بإيديكم وحدا بيختار مين طلع</p>}
+        {auto && <VoiceCheck />}
       </div>
       <div className="card-game">
         <h2 className="font-bold mb-1">👥 اللاعبين ({n})</h2>
