@@ -24,6 +24,7 @@ import ModeSelectScreen from './online/ModeSelectScreen';
 import GuessingGame from './guessing/GuessingGame';
 import OnlineGuessingGame from './guessing/online/OnlineGuessingGame';
 import CountriesGame from './countries/CountriesGame';
+import MafiaGame from './mafia/MafiaGame';
 
 const GameContent: React.FC = () => {
   const { screen } = useGame();
@@ -55,6 +56,10 @@ const GameContent: React.FC = () => {
   const activeGuessingLocalScreens = ['guessingSetup', 'guessingPassPhone', 'guessingShowWord', 'guessingPlay', 'guessingRoundResult', 'guessingFinalResult'];
   if (activeGuessingLocalScreens.includes(screen)) {
     return <div className="max-w-md mx-auto min-h-screen bg-background relative"><GuessingGame /></div>;
+  }
+
+  if (screen === 'mafia') {
+    return <div className="max-w-md mx-auto min-h-screen bg-background relative"><MafiaGame /></div>;
   }
 
   if (screen === 'modeSelect') {

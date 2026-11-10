@@ -110,6 +110,31 @@ const games = [
       "اللاعب اللي طلع برا بقدر يرجع للجلسة عبر التبديل (التفاعل مع لاعب جوا)",
     ],
   },
+  {
+    id: "mafia",
+    name: "المافيا",
+    icon: "🔪",
+    description: "اكشفوا المافيا قبل ما تخلص عليكم!",
+    gradient: "from-zinc-500/20 to-red-700/20",
+    border: "border-red-700/30",
+    accent: "text-red-600",
+    players: "5 لاعبين أو أكثر",
+    duration: "20-50 دقيقة",
+    mode: "محلي (راوي ماسك الجوال)",
+    howToPlay: [
+      { icon: "🎙️", text: "في راوي ما بيلعب، ماسك الجوال وبيدير اللعبة" },
+      { icon: "🎴", text: "التطبيق بيوزّع الكروت عشوائياً، وكل لاعب بياخد الجوال ويشوف كرته بالسر" },
+      { icon: "🌙", text: "بالليل الكل بيغمّض، والراوي بيصحّي المافيا يختاروا مين يقتلوا، وبعدهم قص المافيا والشيخ والبنت" },
+      { icon: "☀️", text: "بالصبح بينعلن مين انقتل ومين مسكّت، والكل بيتناقش وبيتّهم" },
+      { icon: "🗳️", text: "بتصوّتوا على مين يطلع، وبينكشف كرته" },
+      { icon: "🏆", text: "المواطنين بيربحوا إذا طلّعوا كل المافيا، والمافيا بتربح إذا صار عددها قد المواطنين" },
+    ],
+    tips: [
+      "🎩 شيخ المافيا بيحسم إذا المافيا اختلفوا، ✂️ القص بيسكّت حدا طول النهار",
+      "🕵️ الشيخ بيعرف كل ليلة عن لاعب، 💉 البنت بتحمي، 💣 الولد بياخد حدا معه لما يطلع",
+      "ممنوع الحلفان وممنوع الغش، اللعبة كلها تمثيل وتحليل",
+    ],
+  },
 ];
 
 const HubScreen: React.FC = () => {
@@ -401,6 +426,8 @@ const HubScreen: React.FC = () => {
                     setOnlineGuessingScreen("guessingCreateRoom");
                   } else if (game.id === "countries") {
                     createCountriesRoom();
+                  } else if (game.id === "mafia") {
+                    setScreen("mafia");
                   } else {
                     setScreen("home");
                   }
@@ -527,6 +554,8 @@ const HubScreen: React.FC = () => {
                         setOnlineGuessingScreen("guessingCreateRoom");
                       } else if (id === "countries") {
                         createCountriesRoom();
+                      } else if (id === "mafia") {
+                        setScreen("mafia");
                       } else {
                         setScreen("home");
                       }

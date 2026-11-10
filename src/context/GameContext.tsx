@@ -17,7 +17,8 @@ export type GameScreen =
   | 'wordGuess'
   | 'result'
   | 'guessingSetup'
-  | 'guessingModeSelect';
+  | 'guessingModeSelect'
+  | 'mafia';
 
 export interface Player {
   id: number;
