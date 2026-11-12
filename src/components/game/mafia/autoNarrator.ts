@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { arabicUtterance, pickArabicVoice } from '@/lib/speech';
 import { MafiaAction, MafiaState, ROLE_INFO, STEP_INFO, nightSteps, voteResult } from '@/lib/mafia';
 
 export interface Lobbyist { id: string; name: string; avatar: string }
@@ -6,14 +7,8 @@ export interface Snapshot { lobby: Lobbyist[]; game: MafiaState | null; seen: st
 
 // ---------- speech + beeps ----------
 const hasSpeech = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
-const arabic = (vs: SpeechSynthesisVoice[]) => vs.find((v) => v.lang.toLowerCase().replace('_', '-').startsWith('ar')) ?? null;
-let voice: SpeechSynthesisVoice | null | undefined; // undefined = voices not loaded yet
 const pickVoice = () => {
-  if (voice !== undefined || !hasSpeech()) return voice ?? null;
-  const vs = speechSynthesis.getVoices();
-  if (!vs.length) return null; // not loaded yet, try again next time
-  voice = arabic(vs);
-  return voice;
+  return hasSpeech() ? pickArabicVoice(speechSynthesis.getVoices()) : null;
 };
 
 /** Resolves to whether this phone has an Arabic text-to-speech voice (voices load lazily on Chrome). */
@@ -61,10 +56,7 @@ export const unlockSpeech = (text = 'يلا') => {
   void audio?.resume();
   try {
     speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ar-SA';
-    const v = pickVoice();
-    if (v) u.voice = v;
+    const u = arabicUtterance(text, pickVoice());
     speechSynthesis.speak(u);
   } catch { /* unsupported */ }
   void keepAwake(true);
@@ -76,20 +68,16 @@ const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 export function say(text: string): Promise<void> {
   const fallback = 700 + text.length * 70;
   // voices loaded and none is Arabic: an English voice would read nothing useful, so stay quiet (beeps still play)
-  if (!hasSpeech() || (voice === null && speechSynthesis.getVoices().length)) return wait(fallback);
+  if (!hasSpeech() || (!pickVoice() && speechSynthesis.getVoices().length)) return wait(fallback);
   return new Promise((resolve) => {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ar-SA';
-    const v = pickVoice();
-    if (v) u.voice = v;
-    u.rate = 0.95;
+    const u = arabicUtterance(text, pickVoice());
     const t = setTimeout(resolve, fallback + 2500);
     u.onend = u.onerror = () => { clearTimeout(t); resolve(); };
     speechSynthesis.speak(u);
   });
 }
 
-const NUMBERS = ['خمسة', 'أربعة', 'تلاتة', 'اتنين', 'واحد'];
+const NUMBERS = ['خمسة', 'أربعة', 'ثلاثة', 'اثنين', 'واحد'];
 
 // Mafia are many, the girl is a girl, the rest are one man.
 const VERBS = {
@@ -150,30 +138,30 @@ export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: Maf
     (async () => {
       const ph = g.phase;
       if (ph.t === 'reveal') {
-        if (samePhone) await speak('حطّوا الموبايل بالنص، وعلّوا الصوت');
+        if (samePhone) await speak('يلا يا جماعة، أنا الراوي معكم. حطّوا الموبايل بالنص وعلّوا الصوت. كل واحد يفتح عيونه بس لما أنادي دوره');
         else {
           await speak('كل واحد يشوف كرته على موبايله');
           await waitFor(() => cur().players.every((p) => p.id && snapRef.current.seen.includes(p.id)));
         }
-        await speak('الكل ينام');
+        await speak('يلا يا جماعة، الكل يغمّض عيونه');
         await countdown('غمّضوا عيونكم');
         act({ type: 'beginNight' });
       } else if (ph.t === 'night') {
         const key = nightSteps(g)[ph.step];
         if (key === 'intro') {
-          await speak('المافيا، تعرّفوا على بعض');
+          await speak('يا مافيا، يلا تعرّفوا على بعض، بدون حكي');
           await countdown('فتّحوا');
           await wait(7000);
           await countdown('غمّضوا');
           act({ type: 'nextStep' });
           return;
         }
-        if (ph.step === 0 && cameFrom !== 'night') { await speak('الكل ينام'); await countdown('غمّضوا عيونكم'); }
+        if (ph.step === 0 && cameFrom !== 'night') { await speak('يلا يا جماعة، إجا الليل. الكل يغمّض عيونه'); await countdown('غمّضوا عيونكم'); }
         const info = STEP_INFO[key];
         const v = VERBS[key];
         await speak(`${info.who}، ${v.ready}`);
         await countdown(v.open);
-        await speak((info.line.split('…')[1]?.trim() || info.line) + (samePhone ? '، اختار على الموبايل' : ''));
+        await speak((info.line.split('…')[1]?.trim() || info.line) + (samePhone ? (key === 'kill' ? '، اختاروا على الموبايل' : '، اختار على الموبايل') : '، اختار من شاشة اللعبة عندك'));
         await waitFor(() => cur().picks[key] !== null, PICK_TIMEOUT);
         await wait(2500);
         await countdown(v.close);
@@ -188,10 +176,10 @@ export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: Maf
         await speak('الولد، اختار مين تاخد معك');
       } else if (ph.t === 'day') {
         if (cameFrom === 'night') { await speak('صباح الخير'); await countdown('الكل يفتّح'); }
-        if (g.night === 2) await speak('خلصت ليلة التعارف');
+        if (g.night === 2) await speak('هيك خلصت ليلة التعارف، وما حدا طلع فيها');
         if (g.saved) await speak('المافيا حاولت تقتل، بس البنت أنقذته');
         if (g.silenced !== null && g.players[g.silenced]?.alive) await speak(`${g.players[g.silenced].name} مسكّت، ممنوع يحكي`);
-        await speak('يلا ابدأوا النقاش');
+        await speak('يلا يا جماعة، احكوا شو عندكم. مين شاكّ بمين؟ ولما تخلصوا النقاش، اضغطوا على زر التصويت');
       } else if (ph.t === 'vote' && samePhone) {
         await speak('صوّتوا بإيديكم، وبعدين اختاروا على الموبايل مين طلع');
       } else if (ph.t === 'vote') {
@@ -202,7 +190,7 @@ export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: Maf
         if (out === null) await speak('تعادل، ما حدا طلع');
         act({ type: 'voteOut', idx: out });
       } else if (ph.t === 'end') {
-        await speak(ph.win === 'mafia' ? 'المافيا ربحت' : 'المواطنين ربحوا');
+        await speak(ph.win === 'mafia' ? 'المافيا فازت، لعبتوها صح!' : 'المواطنين فازوا، يعطيكم العافية!');
       }
     })();
 

@@ -176,13 +176,14 @@ export const VoiceCheck: React.FC = () => {
         ? 'إعدادات النظام ← تسهيلات الاستخدام ← المحتوى المنطوق ← صوت النظام ← إدارة الأصوات ← العربية'
         : 'إعدادات ويندوز ← الوقت واللغة ← الكلام ← إضافة أصوات ← العربية';
   const test = async () => {
-    unlockSpeech('أهلا، الصوت شغّال. خمسة، أربعة، تلاتة');
+    unlockSpeech('أهلين يا جماعة، أنا الراوي معكم. يلا نلعب مافيا! خمسة، أربعة، ثلاثة، اثنين، واحد');
     if (!('speechSynthesis' in window)) return setStatus('noSpeech');
     setStatus((await hasArabicVoice()) ? 'ok' : 'noArabic');
   };
   return (
     <div className="space-y-2">
       <button onClick={test} className="w-full py-2.5 rounded-xl bg-secondary font-bold text-sm">🔊 جرّب الصوت</button>
+      <p className="text-xs text-muted-foreground leading-relaxed">الراوي بيحكي تعليمات اللعبة لحاله. بيفضّل صوت أردني إذا موجود؛ نبرة الصوت حسب الأصوات المثبّتة على جهازك.</p>
       {status === 'ok' && <p className="text-xs text-emerald-500 leading-relaxed">✅ جهازك فيه صوت عربي. إذا ما سمعت شي: علّي الصوت{isIOS ? '، وشيل الآيفون عن الصامت (الزر الجانبي)' : ''}.</p>}
       {status === 'noArabic' && (
         <p className="text-xs text-amber-500 leading-relaxed">
