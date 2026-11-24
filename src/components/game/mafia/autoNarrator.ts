@@ -141,7 +141,7 @@ export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: Maf
         if (samePhone) await speak('يلا يا جماعة، أنا الراوي معكم. حطّوا الموبايل بالنص وعلّوا الصوت. كل واحد يفتح عيونه بس لما أنادي دوره');
         else {
           await speak('كل واحد يشوف كرته على موبايله');
-          await waitFor(() => cur().players.every((p) => p.id && snapRef.current.seen.includes(p.id)));
+          await waitFor(() => cur().players.every((p) => p.id && snapRef.current.seen.includes(p.id)), 90_000); // someone left: start anyway
         }
         await speak('يلا يا جماعة، الكل يغمّض عيونه');
         await countdown('غمّضوا عيونكم');
@@ -185,7 +185,7 @@ export function useAutoNarrator(enabled: boolean, snap: Snapshot, apply: (a: Maf
       } else if (ph.t === 'vote') {
         await speak('صوّتوا هلأ على موبايلاتكم');
         const alive = () => cur().players.filter((p) => p.alive && p.id);
-        await waitFor(() => alive().every((p) => snapRef.current.votes[p.id!] !== undefined));
+        await waitFor(() => alive().every((p) => snapRef.current.votes[p.id!] !== undefined), 120_000); // someone left: count what we have
         const out = voteResult(snapRef.current.votes);
         if (out === null) await speak('تعادل، ما حدا طلع');
         act({ type: 'voteOut', idx: out });

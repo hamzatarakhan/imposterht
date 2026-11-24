@@ -251,7 +251,7 @@ export const NarratorView: React.FC<{
         </div>
         {key !== 'intro' && (
           <>
-            {online?.stepHint ?? <p className="text-sm text-muted-foreground">{info.who} بيأشّر، والراوي بيختار:</p>}
+            {online?.stepHint ?? <p className="text-sm text-muted-foreground">{info.who} {key === 'kill' ? 'بيأشّروا' : key === 'protect' ? 'بتأشّر' : 'بيأشّر'}، والراوي بيختار:</p>}
             <PlayerGrid players={s.players} selected={picked} onPick={(i) => dispatch({ type: 'pick', key, idx: i })}
               filter={key === 'kill' ? (p) => p.alive && !isMafia(p) : undefined} />
             {key === 'check' && picked !== null && <SheikhAnswer p={s.players[picked]} />}

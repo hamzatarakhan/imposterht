@@ -120,10 +120,10 @@ const games = [
     accent: "text-red-600",
     players: "5 لاعبين أو أكثر",
     duration: "20-50 دقيقة",
-    mode: "محلي (راوي ماسك الجوال)",
+    mode: "جوال واحد أو أونلاين",
     howToPlay: [
-      { icon: "🎙️", text: "في راوي ما بيلعب، ماسك الجوال وبيدير اللعبة" },
-      { icon: "🎴", text: "التطبيق بيوزّع الكروت عشوائياً، وكل لاعب بياخد الجوال ويشوف كرته بالسر" },
+      { icon: "🎙️", text: "في راوي بيدير اللعبة وما بيلعب، أو اختاروا 'بدون راوي' والجوال بيحكي ويعدّ ٥، ٤، ٣، ٢، ١ لحاله" },
+      { icon: "🎴", text: "التطبيق بيوزّع الكروت عشوائياً: على جوال واحد بتمرّروه، وأونلاين كل واحد بيشوف كرته على موبايله" },
       { icon: "🌙", text: "بالليل الكل بيغمّض، والراوي بيصحّي المافيا يختاروا مين يقتلوا، وبعدهم قص المافيا والشيخ والبنت" },
       { icon: "☀️", text: "بالصبح بينعلن مين انقتل ومين مسكّت، والكل بيتناقش وبيتّهم" },
       { icon: "🗳️", text: "بتصوّتوا على مين يطلع، وبينكشف كرته" },
@@ -136,6 +136,14 @@ const games = [
     ],
   },
 ];
+
+// One short line per card, so the four cards stay the same height.
+const CARD_TAGS: Record<string, string> = {
+  imposter: "3-10 لاعبين",
+  guessing: "1 ضد 1 · أونلاين",
+  countries: "لاعبين وأكثر",
+  mafia: "5 لاعبين وأكثر",
+};
 
 const HubScreen: React.FC = () => {
   const { setScreen } = useGame();
@@ -411,12 +419,12 @@ const HubScreen: React.FC = () => {
           <p className="text-xs text-muted-foreground">اختار اللعبة اللي ببالك ويلا نغير جو</p>
         </div>
 
-        {/* Games Row */}
-        <div className="w-full max-w-sm grid grid-cols-3 gap-3 mb-8">
+        {/* Games: 2×2 so all four cards are equal */}
+        <div className="w-full max-w-sm grid grid-cols-2 auto-rows-fr gap-3 mb-8">
           {games.map((game) => (
             <div
               key={game.id}
-              className={`relative flex flex-col rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm shadow-lg overflow-hidden`}
+              className={`relative flex flex-col rounded-3xl bg-gradient-to-br ${game.gradient} border ${game.border} backdrop-blur-sm overflow-hidden`}
             >
               <button
                 onClick={() => {
@@ -432,12 +440,16 @@ const HubScreen: React.FC = () => {
                     setScreen("home");
                   }
                 }}
-                className="flex flex-col items-center gap-1.5 pt-4 pb-2 px-1.5 hover:scale-[1.03] active:scale-95 transition-transform duration-300"
+                className="flex-1 flex flex-col items-center gap-1.5 pt-5 pb-3 px-3 active:scale-95 transition-transform duration-200"
               >
-                <span className="text-3xl drop-shadow-lg">{game.icon}</span>
-                <span className="text-sm font-bold text-foreground">{game.name}</span>
-                <span className="text-[10px] text-muted-foreground text-center leading-tight px-0.5 min-h-[1.5rem]">
+                <span className="text-4xl mb-1">{game.icon}</span>
+                <span className="text-base font-black text-foreground">{game.name}</span>
+                <span className="text-[11px] text-muted-foreground text-center leading-snug">
                   {game.description}
+                </span>
+                <span className="mt-auto pt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-muted-foreground/90">
+                  <Users size={11} />
+                  {CARD_TAGS[game.id]}
                 </span>
               </button>
               <button
@@ -446,7 +458,7 @@ const HubScreen: React.FC = () => {
                   vibrate(20);
                   setInfoGameId(game.id);
                 }}
-                className="mt-1 mx-2 mb-2 py-1.5 rounded-xl bg-card/60 hover:bg-card/90 active:bg-card border border-border/40 text-[10px] font-bold text-foreground flex items-center justify-center gap-1 transition-colors"
+                className="mx-2.5 mb-2.5 py-2 rounded-xl bg-card/60 hover:bg-card/90 active:bg-card border border-border/40 text-[11px] font-bold text-foreground flex items-center justify-center gap-1 transition-colors"
                 aria-label={`شرح لعبة ${game.name}`}
               >
                 <Info size={11} className={game.accent} />
@@ -601,7 +613,7 @@ const HubScreen: React.FC = () => {
               vibrate(30);
               setShowInstallSteps(true);
             }}
-            className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-accent to-primary/80 text-accent-foreground font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+            className="w-full py-2.5 px-5 rounded-2xl bg-secondary/60 border border-border/40 text-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
           >
             <Download size={20} />
             كيف أضيف التطبيق للشاشة الرئيسية؟
