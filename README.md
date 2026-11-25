@@ -22,3 +22,4 @@ The Lovable project syncs with this repo, so edits made there land here too.
 React 18, TypeScript, Vite, Tailwind, shadcn/ui, Supabase (Postgres, Realtime, Edge Functions), Vercel.
 
 <!-- sync test: pushed from Claude Code -->
+<!-- sync test 2: 21:49 -->
