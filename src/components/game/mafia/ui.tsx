@@ -52,7 +52,7 @@ export const PlayerGrid: React.FC<{
   );
 };
 
-export const RoleEditor: React.FC<{ n: number; roles: MafiaRole[]; setRoles: (r: MafiaRole[]) => void }> = ({ n, roles, setRoles }) => {
+export const RoleEditor: React.FC<{ n: number; roles: MafiaRole[]; setRoles: (r: MafiaRole[]) => void; plain: boolean; setPlain: (v: boolean) => void }> = ({ n, roles, setRoles, plain, setPlain }) => {
   const tap = useTap();
   const mafiaN = roles.filter((r) => ROLE_INFO[r].team === 'mafia').length;
   const specials = roles.filter((r) => MAFIA_SPECIALS.includes(r) || TOWN_SPECIALS.includes(r));
@@ -90,6 +90,13 @@ export const RoleEditor: React.FC<{ n: number; roles: MafiaRole[]; setRoles: (r:
         <p className="text-xs font-bold text-emerald-500 mb-2">أدوار المواطنين</p>
         <div className="flex flex-wrap gap-2">{TOWN_SPECIALS.map((r) => <Chip key={r} r={r} />)}</div>
       </div>
+      <button onClick={() => { tap(); setPlain(!plain); }} className="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-secondary/60 text-start">
+        <span>
+          <span className="block text-sm font-bold">🎨 لون أحمر لكروت المافيا</span>
+          <span className="block text-xs text-muted-foreground">{plain ? 'مطفي: كل الكروت بنفس اللون، الدور بينعرف من الكتابة بس' : 'شغّال: كرت المافيا أحمر وكرت المواطن أخضر'}</span>
+        </span>
+        <span className={`shrink-0 w-11 h-6 rounded-full p-0.5 transition-colors ${plain ? 'bg-secondary' : 'bg-primary'}`}><span className={`block w-5 h-5 rounded-full bg-white transition-transform ${plain ? '' : '-translate-x-5'}`} /></span>
+      </button>
       <p className="text-xs text-muted-foreground leading-relaxed">
         الكروت: {Object.entries(counts).map(([r, c]) => `${ROLE_INFO[r as MafiaRole].icon} ${ROLE_INFO[r as MafiaRole].name}${c > 1 ? ` ×${c}` : ''}`).join(' · ')}
       </p>
@@ -97,16 +104,17 @@ export const RoleEditor: React.FC<{ n: number; roles: MafiaRole[]; setRoles: (r:
   );
 };
 
-export const RoleCard: React.FC<{ me: MafiaPlayer; players: MafiaPlayer[] }> = ({ me, players }) => {
+export const RoleCard: React.FC<{ me: MafiaPlayer; players: MafiaPlayer[]; plain?: boolean }> = ({ me, players, plain }) => {
   const info = ROLE_INFO[me.role];
+  const tint = (red: string, green: string, neutral: string) => (plain ? neutral : info.team === 'mafia' ? red : green);
   const mates = isMafia(me) ? players.filter((q) => q !== me && isMafia(q)) : [];
   return (
-    <div className={`card-game text-center border-2 ${info.team === 'mafia' ? 'border-red-500/50' : 'border-emerald-500/40'}`}>
+    <div className={`card-game text-center border-2 ${tint('border-red-500/50', 'border-emerald-500/40', 'border-border')}`}>
       <div className="text-7xl mb-3">{info.icon}</div>
-      <h2 className={`text-3xl font-black mb-2 ${info.team === 'mafia' ? 'text-red-500' : 'text-emerald-500'}`}>{info.name}</h2>
+      <h2 className={`text-3xl font-black mb-2 ${tint('text-red-500', 'text-emerald-500', 'text-foreground')}`}>{info.name}</h2>
       <p className="text-sm text-muted-foreground mb-2">{info.desc}</p>
       {mates.length > 0 && (
-        <div className="rounded-2xl bg-red-500/10 p-3 mt-3 text-sm">
+        <div className={`rounded-2xl p-3 mt-3 text-sm ${plain ? 'bg-secondary/60' : 'bg-red-500/10'}`}>
           <p className="font-bold mb-1">جماعتك:</p>
           {mates.map((m) => <p key={m.name}>{m.avatar} {m.name} — {ROLE_INFO[m.role].name}</p>)}
         </div>
@@ -209,8 +217,8 @@ export const VoiceBanner: React.FC<{ line: string; count: number | null }> = ({ 
   </div>
 );
 
-export const SheikhAnswer: React.FC<{ p: MafiaPlayer }> = ({ p }) => (
-  <div className={`card-game text-center text-xl font-black ${isMafia(p) ? 'text-red-500' : 'text-emerald-500'}`}>
+export const SheikhAnswer: React.FC<{ p: MafiaPlayer; plain?: boolean }> = ({ p, plain }) => (
+  <div className={`card-game text-center text-xl font-black ${plain ? '' : isMafia(p) ? 'text-red-500' : 'text-emerald-500'}`}>
     {p.name}: {isMafia(p) ? '👎 مافيا' : '👍 مواطن'}
   </div>
 );
@@ -262,7 +270,7 @@ export const NarratorView: React.FC<{
             <PlayerGrid players={s.players} selected={picked} onPick={(i) => dispatch({ type: 'pick', key, idx: i })}
               filter={key === 'kill' ? (p) => p.alive && !isMafia(p) : key === 'snipe' ? (p) => p.alive && p.role !== 'sniper' : undefined} />
             {key === 'snipe' && <NoShotButton picked={picked} onPick={() => dispatch({ type: 'pick', key, idx: NO_SHOT })} />}
-            {key === 'check' && picked !== null && picked >= 0 && <SheikhAnswer p={s.players[picked]} />}
+            {key === 'check' && picked !== null && picked >= 0 && <SheikhAnswer p={s.players[picked]} plain={s.plain} />}
           </>
         )}
       </Shell>

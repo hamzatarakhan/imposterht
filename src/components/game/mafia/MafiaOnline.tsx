@@ -143,6 +143,7 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
     try { return { ...emptySnap, ...JSON.parse(sessionStorage.getItem(storeKey) || '{}') }; } catch { return emptySnap; }
   });
   const [roles, setRoles] = useState<MafiaRole[] | null>(null);
+  const [plain, setPlain] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [myName, setMyName] = useState(snap.auto?.name ?? savedPlayers[0]?.name ?? '');
   const [myAvatar, setMyAvatar] = useState(snap.auto?.avatar ?? savedPlayers[0]?.avatar ?? '👤');
@@ -255,7 +256,7 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
   const deal = () => {
     tap(50);
     if (autoMode) unlockSpeech();
-    setSnap((sn) => ({ ...sn, auto: hostPlayer, game: newGame(people, roleList), seen: [], votes: {}, mafiaPicks: {} }));
+    setSnap((sn) => ({ ...sn, auto: hostPlayer, game: { ...newGame(people, roleList), plain }, seen: [], votes: {}, mafiaPicks: {} }));
   };
 
   return (
@@ -310,7 +311,7 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
           {snap.bots.length ? '🧪 شيل اللاعبين التجريبيين' : '🧪 تيست: ضيف 5 لاعبين تجريبيين'}
         </button>
       </div>
-      {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} />}
+      {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} plain={plain} setPlain={setPlain} />}
     </Shell>
   );
 };
@@ -349,7 +350,7 @@ const PlayerView: React.FC<{
   const ph = g.phase;
   if (ph.t === 'reveal') {
     const seen = snap.seen.includes(myId);
-    return wrap('كرتك', <RoleCard me={mine} players={g.players} />,
+    return wrap('كرتك', <RoleCard me={mine} players={g.players} plain={g.plain} />,
       <button onClick={() => act('seen')} disabled={seen} className="w-full btn-primary-game text-lg disabled:opacity-60">{seen ? '✅ تمام، استنى الباقي' : '🙈 شفت كرتي'}</button>);
   }
 
@@ -371,7 +372,7 @@ const PlayerView: React.FC<{
         <PlayerGrid players={g.players} selected={myPick} onPick={(i) => { setChecked(i); act('pick', i); }}
           filter={key === 'kill' ? (p) => p.alive && !isMafia(p) : (p, i) => p.alive && ((key !== 'check' && key !== 'snipe') || i !== myIdx)} />
         {key === 'snipe' && <NoShotButton picked={myPick} onPick={() => { setChecked(NO_SHOT); act('pick', NO_SHOT); }} />}
-        {key === 'check' && checked !== null && checked >= 0 && <SheikhAnswer p={g.players[checked]} />}
+        {key === 'check' && checked !== null && checked >= 0 && <SheikhAnswer p={g.players[checked]} plain={g.plain} />}
       </>
     ));
   }

@@ -14,6 +14,7 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
   const [newName, setNewName] = useState('');
   const [roles, setRoles] = useState<MafiaRole[] | null>(null);
   const [game, setGame] = useState<MafiaState | null>(null);
+  const [plain, setPlain] = useState(false);
   const [reveal, setReveal] = useState<{ i: number; shown: boolean } | null>(null);
   const [auto, setAuto] = useState(false);
   const dispatch = (a: MafiaAction) => setGame((g) => g && mafiaReducer(g, a));
@@ -26,7 +27,7 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
   const start = () => {
     tap(50);
     if (auto) unlockSpeech();
-    setGame(newGame(names, roleList));
+    setGame({ ...newGame(names, roleList), plain });
     setReveal({ i: 0, shown: false });
   };
 
@@ -45,7 +46,7 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
             </div>
           ) : (
             <>
-              <RoleCard me={p} players={game.players} />
+              <RoleCard me={p} players={game.players} plain={game.plain} />
               <button onClick={next} className="w-full btn-secondary-game">🙈 خبّيت كرتي، التالي</button>
             </>
           )}
@@ -99,7 +100,7 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
           ))}
         </div>
       </div>
-      {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} />}
+      {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} plain={plain} setPlain={setPlain} />}
     </Shell>
   );
 };

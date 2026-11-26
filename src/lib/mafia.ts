@@ -118,6 +118,7 @@ export interface MafiaState {
   saved: boolean;
   sniperUsed: boolean;
   queue: number[]; // more night deaths waiting to be announced
+  plain?: boolean; // no red/green on private screens, so a neighbour can't read a role from the colour
   log: string[];
 }
 
