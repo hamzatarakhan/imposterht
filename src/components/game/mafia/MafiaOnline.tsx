@@ -5,10 +5,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import {
-  MafiaAction, MafiaRole, MIN_PLAYERS, STEP_INFO, isMafia, mafiaDecision, mafiaReducer, newGame, nightSteps, suggestRoles, voteResult,
+  MafiaAction, MafiaRole, MIN_PLAYERS, NO_SHOT, STEP_INFO, isMafia, mafiaDecision, mafiaReducer, newGame, nightSteps, suggestRoles, voteResult,
 } from '@/lib/mafia';
 import QRCodeModal from '../QRCodeModal';
-import { DayInfo, EndView, NarratorView, OutCard, PlayerGrid, RoleCard, RoleEditor, SheikhAnswer, Shell, VoiceBanner, VoiceCheck, useTap } from './ui';
+import { DayInfo, EndView, NarratorView, NoShotButton, OutCard, PlayerGrid, RoleCard, RoleEditor, SheikhAnswer, Shell, VoiceBanner, VoiceCheck, useTap } from './ui';
 import { Lobbyist, Snapshot, unlockSpeech, useAutoNarrator } from './autoNarrator';
 
 // ponytail: the room creator's phone holds the whole game and talks to players over a Supabase Realtime channel
@@ -43,7 +43,7 @@ function botActs(sn: Snapshot): Act[] {
         const town = others.filter((x) => !isMafia(x.q));
         if (town.length) acts.push({ from: p.id, kind: 'pick', idx: pick(town).j });
       } else if (key !== 'intro' && key !== 'kill' && STEP_INFO[key].role === p.role && g.picks[key] === null) {
-        acts.push({ from: p.id, kind: 'pick', idx: pick(others).j });
+        acts.push({ from: p.id, kind: 'pick', idx: key === 'snipe' && Math.random() < 0.6 ? NO_SHOT : pick(others).j });
       }
     }
     if (ph.t === 'vote' && p.alive && sn.votes[p.id] === undefined) acts.push({ from: p.id, kind: 'vote', idx: pick(others).j });
@@ -115,7 +115,9 @@ function applyAct<S extends Snapshot>(sn: S, a: Act): S {
   if (!me) return sn;
   const ph = g.phase;
   if (a.kind === 'seen' && ph.t === 'reveal') return sn.seen.includes(a.from) ? sn : { ...sn, seen: [...sn.seen, a.from] };
-  if (a.idx === undefined || !g.players[a.idx]?.alive) return sn;
+  if (a.idx === undefined) return sn;
+  if (a.kind === 'pick' && a.idx === NO_SHOT && ph.t === 'night' && me.alive && me.role === 'sniper' && nightSteps(g)[ph.step] === 'snipe') return withAction(sn, { type: 'pick', key: 'snipe', idx: NO_SHOT });
+  if (!g.players[a.idx]?.alive) return sn;
   if (a.kind === 'vote' && ph.t === 'vote' && me.alive) return { ...sn, votes: { ...sn.votes, [a.from]: a.idx } };
   if (a.kind === 'boy' && ph.t === 'boy' && me.role === 'boy') return withAction(sn, { type: 'boyTake', idx: a.idx });
   if (a.kind === 'pick' && ph.t === 'night' && me.alive) {
@@ -125,6 +127,7 @@ function applyAct<S extends Snapshot>(sn: S, a: Act): S {
       const kill = mafiaDecision(g.players, mafiaPicks);
       return kill === null ? { ...sn, mafiaPicks } : withAction({ ...sn, mafiaPicks }, { type: 'pick', key: 'kill', idx: kill });
     }
+    if (key === 'snipe' && a.from === me.id && g.players[a.idx] === me) return sn;
     if (key !== 'intro' && key !== 'kill' && STEP_INFO[key].role === me.role) return withAction(sn, { type: 'pick', key, idx: a.idx });
   }
   return sn;
@@ -366,8 +369,9 @@ const PlayerView: React.FC<{
           </div>
         )}
         <PlayerGrid players={g.players} selected={myPick} onPick={(i) => { setChecked(i); act('pick', i); }}
-          filter={key === 'kill' ? (p) => p.alive && !isMafia(p) : (p, i) => p.alive && (key !== 'check' || i !== myIdx)} />
-        {key === 'check' && checked !== null && <SheikhAnswer p={g.players[checked]} />}
+          filter={key === 'kill' ? (p) => p.alive && !isMafia(p) : (p, i) => p.alive && ((key !== 'check' && key !== 'snipe') || i !== myIdx)} />
+        {key === 'snipe' && <NoShotButton picked={myPick} onPick={() => { setChecked(NO_SHOT); act('pick', NO_SHOT); }} />}
+        {key === 'check' && checked !== null && checked >= 0 && <SheikhAnswer p={g.players[checked]} />}
       </>
     ));
   }

@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
 import {
-  MafiaPlayer, MafiaRole, MafiaState, MafiaAction, ROLE_INFO, STEP_INFO, isMafia, nightSteps, buildRoles, maxMafia, MAFIA_SPECIALS, TOWN_SPECIALS,
+  MafiaPlayer, MafiaRole, MafiaState, MafiaAction, ROLE_INFO, STEP_INFO, isMafia, nightSteps, buildRoles, maxMafia, MAFIA_SPECIALS, TOWN_SPECIALS, NO_SHOT,
 } from '@/lib/mafia';
 import { hasArabicVoice, unlockSpeech } from './autoNarrator';
 
@@ -24,6 +24,13 @@ export const Shell: React.FC<{ title?: string; onBack?: () => void; children: Re
     <div className="flex-1 p-4 pb-32 space-y-4">{banner}{children}</div>
     {footer && <div className="sticky bottom-0 p-4 bg-gradient-to-t from-background via-background to-transparent space-y-2">{footer}</div>}
   </div>
+);
+
+/** The sniper may keep the bullet for another night. */
+export const NoShotButton: React.FC<{ picked: number | null; onPick: () => void }> = ({ picked, onPick }) => (
+  <button onClick={onPick} className={`w-full p-3 rounded-2xl font-bold border-2 ${picked === NO_SHOT ? 'border-primary bg-primary/15' : 'border-transparent bg-secondary/60'}`}>
+    🤚 ما بدي أقنص الليلة، بخلّي الرصاصة
+  </button>
 );
 
 export const PlayerGrid: React.FC<{
@@ -253,8 +260,9 @@ export const NarratorView: React.FC<{
           <>
             {online?.stepHint ?? <p className="text-sm text-muted-foreground">{info.who} {key === 'kill' ? 'بيأشّروا' : key === 'protect' ? 'بتأشّر' : 'بيأشّر'}، والراوي بيختار:</p>}
             <PlayerGrid players={s.players} selected={picked} onPick={(i) => dispatch({ type: 'pick', key, idx: i })}
-              filter={key === 'kill' ? (p) => p.alive && !isMafia(p) : undefined} />
-            {key === 'check' && picked !== null && <SheikhAnswer p={s.players[picked]} />}
+              filter={key === 'kill' ? (p) => p.alive && !isMafia(p) : key === 'snipe' ? (p) => p.alive && p.role !== 'sniper' : undefined} />
+            {key === 'snipe' && <NoShotButton picked={picked} onPick={() => dispatch({ type: 'pick', key, idx: NO_SHOT })} />}
+            {key === 'check' && picked !== null && picked >= 0 && <SheikhAnswer p={s.players[picked]} />}
           </>
         )}
       </Shell>

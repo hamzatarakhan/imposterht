@@ -1,4 +1,4 @@
-export type MafiaRole = 'godfather' | 'silencer' | 'mafia' | 'sheikh' | 'girl' | 'boy' | 'citizen';
+export type MafiaRole = 'godfather' | 'silencer' | 'mafia' | 'sheikh' | 'girl' | 'boy' | 'sniper' | 'citizen';
 
 export const ROLE_INFO: Record<MafiaRole, { name: string; icon: string; team: 'mafia' | 'town'; desc: string }> = {
   godfather: { name: 'شيخ المافيا', icon: '🎩', team: 'mafia', desc: 'إذا اختلفت المافيا، إنت اللي بتقرر مين ينقتل' },
@@ -7,6 +7,7 @@ export const ROLE_INFO: Record<MafiaRole, { name: string; icon: string; team: 'm
   sheikh: { name: 'الشيخ', icon: '🕵️', team: 'town', desc: 'كل ليلة بتسأل عن لاعب وبتعرف إذا مافيا أو مواطن' },
   girl: { name: 'البنت', icon: '💉', team: 'town', desc: 'كل ليلة بتحمي لاعب من القتل' },
   boy: { name: 'الولد', icon: '💣', team: 'town', desc: 'لما تطلع من اللعبة بتاخد حدا معك' },
+  sniper: { name: 'القناص', icon: '🎯', team: 'town', desc: 'معك رصاصة وحدة باللعبة كلها: بأي ليلة بتقدر تقنص فيها حدا' },
   citizen: { name: 'مواطن صالح', icon: '👤', team: 'town', desc: 'اكشف المافيا بالنقاش والتصويت' },
 };
 
@@ -14,7 +15,7 @@ export const MIN_PLAYERS = 5;
 
 /** Suggested role list for n players (any size >= MIN_PLAYERS). */
 export const MAFIA_SPECIALS: MafiaRole[] = ['godfather', 'silencer'];
-export const TOWN_SPECIALS: MafiaRole[] = ['sheikh', 'girl', 'boy'];
+export const TOWN_SPECIALS: MafiaRole[] = ['sheikh', 'girl', 'boy', 'sniper'];
 
 export function suggestRoles(n: number): MafiaRole[] {
   const mafiaCount = n <= 6 ? 1 : n <= 10 ? 2 : n <= 13 ? 3 : Math.floor(n / 4);
@@ -22,6 +23,7 @@ export function suggestRoles(n: number): MafiaRole[] {
   if (mafiaCount >= 2) specials.push('godfather');
   if (mafiaCount >= 2 && n >= 9) specials.push('silencer');
   if (n >= 9) specials.push('boy');
+  if (n >= 11) specials.push('sniper');
   return buildRoles(n, mafiaCount, specials);
 }
 
@@ -52,6 +54,12 @@ export const isMafia = (p: MafiaPlayer) => ROLE_INFO[p.role].team === 'mafia';
 /** Kill target dies unless the girl protected the same player. Returns index killed or null. */
 export function resolveNight(kill: number | null, protect: number | null): number | null {
   return kill !== null && kill !== protect ? kill : null;
+}
+
+/** Everyone who dies tonight: the mafia's target and the sniper's (NO_SHOT = kept the bullet); the girl's protection saves either. */
+export function nightDeaths(p: Pick<Picks, 'kill' | 'protect' | 'snipe'>): number[] {
+  const dead = [resolveNight(p.kill, p.protect), p.snipe !== null && p.snipe >= 0 ? resolveNight(p.snipe, p.protect) : null];
+  return [...new Set(dead.filter((d): d is number => d !== null))];
 }
 
 /** Vote result: the single most-voted player, or null on a tie / no votes. */
@@ -86,8 +94,10 @@ export function mafiaDecision(players: MafiaPlayer[], picks: Record<string, numb
 
 // ---------- game state machine (shared by local and online) ----------
 
-export type StepKey = 'intro' | 'kill' | 'silence' | 'check' | 'protect';
+export type StepKey = 'intro' | 'kill' | 'silence' | 'check' | 'protect' | 'snipe';
 export type OutBy = 'night' | 'vote' | 'boy';
+/** Sniper pick meaning: keep the bullet tonight. */
+export const NO_SHOT = -1;
 export type Phase =
   | { t: 'reveal' }
   | { t: 'night'; step: number }
@@ -97,7 +107,7 @@ export type Phase =
   | { t: 'boy'; then: 'day' | 'vote' }
   | { t: 'end'; win: 'mafia' | 'town' };
 
-export interface Picks { kill: number | null; silence: number | null; check: number | null; protect: number | null }
+export interface Picks { kill: number | null; silence: number | null; check: number | null; protect: number | null; snipe: number | null }
 export interface MafiaState {
   players: MafiaPlayer[];
   phase: Phase;
@@ -106,6 +116,8 @@ export interface MafiaState {
   silenced: number | null;
   lastKilled: number | null;
   saved: boolean;
+  sniperUsed: boolean;
+  queue: number[]; // more night deaths waiting to be announced
   log: string[];
 }
 
@@ -124,30 +136,36 @@ export const STEP_INFO: Record<StepKey, { icon: string; who: string; line: strin
   silence: { icon: '✂️', who: 'قص المافيا', line: 'قص المافيا يفتح… مين بدك تسكّت بكرا؟', role: 'silencer' },
   check: { icon: '🕵️', who: 'الشيخ', line: 'الشيخ يفتح… عن مين بدك تسأل؟', role: 'sheikh' },
   protect: { icon: '💉', who: 'البنت', line: 'البنت تفتح… مين بدّك تحمي؟', role: 'girl' },
+  snipe: { icon: '🎯', who: 'القناص', line: 'القناص يفتح… بدك تقنص حدا الليلة؟', role: 'sniper' },
 };
 
-export function nightSteps(s: Pick<MafiaState, 'players' | 'night'>): StepKey[] {
+export function nightSteps(s: Pick<MafiaState, 'players' | 'night'> & { sniperUsed?: boolean }): StepKey[] {
   if (s.night === 1) return ['intro'];
   const alive = (r: MafiaRole) => s.players.some((p) => p.alive && p.role === r);
-  return ['kill', ...(alive('silencer') ? ['silence' as const] : []), ...(alive('sheikh') ? ['check' as const] : []), ...(alive('girl') ? ['protect' as const] : [])];
+  return ['kill', ...(alive('silencer') ? ['silence' as const] : []), ...(alive('sheikh') ? ['check' as const] : []), ...(alive('girl') ? ['protect' as const] : []), ...(alive('sniper') && !s.sniperUsed ? ['snipe' as const] : [])];
 }
 
-const emptyPicks: Picks = { kill: null, silence: null, check: null, protect: null };
+const emptyPicks: Picks = { kill: null, silence: null, check: null, protect: null, snipe: null };
 
 export function newGame(people: { id?: string; name: string; avatar: string }[], roles: MafiaRole[], rand = Math.random): MafiaState {
   const dealt = shuffle(roles, rand);
   return {
     players: people.map((p, i) => ({ ...p, role: dealt[i], alive: true })),
-    phase: { t: 'reveal' }, night: 1, picks: emptyPicks, silenced: null, lastKilled: null, saved: false, log: [],
+    phase: { t: 'reveal' }, night: 1, picks: emptyPicks, silenced: null, lastKilled: null, saved: false, sniperUsed: false, queue: [], log: [],
   };
 }
 
 const outLine = (p: MafiaPlayer, by: OutBy) =>
   `${by === 'vote' ? '🗳️ انطرد' : by === 'boy' ? '💣 أخذه الولد' : '💀 انقتل'}: ${p.name} (${ROLE_INFO[p.role].name})`;
 
+/** Shows who went out; they must already be marked dead. */
+const announce = (s: MafiaState, idx: number, by: OutBy, then?: 'day' | 'vote'): MafiaState =>
+  ({ ...s, log: [...s.log, outLine(s.players[idx], by)], phase: { t: 'out', idx, by, then } });
+
+const kill = (players: MafiaPlayer[], dead: number[]) => players.map((p, i) => (dead.includes(i) ? { ...p, alive: false } : p));
+
 function eliminate(s: MafiaState, idx: number, by: OutBy, then?: 'day' | 'vote'): MafiaState {
-  const players = s.players.map((p, i) => (i === idx ? { ...p, alive: false } : p));
-  return { ...s, players, log: [...s.log, outLine(s.players[idx], by)], phase: { t: 'out', idx, by, then } };
+  return announce({ ...s, players: kill(s.players, [idx]) }, idx, by, then);
 }
 
 const startNight = (s: MafiaState): MafiaState => ({ ...s, picks: emptyPicks, phase: { t: 'night', step: 0 } });
@@ -166,13 +184,16 @@ export function mafiaReducer(s: MafiaState, a: MafiaAction): MafiaState {
       if (key !== 'intro' && s.picks[key] === null && !a.force) return s;
       if (ph.step < steps.length - 1) return { ...s, phase: { t: 'night', step: ph.step + 1 } };
       if (s.night === 1) return { ...s, night: 2, silenced: null, lastKilled: null, saved: false, phase: { t: 'day' } };
-      const dead = resolveNight(s.picks.kill, s.picks.protect);
-      const next = { ...s, night: s.night + 1, silenced: s.picks.silence, lastKilled: dead, saved: dead === null && s.picks.kill !== null };
-      return dead === null ? { ...next, phase: { t: 'day' } } : eliminate(next, dead, 'night');
+      const [dead, ...more] = nightDeaths(s.picks);
+      const shot = s.picks.snipe !== null && s.picks.snipe >= 0;
+      const next = { ...s, night: s.night + 1, silenced: s.picks.silence, lastKilled: dead ?? null, saved: s.picks.kill !== null && s.picks.kill === s.picks.protect, sniperUsed: s.sniperUsed || shot, queue: more, players: kill(s.players, more) }; // all of tonight's dead count before any winner check
+      return dead === undefined ? { ...next, phase: { t: 'day' } } : eliminate(next, dead, 'night');
     }
     case 'continue': {
       if (ph.t !== 'out') return s;
       if (s.players[ph.idx].role === 'boy' && ph.by !== 'boy') return { ...s, phase: { t: 'boy', then: ph.by === 'night' ? 'day' : 'vote' } };
+      const [nextDead, ...rest] = s.queue ?? []; // announce every death of the night before the winner
+      if (nextDead !== undefined) return announce({ ...s, queue: rest }, nextDead, 'night');
       const w = winner(s.players);
       if (w) return { ...s, phase: { t: 'end', win: w } };
       const origin = ph.by === 'boy' ? ph.then : ph.by === 'night' ? 'day' : 'vote';

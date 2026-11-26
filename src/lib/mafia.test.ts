@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import {
-  suggestRoles, resolveNight, winner, ROLE_INFO, MafiaPlayer, MafiaRole, MafiaState, mafiaReducer, MafiaAction, mafiaDecision, voteResult, buildRoles,
+  suggestRoles, resolveNight, winner, ROLE_INFO, MafiaPlayer, MafiaRole, MafiaState, mafiaReducer, MafiaAction, mafiaDecision, voteResult, buildRoles, newGame, nightSteps, NO_SHOT,
 } from './mafia';
 
 const mafiaCount = (roles: MafiaRole[]) => roles.filter((r) => ROLE_INFO[r].team === 'mafia').length;
 const mk = (roles: [MafiaRole, boolean][]): MafiaPlayer[] => roles.map(([role, alive], i) => ({ id: `p${i}`, name: `p${i}`, avatar: '', role, alive }));
 const game = (roles: MafiaRole[]): MafiaState => ({
   players: mk(roles.map((r) => [r, true])), phase: { t: 'reveal' }, night: 1,
-  picks: { kill: null, silence: null, check: null, protect: null }, silenced: null, lastKilled: null, saved: false, log: [],
+  picks: { kill: null, silence: null, check: null, protect: null, snipe: null }, silenced: null, lastKilled: null, saved: false, sniperUsed: false, queue: [], log: [],
 });
 const run = (s: MafiaState, ...acts: MafiaAction[]) => acts.reduce(mafiaReducer, s);
 
@@ -93,5 +93,40 @@ describe('mafia', () => {
     s = run(s, { type: 'continue' }, { type: 'boyTake', idx: 2 }, { type: 'continue' });
     expect(s.phase).toEqual({ t: 'day' });
     expect(s.players.filter((p) => p.alive)).toHaveLength(4);
+  });
+});
+
+describe('sniper', () => {
+  const people = ['أ', 'ب', 'ج', 'د', 'ه', 'و'].map((name) => ({ name, avatar: '🙂' }));
+  it('can keep the bullet, then shoots once; both deaths are announced', () => {
+    let s = { ...newGame(people, ['mafia', 'sniper', 'citizen', 'citizen', 'citizen', 'citizen']), night: 2 };
+    s = { ...s, players: s.players.map((p, i) => ({ ...p, role: (['mafia', 'sniper', 'citizen', 'citizen', 'citizen', 'citizen'] as const)[i] })) };
+    s = mafiaReducer(s, { type: 'beginNight' });
+    expect(nightSteps(s)).toEqual(['kill', 'snipe']);
+    s = mafiaReducer(s, { type: 'pick', key: 'kill', idx: 2 });
+    s = mafiaReducer(s, { type: 'nextStep' });
+    s = mafiaReducer(s, { type: 'pick', key: 'snipe', idx: NO_SHOT });
+    s = mafiaReducer(s, { type: 'nextStep' });
+    expect(s.sniperUsed).toBe(false);
+    expect(s.phase).toMatchObject({ t: 'out', idx: 2 });
+    s = mafiaReducer(s, { type: 'continue' });
+    s = mafiaReducer(s, { type: 'toVote' });
+    s = mafiaReducer(s, { type: 'voteOut', idx: null });
+    s = mafiaReducer(s, { type: 'pick', key: 'kill', idx: 3 });
+    s = mafiaReducer(s, { type: 'nextStep' });
+    s = mafiaReducer(s, { type: 'pick', key: 'snipe', idx: 0 });
+    s = mafiaReducer(s, { type: 'nextStep' });
+    expect(s.sniperUsed).toBe(true);
+    expect(s.phase).toMatchObject({ t: 'out', idx: 3 });
+    expect(s.players[0].alive).toBe(false); // both died at once
+    s = mafiaReducer(s, { type: 'continue' });
+    expect(s.phase).toMatchObject({ t: 'out', idx: 0 });
+    s = mafiaReducer(s, { type: 'continue' });
+    expect(s.phase).toMatchObject({ t: 'end', win: 'town' });
+  });
+
+  it('no snipe step after the bullet is used', () => {
+    const s = { ...newGame(people, ['mafia', 'sniper', 'citizen', 'citizen', 'citizen', 'citizen']), night: 3, sniperUsed: true };
+    expect(nightSteps(s)).not.toContain('snipe');
   });
 });

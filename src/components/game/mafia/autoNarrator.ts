@@ -85,6 +85,7 @@ const VERBS = {
   silence: { ready: 'جهّز حالك', open: 'فتّح', close: 'غمّض' },
   check: { ready: 'جهّز حالك', open: 'فتّح', close: 'غمّض' },
   protect: { ready: 'جهّزي حالك', open: 'فتّحي', close: 'غمّضي' },
+  snipe: { ready: 'جهّز حالك', open: 'فتّح', close: 'غمّض' },
 } as const;
 
 // ---------- the narrator ----------
