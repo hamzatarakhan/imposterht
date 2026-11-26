@@ -220,7 +220,7 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
         );
       } else if (key !== 'intro') {
         const holder = g.players.find((p) => p.alive && p.role === STEP_INFO[key].role);
-        stepHint = <p className="text-sm text-muted-foreground">{g.picks[key] === null ? `⏳ بانتظار ${STEP_INFO[key].who} (${holder?.name})…` : `✅ ${STEP_INFO[key].who} اختار`}</p>;
+        stepHint = <p className="text-sm text-muted-foreground">{g.picks[key] === null ? `⏳ بانتظار ${STEP_INFO[key].who} (${holder?.name})…` : `✅ ${STEP_INFO[key].who} ${key === 'protect' ? 'اختارت' : 'اختار'}`}</p>;
       }
     }
     const voteCounts: Record<number, number> = {};
