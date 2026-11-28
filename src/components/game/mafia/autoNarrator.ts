@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { arabicUtterance, pickArabicVoice } from '@/lib/speech';
-import { MafiaAction, MafiaState, ROLE_INFO, STEP_INFO, nightSteps, voteResult } from '@/lib/mafia';
+import { MafiaAction, MafiaState, Ranking, ROLE_INFO, STEP_INFO, nightSteps, voteResult } from '@/lib/mafia';
 
 export interface Lobbyist { id: string; name: string; avatar: string }
-export interface Snapshot { lobby: Lobbyist[]; game: MafiaState | null; seen: string[]; votes: Record<string, number>; mafiaPicks: Record<string, number> }
+export interface Snapshot { lobby: Lobbyist[]; game: MafiaState | null; seen: string[]; votes: Record<string, number>; mafiaPicks: Record<string, number>; cardsOnly?: boolean; ranking?: Ranking }
 
 // ---------- speech + beeps ----------
 const hasSpeech = () => typeof window !== 'undefined' && 'speechSynthesis' in window;

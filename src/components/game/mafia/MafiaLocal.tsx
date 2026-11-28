@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { unlockSpeech, useAutoNarrator } from './autoNarrator';
 import { Plus, X } from 'lucide-react';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import { MafiaAction, MafiaRole, MafiaState, MIN_PLAYERS, mafiaReducer, newGame, suggestRoles } from '@/lib/mafia';
-import { NarratorView, RoleCard, RoleEditor, Shell, VoiceBanner, VoiceCheck, useTap } from './ui';
+import { CardsOnlyView, NarratorView, RankingView, RoleCard, RoleEditor, Shell, VoiceBanner, VoiceCheck, loadRanking, recordResult, saveRanking, useTap } from './ui';
 
 /** One phone, held by the narrator; cards are revealed by passing the phone around. */
 const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
@@ -17,6 +17,11 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
   const [plain, setPlain] = useState(false);
   const [reveal, setReveal] = useState<{ i: number; shown: boolean } | null>(null);
   const [auto, setAuto] = useState(false);
+  const [ranking, setRanking] = useState(loadRanking);
+  useEffect(() => {
+    const r = recordResult(game);
+    if (r) { setRanking(r); setGame((g) => g && { ...g, ranked: true }); }
+  }, [game]);
   const dispatch = (a: MafiaAction) => setGame((g) => g && mafiaReducer(g, a));
   const snap = useMemo(() => ({ lobby: [], game, seen: [], votes: {}, mafiaPicks: {} }), [game]);
   const voice = useAutoNarrator(auto && !!game && !reveal, snap, dispatch, { samePhone: true });
@@ -53,8 +58,10 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
         </Shell>
       );
     }
-    return <NarratorView s={game} dispatch={dispatch} onQuit={onQuit} onRestart={() => { setGame(null); setRoles(null); }}
-      banner={auto ? <VoiceBanner line={voice.line} count={voice.count} /> : undefined} />;
+    const restart = () => { setGame(null); setRoles(null); };
+    if (!auto) return <CardsOnlyView s={game} onFinish={(win) => dispatch({ type: 'finish', win })} onQuit={onQuit} onRestart={restart} ranking={ranking} />;
+    return <NarratorView s={game} dispatch={dispatch} onQuit={onQuit} onRestart={restart} ranking={ranking}
+      banner={<VoiceBanner line={voice.line} count={voice.count} />} />;
   }
 
   const add = () => {
@@ -71,7 +78,7 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
       <div className="card-game space-y-3">
         <h2 className="font-bold">🎙️ مين الراوي؟</h2>
         <div className="grid grid-cols-2 gap-2">
-          {[{ v: false, icon: '🎙️', t: 'في راوي', d: 'ماسك الجوال وما بيلعب' }, { v: true, icon: '🤖', t: 'بدون راوي', d: 'الجوال بيحكي والكل بيلعب' }].map((o) => (
+          {[{ v: false, icon: '🎙️', t: 'في راوي', d: 'الجوال بيوزّع الكروت بس، والراوي بيكمّل' }, { v: true, icon: '🤖', t: 'بدون راوي', d: 'الجوال بيحكي والكل بيلعب' }].map((o) => (
             <button key={o.t} onClick={() => { tap(); setAuto(o.v); }}
               className={`p-3 rounded-2xl text-center border-2 ${auto === o.v ? 'border-primary bg-primary/10' : 'border-transparent bg-secondary/60'}`}>
               <span className="block text-2xl">{o.icon}</span>
@@ -101,6 +108,7 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
         </div>
       </div>
       {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} plain={plain} setPlain={setPlain} />}
+      <RankingView ranking={ranking} onReset={() => { saveRanking({}); setRanking({}); }} />
     </Shell>
   );
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
 import {
-  MafiaPlayer, MafiaRole, MafiaState, MafiaAction, ROLE_INFO, STEP_INFO, isMafia, nightSteps, buildRoles, maxMafia, MAFIA_SPECIALS, TOWN_SPECIALS, NO_SHOT,
+  MafiaPlayer, MafiaRole, MafiaState, MafiaAction, Ranking, ROLE_INFO, STEP_INFO, isMafia, nightSteps, addResult, rankOrder, buildRoles, maxMafia, MAFIA_SPECIALS, TOWN_SPECIALS, NO_SHOT,
 } from '@/lib/mafia';
 import { hasArabicVoice, unlockSpeech } from './autoNarrator';
 
@@ -155,7 +155,7 @@ export const DayInfo: React.FC<{ s: MafiaState }> = ({ s }) => (
   </>
 );
 
-export const EndView: React.FC<{ s: MafiaState }> = ({ s }) => {
+export const EndView: React.FC<{ s: MafiaState; ranking?: Ranking }> = ({ s, ranking }) => {
   if (s.phase.t !== 'end') return null;
   const win = s.phase.win;
   return (
@@ -173,6 +173,7 @@ export const EndView: React.FC<{ s: MafiaState }> = ({ s }) => {
           </div>
         ))}
       </div>
+      <RankingView ranking={ranking} />
       {s.log.length > 0 && <div className="card-game text-xs text-muted-foreground space-y-1">{s.log.map((l, i) => <p key={i}>{l}</p>)}</div>}
     </>
   );
@@ -223,15 +224,84 @@ export const SheikhAnswer: React.FC<{ p: MafiaPlayer; plain?: boolean }> = ({ p,
   </div>
 );
 
+// ---------- ranking (stored on the phone that runs the game) ----------
+
+const RANK_KEY = 'mafia_ranking';
+export const loadRanking = (): Ranking => { try { return JSON.parse(localStorage.getItem(RANK_KEY) || '{}'); } catch { return {}; } };
+export const saveRanking = (r: Ranking) => { try { localStorage.setItem(RANK_KEY, JSON.stringify(r)); } catch { /* private mode */ } };
+
+/** Adds a finished game to the stored ranking (once) and returns the new ranking, or null if nothing to add. */
+export function recordResult(g: MafiaState | null): Ranking | null {
+  if (!g || g.phase.t !== 'end' || g.ranked) return null;
+  const r = addResult(loadRanking(), g.players.filter((p) => !p.id?.startsWith('bot-')), g.phase.win);
+  saveRanking(r);
+  return r;
+}
+
+const MEDALS = ['🥇', '🥈', '🥉'];
+export const RankingView: React.FC<{ ranking?: Ranking; onReset?: () => void }> = ({ ranking, onReset }) => {
+  const rows = ranking ? rankOrder(ranking) : [];
+  if (!rows.length) return null;
+  return (
+    <div className="card-game space-y-2">
+      <div className="flex items-center justify-between">
+        <h2 className="font-bold">🏆 الترتيب</h2>
+        {onReset && <button onClick={() => { if (confirm('أكيد بدك تصفّر الترتيب؟')) onReset(); }} className="text-xs text-muted-foreground underline">صفّر</button>}
+      </div>
+      {rows.map(([name, { wins, games }], i) => (
+        <div key={name} className="flex items-center gap-2 text-sm">
+          <span className="w-6 text-center">{MEDALS[i] ?? i + 1}</span>
+          <span className="font-bold flex-1">{name}</span>
+          <span className="text-muted-foreground">{wins} فوز من {games}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export const WinnerButtons: React.FC<{ onPick: (win: 'mafia' | 'town') => void }> = ({ onPick }) => {
+  const tap = useTap();
+  return (
+    <div>
+      <p className="text-xs text-center text-muted-foreground mb-2">لما تخلص اللعبة: مين فاز؟</p>
+      <div className="grid grid-cols-2 gap-2">
+        <button onClick={() => { tap(50); onPick('town'); }} className="btn-secondary-game">👍 المواطنين</button>
+        <button onClick={() => { tap(50); onPick('mafia'); }} className="btn-secondary-game">🔪 المافيا</button>
+      </div>
+    </div>
+  );
+};
+
+/** With a human narrator the app only deals cards; then the phone waits for the result. */
+export const CardsOnlyView: React.FC<{ s: MafiaState; onFinish: (win: 'mafia' | 'town') => void; onQuit: () => void; onRestart: () => void; ranking?: Ranking }> =
+  ({ s, onFinish, onQuit, onRestart, ranking }) => {
+    const tap = useTap();
+    if (s.phase.t === 'end') {
+      return (
+        <Shell title="خلصت اللعبة" onBack={onQuit} footer={<button onClick={() => { tap(50); onRestart(); }} className="w-full btn-primary-game text-lg">🔄 العب مرة تانية</button>}>
+          <EndView s={s} ranking={ranking} />
+        </Shell>
+      );
+    }
+    return (
+      <Shell title="🤫 الكل عرف دوره" onBack={onQuit} footer={<WinnerButtons onPick={onFinish} />}>
+        <div className="card-game text-center">
+          <div className="text-6xl mb-3">📵</div>
+          <p className="text-lg font-bold">سكّروا الموبايل، والراوي يكمّل اللعبة</p>
+          <p className="text-sm text-muted-foreground mt-1">لما تخلص، ارجعوا هون واختاروا مين فاز عشان تنحسب بالترتيب</p>
+        </div>
+      </Shell>
+    );
+  };
 /**
- * The narrator's screen for every phase after cards are dealt. Used by the local game and the online host.
+ * The step-by-step screen for the one-phone game without a narrator (the phone talks, players pick on it).
  * `online` adds who-has-acted hints and live vote counts; the narrator can always pick on someone's behalf.
  */
 export const NarratorView: React.FC<{
   s: MafiaState; dispatch: (a: MafiaAction) => void; onQuit: () => void; onRestart: () => void;
   online?: { stepHint?: React.ReactNode; voteCounts?: Record<number, number>; revealFooter?: React.ReactNode; revealBody?: React.ReactNode };
-  banner?: React.ReactNode;
-}> = ({ s, dispatch, onQuit, onRestart, online, banner }) => {
+  banner?: React.ReactNode; ranking?: Ranking;
+}> = ({ s, dispatch, onQuit, onRestart, online, banner, ranking }) => {
   const tap = useTap();  const go = (a: MafiaAction, ms = 30) => { tap(ms); dispatch(a); };
   const ph = s.phase;
 
@@ -324,7 +394,7 @@ export const NarratorView: React.FC<{
 
   return (
     <Shell banner={banner} title="خلصت اللعبة" onBack={onQuit} footer={<button onClick={() => { tap(50); onRestart(); }} className="w-full btn-primary-game text-lg">🔄 العب مرة تانية</button>}>
-      <EndView s={s} />
+      <EndView s={s} ranking={ranking} />
     </Shell>
   );
 };

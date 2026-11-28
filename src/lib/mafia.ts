@@ -118,7 +118,8 @@ export interface MafiaState {
   saved: boolean;
   sniperUsed: boolean;
   queue: number[]; // more night deaths waiting to be announced
-  plain?: boolean; // no red/green on private screens, so a neighbour can't read a role from the colour
+  plain?: boolean;
+  ranked?: boolean; // result already added to the ranking // no red/green on private screens, so a neighbour can't read a role from the colour
   log: string[];
 }
 
@@ -129,7 +130,8 @@ export type MafiaAction =
   | { type: 'continue' }
   | { type: 'toVote' }
   | { type: 'voteOut'; idx: number | null }
-  | { type: 'boyTake'; idx: number };
+  | { type: 'boyTake'; idx: number }
+  | { type: 'finish'; win: 'mafia' | 'town' }; // cards-only games: the group says who won
 
 export const STEP_INFO: Record<StepKey, { icon: string; who: string; line: string; role?: MafiaRole | 'anyMafia' }> = {
   intro: { icon: '🌙', who: 'الكل', line: 'الكل ينام… المافيا تفتح وتتعرّف على بعض. الشيخ يفتح، البنت تفتح، الولد يفتح… الكل يسكّر.' },
@@ -205,7 +207,26 @@ export function mafiaReducer(s: MafiaState, a: MafiaAction): MafiaState {
     case 'voteOut':
       if (ph.t !== 'vote') return s;
       return a.idx === null ? startNight({ ...s, log: [...s.log, '🗳️ ما حدا طلع'] }) : eliminate(s, a.idx, 'vote');
+    case 'finish':
+      return ph.t === 'end' ? s : { ...s, phase: { t: 'end', win: a.win } };
     case 'boyTake':
       return ph.t === 'boy' && s.players[a.idx]?.alive ? eliminate(s, a.idx, 'boy', ph.then) : s;
   }
 }
+
+// ---------- ranking across games (kept on the room creator's phone) ----------
+
+export type Ranking = Record<string, { wins: number; games: number }>;
+
+/** Adds one finished game: every player gets a game, the winning team's players get a win. */
+export function addResult(r: Ranking, players: MafiaPlayer[], win: 'mafia' | 'town'): Ranking {
+  const next = { ...r };
+  for (const p of players) {
+    const cur = next[p.name] ?? { wins: 0, games: 0 };
+    next[p.name] = { wins: cur.wins + (ROLE_INFO[p.role].team === win ? 1 : 0), games: cur.games + 1 };
+  }
+  return next;
+}
+
+/** Most wins first; fewer games breaks a tie. */
+export const rankOrder = (r: Ranking) => Object.entries(r).sort((a, b) => b[1].wins - a[1].wins || a[1].games - b[1].games);

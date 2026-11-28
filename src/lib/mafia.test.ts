@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  suggestRoles, resolveNight, winner, ROLE_INFO, MafiaPlayer, MafiaRole, MafiaState, mafiaReducer, MafiaAction, mafiaDecision, voteResult, buildRoles, newGame, nightSteps, NO_SHOT,
+  suggestRoles, resolveNight, winner, ROLE_INFO, MafiaPlayer, MafiaRole, MafiaState, mafiaReducer, MafiaAction, mafiaDecision, voteResult, buildRoles, newGame, nightSteps, NO_SHOT, addResult, rankOrder,
 } from './mafia';
 
 const mafiaCount = (roles: MafiaRole[]) => roles.filter((r) => ROLE_INFO[r].team === 'mafia').length;
@@ -128,5 +128,21 @@ describe('sniper', () => {
   it('no snipe step after the bullet is used', () => {
     const s = { ...newGame(people, ['mafia', 'sniper', 'citizen', 'citizen', 'citizen', 'citizen']), night: 3, sniperUsed: true };
     expect(nightSteps(s)).not.toContain('snipe');
+  });
+});
+
+describe('cards-only games and ranking', () => {
+  it('finish ends the game with the chosen winner', () => {
+    const s = newGame([1, 2, 3, 4, 5].map((i) => ({ name: `p${i}`, avatar: '' })), ['mafia', 'citizen', 'citizen', 'citizen', 'sheikh']);
+    expect(mafiaReducer(s, { type: 'finish', win: 'town' }).phase).toEqual({ t: 'end', win: 'town' });
+  });
+
+  it('winning team gets a win, everyone gets a game', () => {
+    const players = mk([['mafia', true], ['sheikh', true], ['citizen', false]]);
+    let r = addResult({}, players, 'town');
+    r = addResult(r, players, 'mafia');
+    expect(r).toEqual({ p0: { wins: 1, games: 2 }, p1: { wins: 1, games: 2 }, p2: { wins: 1, games: 2 } });
+    r = addResult(r, players, 'town');
+    expect(rankOrder(r)[0][0]).toBe('p1');
   });
 });

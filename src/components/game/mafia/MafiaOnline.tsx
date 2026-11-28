@@ -8,7 +8,7 @@ import {
   MafiaAction, MafiaRole, MIN_PLAYERS, NO_SHOT, STEP_INFO, isMafia, mafiaDecision, mafiaReducer, newGame, nightSteps, suggestRoles, voteResult,
 } from '@/lib/mafia';
 import QRCodeModal from '../QRCodeModal';
-import { DayInfo, EndView, NarratorView, NoShotButton, OutCard, PlayerGrid, RoleCard, RoleEditor, SheikhAnswer, Shell, VoiceBanner, VoiceCheck, useTap } from './ui';
+import { DayInfo, EndView, NoShotButton, RankingView, WinnerButtons, loadRanking, recordResult, saveRanking, OutCard, PlayerGrid, RoleCard, RoleEditor, SheikhAnswer, Shell, VoiceBanner, VoiceCheck, useTap } from './ui';
 import { Lobbyist, Snapshot, unlockSpeech, useAutoNarrator } from './autoNarrator';
 
 // ponytail: the room creator's phone holds the whole game and talks to players over a Supabase Realtime channel
@@ -163,7 +163,13 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
   }, [snap, connected]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dispatch = (a: MafiaAction) => setSnap((sn) => withAction(sn, a));
-  const voice = useAutoNarrator(!!snap.auto && !!snap.game, snap, dispatch);
+  const voice = useAutoNarrator(!!snap.auto && !!snap.game && !snap.cardsOnly, snap, dispatch);
+
+  // a finished game goes into the ranking once; players get it with the room state
+  useEffect(() => {
+    const r = recordResult(snap.game);
+    if (r) setSnap((sn) => ({ ...sn, ranking: r, game: sn.game && { ...sn.game, ranked: true } }));
+  }, [snap.game]);
 
   // 🧪 bots act one at a time, a moment apart, like slow humans
   const hasBots = snap.bots.length > 0 && !!snap.game;
@@ -186,10 +192,14 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
 
   const g = snap.game;
 
-  // Auto mode: the creator is a player; the phone narrates.
-  if (g && snap.auto) {
+  // The creator always plays. Cards-only: the app stops after the cards; auto: the phone narrates.
+  if (g) {
     const ph = g.phase;
-    const controls = ph.t === 'day'
+    const controls = snap.cardsOnly
+      ? ph.t === 'end'
+        ? <button onClick={() => { tap(50); restart(); }} className="w-full btn-primary-game text-lg">🔄 العب مرة تانية</button>
+        : <WinnerButtons onPick={(win) => dispatch({ type: 'finish', win })} />
+      : ph.t === 'day'
       ? <button onClick={() => { tap(50); dispatch({ type: 'toVote' }); }} className="w-full btn-primary-game text-lg">🗳️ خلّصنا نقاش، يلا نصوّت</button>
       : ph.t === 'vote'
         ? <button onClick={() => { tap(); dispatch({ type: 'voteOut', idx: voteResult(snap.votes) }); }} className="w-full btn-secondary-game">⏹️ خلّص التصويت هلأ</button>
@@ -197,72 +207,29 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
           ? <button onClick={() => { tap(50); restart(); }} className="w-full btn-primary-game text-lg">🔄 العب مرة تانية</button>
           : undefined;
     return (
-      <PlayerView snap={snap} myId={snap.auto.id} connected={connected} onQuit={quit}
-        act={(kind, idx) => { tap(); setSnap((sn) => applyAct(sn, { from: snap.auto!.id, kind, idx })); }}
-        banner={<VoiceBanner line={voice.line} count={voice.count} />}
+      <PlayerView snap={snap} myId={snap.auto?.id ?? me.id} connected={connected} onQuit={quit}
+        act={(kind, idx) => { tap(); setSnap((sn) => applyAct(sn, { from: snap.auto?.id ?? me.id, kind, idx })); }}
+        banner={snap.cardsOnly ? undefined : <VoiceBanner line={voice.line} count={voice.count} />}
         footer={controls} />
     );
   }
 
-  if (g) {
-    const byId = (id: string) => g.players.find((p) => p.id === id);
-    const ph = g.phase;
-    let stepHint: React.ReactNode;
-    if (ph.t === 'night') {
-      const key = nightSteps(g)[ph.step];
-      if (key === 'kill') {
-        const picks = Object.entries(snap.mafiaPicks);
-        stepHint = (
-          <div className="text-sm text-muted-foreground space-y-1">
-            <p>المافيا عم يختاروا على موبايلاتهم{g.players.some((p) => p.alive && p.role === 'godfather') ? ' (شيخ المافيا بيحسم)' : ''}:</p>
-            {picks.length === 0 ? <p>⏳ لسا ما حدا اختار</p> : picks.map(([id, t]) => <p key={id}>{byId(id)?.name} ← {g.players[t]?.name}</p>)}
-          </div>
-        );
-      } else if (key !== 'intro') {
-        const holder = g.players.find((p) => p.alive && p.role === STEP_INFO[key].role);
-        stepHint = <p className="text-sm text-muted-foreground">{g.picks[key] === null ? `⏳ بانتظار ${STEP_INFO[key].who} (${holder?.name})…` : `✅ ${STEP_INFO[key].who} ${key === 'protect' ? 'اختارت' : 'اختار'}`}</p>;
-      }
-    }
-    const voteCounts: Record<number, number> = {};
-    Object.values(snap.votes).forEach((t) => { voteCounts[t] = (voteCounts[t] ?? 0) + 1; });
-    const allSeen = g.players.every((p) => p.id && snap.seen.includes(p.id));
-
-    return (
-      <NarratorView s={g} dispatch={dispatch} onQuit={quit} onRestart={restart}
-        online={{
-          stepHint, voteCounts,
-          revealBody: (
-            <div className="card-game space-y-2">
-              <p className="font-bold text-center mb-2">كل واحد عم يشوف كرته على موبايله</p>
-              {g.players.map((p) => <p key={p.id} className="text-sm">{p.id && snap.seen.includes(p.id) ? '✅' : '⏳'} {p.avatar} {p.name}</p>)}
-            </div>
-          ),
-          revealFooter: (
-            <button onClick={() => { tap(50); dispatch({ type: 'beginNight' }); }} className="w-full btn-primary-game text-xl">
-              {allSeen ? '🌙 ابدأ الليل' : `🌙 ابدأ الليل (${snap.seen.length}/${g.players.length} شافوا)`}
-            </button>
-          ),
-        }}
-      />
-    );
-  }
-
   // Lobby
-  const hostPlayer: Lobbyist | null = autoMode && myName.trim() ? { id: me.id, name: myName.trim(), avatar: myAvatar } : null;
+  const hostPlayer: Lobbyist | null = myName.trim() ? { id: me.id, name: myName.trim(), avatar: myAvatar } : null;
   const people = [...(hostPlayer ? [hostPlayer] : []), ...snap.lobby, ...snap.bots];
   const n = people.length;
   const roleList = roles && roles.length === n ? roles : n >= MIN_PLAYERS ? suggestRoles(n) : [];
-  const canStart = n >= MIN_PLAYERS && (!autoMode || !!hostPlayer);
+  const canStart = n >= MIN_PLAYERS && !!hostPlayer;
   const deal = () => {
     tap(50);
     if (autoMode) unlockSpeech();
-    setSnap((sn) => ({ ...sn, auto: hostPlayer, game: { ...newGame(people, roleList), plain }, seen: [], votes: {}, mafiaPicks: {} }));
+    setSnap((sn) => ({ ...sn, auto: hostPlayer, cardsOnly: !autoMode, game: { ...newGame(people, roleList), plain }, seen: [], votes: {}, mafiaPicks: {} }));
   };
 
   return (
     <Shell title="غرفة المافيا" onBack={quit}
       footer={<button onClick={deal} disabled={!canStart} className="w-full btn-primary-game text-xl disabled:opacity-50 disabled:cursor-not-allowed">
-        {autoMode && !hostPlayer ? 'اكتب اسمك أول' : n < MIN_PLAYERS ? `بدنا ${MIN_PLAYERS} لاعبين على الأقل (${n})` : '🎴 وزّع الكروت'}
+        {!hostPlayer ? 'اكتب اسمك أول' : n < MIN_PLAYERS ? `بدنا ${MIN_PLAYERS} لاعبين على الأقل (${n})` : '🎴 وزّع الكروت'}
       </button>}>
       <Offline connected={connected} />
       <div className="card-game text-center">
@@ -278,7 +245,7 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
       <div className="card-game space-y-3">
         <h2 className="font-bold">🎙️ مين الراوي؟</h2>
         <div className="grid grid-cols-2 gap-2">
-          {[{ v: false, icon: '🎙️', t: 'في راوي', d: 'إنت بتدير وما بتلعب' }, { v: true, icon: '🤖', t: 'راوي آلي', d: 'الموبايل بيحكي، وإنت بتلعب' }].map((o) => (
+          {[{ v: false, icon: '🎙️', t: 'في راوي', d: 'الموبايل بيوزّع الكروت بس، وإنت بتلعب' }, { v: true, icon: '🤖', t: 'راوي آلي', d: 'الموبايل بيحكي، وإنت بتلعب' }].map((o) => (
             <button key={o.t} onClick={() => { tap(); setAutoMode(o.v); setRoles(null); }}
               className={`p-3 rounded-2xl text-center border-2 ${autoMode === o.v ? 'border-primary bg-primary/10' : 'border-transparent bg-secondary/60'}`}>
               <span className="block text-2xl">{o.icon}</span>
@@ -287,14 +254,14 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
             </button>
           ))}
         </div>
-        {autoMode && (
-          <>
-            <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
               <button onClick={() => { tap(); setMyAvatar(AVATAR_OPTIONS[(AVATAR_OPTIONS.indexOf(myAvatar) + 1) % AVATAR_OPTIONS.length]); }}
                 className="w-11 h-11 rounded-full bg-primary/20 flex items-center justify-center text-2xl shrink-0" aria-label="غيّر الأفاتار">{myAvatar}</button>
               <input value={myName} onChange={(e) => setMyName(e.target.value.slice(0, 20))} placeholder="اسمك"
                 className="flex-1 text-sm font-bold py-2.5 px-3 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none" />
             </div>
+        {autoMode && (
+          <>
             <p className="text-xs text-muted-foreground leading-relaxed">🔊 علّي صوت الموبايل وحطّه بالنص. رح يحكي ويعدّ ٥، ٤، ٣، ٢، ١ قبل ما تفتّحوا أو تغمّضوا</p>
             <VoiceCheck />
           </>
@@ -312,6 +279,7 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
         </button>
       </div>
       {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} plain={plain} setPlain={setPlain} />}
+      <RankingView ranking={snap.ranking ?? loadRanking()} onReset={() => { saveRanking({}); setSnap((sn) => ({ ...sn, ranking: {} })); }} />
     </Shell>
   );
 };
@@ -322,6 +290,7 @@ const PlayerView: React.FC<{
   act: (kind: Act['kind'], idx?: number) => void; banner?: React.ReactNode; footer?: React.ReactNode; hello?: { name: string; avatar: string; code: string };
 }> = ({ snap, myId, connected, onQuit, act, banner, footer, hello }) => {
   const [checked, setChecked] = useState<number | null>(null);
+  const [peek, setPeek] = useState(false);
   const g = snap?.game;
   const myIdx = g ? g.players.findIndex((p) => p.id === myId) : -1;
   const mine = g?.players[myIdx];
@@ -350,6 +319,18 @@ const PlayerView: React.FC<{
   const ph = g.phase;
   if (ph.t === 'reveal') {
     const seen = snap.seen.includes(myId);
+    if (snap.cardsOnly && seen && !peek) {
+      return wrap('🤫 سكّر الموبايل', (
+        <div className="card-game text-center">
+          <div className="text-6xl mb-3">📵</div>
+          <p className="text-lg font-bold">خلص، عرفت دورك</p>
+          <p className="text-sm text-muted-foreground mt-1 mb-4">سكّر الموبايل، والراوي بيكمّل اللعبة</p>
+          <button onClick={() => setPeek(true)} className="text-sm text-muted-foreground underline">👀 شوف كرتي مرة تانية</button>
+        </div>
+      ));
+    }
+    if (snap.cardsOnly && seen) return wrap('كرتك', <RoleCard me={mine} players={g.players} plain={g.plain} />,
+      <button onClick={() => setPeek(false)} className="w-full btn-primary-game text-lg">🙈 خبّي كرتي</button>);
     return wrap('كرتك', <RoleCard me={mine} players={g.players} plain={g.plain} />,
       <button onClick={() => act('seen')} disabled={seen} className="w-full btn-primary-game text-lg disabled:opacity-60">{seen ? '✅ تمام، استنى الباقي' : '🙈 شفت كرتي'}</button>);
   }
@@ -379,7 +360,7 @@ const PlayerView: React.FC<{
 
   if (ph.t === 'day') return wrap('النهار ☀️', <DayInfo s={g} />);
   if (ph.t === 'out') return wrap(ph.by === 'vote' ? 'نتيجة التصويت' : 'صباح الخير', <OutCard s={g} />);
-  if (ph.t === 'end') return wrap('خلصت اللعبة', <EndView s={g} />);
+  if (ph.t === 'end') return wrap('خلصت اللعبة', <EndView s={g} ranking={snap.ranking} />);
 
   if (ph.t === 'boy') {
     if (mine.role !== 'boy') return wrap('💣 الولد', <div className="card-game text-center"><p className="font-bold">{g.players.find((p) => p.role === 'boy')?.name} كان الولد!</p><p className="text-sm text-muted-foreground">عم يختار مين ياخد معه…</p></div>);
