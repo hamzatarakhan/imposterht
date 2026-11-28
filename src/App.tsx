@@ -6,10 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UpdateNotification } from "@/components/UpdateNotification";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { Maintenance, isMaintenance } from "@/components/Maintenance";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => isMaintenance ? <Maintenance /> : (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
