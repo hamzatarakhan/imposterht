@@ -118,8 +118,9 @@ export interface MafiaState {
   saved: boolean;
   sniperUsed: boolean;
   queue: number[]; // more night deaths waiting to be announced
-  plain?: boolean;
-  ranked?: boolean; // result already added to the ranking // no red/green on private screens, so a neighbour can't read a role from the colour
+  plain?: boolean; // no red/green on private cards
+  noIcons?: boolean; // no role emoji on private cards
+  ranked?: boolean; // result already added to the ranking
   log: string[];
 }
 

@@ -8,7 +8,7 @@ import {
   MafiaAction, MafiaRole, MIN_PLAYERS, NO_SHOT, STEP_INFO, isMafia, mafiaDecision, mafiaReducer, newGame, nightSteps, suggestRoles, voteResult,
 } from '@/lib/mafia';
 import QRCodeModal from '../QRCodeModal';
-import { DayInfo, EndView, NoShotButton, RankingView, WinnerButtons, loadRanking, recordResult, saveRanking, OutCard, PlayerGrid, RoleCard, RoleEditor, SheikhAnswer, Shell, VoiceBanner, VoiceCheck, useTap } from './ui';
+import { DayInfo, EndView, NoShotButton, DEFAULT_LOOK, GroupField, RankingView, WinnerButtons, loadGroup, loadMe, recordResult, saveMe, saveRanking, useRanking, OutCard, PlayerGrid, RoleCard, RoleEditor, SheikhAnswer, Shell, VoiceBanner, VoiceCheck, useTap } from './ui';
 import { Lobbyist, Snapshot, unlockSpeech, useAutoNarrator } from './autoNarrator';
 
 // ponytail: the room creator's phone holds the whole game and talks to players over a Supabase Realtime channel
@@ -143,10 +143,10 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
     try { return { ...emptySnap, ...JSON.parse(sessionStorage.getItem(storeKey) || '{}') }; } catch { return emptySnap; }
   });
   const [roles, setRoles] = useState<MafiaRole[] | null>(null);
-  const [plain, setPlain] = useState(false);
+  const [look, setLook] = useState(DEFAULT_LOOK);
   const [showQR, setShowQR] = useState(false);
-  const [myName, setMyName] = useState(snap.auto?.name ?? savedPlayers[0]?.name ?? '');
-  const [myAvatar, setMyAvatar] = useState(snap.auto?.avatar ?? savedPlayers[0]?.avatar ?? '👤');
+  const [myName, setMyName] = useState(snap.auto?.name ?? loadMe()?.name ?? savedPlayers[0]?.name ?? '');
+  const [myAvatar, setMyAvatar] = useState(snap.auto?.avatar ?? loadMe()?.avatar ?? savedPlayers[0]?.avatar ?? '👤');
   const [autoMode, setAutoMode] = useState(!!snap.auto);
   const snapRef = useRef(snap);
   snapRef.current = snap;
@@ -166,10 +166,14 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
   const voice = useAutoNarrator(!!snap.auto && !!snap.game && !snap.cardsOnly, snap, dispatch);
 
   // a finished game goes into the ranking once; players get it with the room state
+  const [group, setGroup] = useState(loadGroup);
+  const [ranking, setRanking] = useRanking(group.trim());
   useEffect(() => {
-    const r = recordResult(snap.game);
-    if (r) setSnap((sn) => ({ ...sn, ranking: r, game: sn.game && { ...sn.game, ranked: true } }));
-  }, [snap.game]);
+    const g = snap.game;
+    if (!g || g.phase.t !== 'end' || g.ranked) return;
+    setSnap((sn) => ({ ...sn, game: sn.game && { ...sn.game, ranked: true } }));
+    void recordResult(g, group.trim()).then((r) => { setRanking(r); setSnap((sn) => ({ ...sn, ranking: r })); });
+  }, [snap.game]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 🧪 bots act one at a time, a moment apart, like slow humans
   const hasBots = snap.bots.length > 0 && !!snap.game;
@@ -223,7 +227,8 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
   const deal = () => {
     tap(50);
     if (autoMode) unlockSpeech();
-    setSnap((sn) => ({ ...sn, auto: hostPlayer, cardsOnly: !autoMode, game: { ...newGame(people, roleList), plain }, seen: [], votes: {}, mafiaPicks: {} }));
+    if (hostPlayer) saveMe(hostPlayer.name, hostPlayer.avatar);
+    setSnap((sn) => ({ ...sn, auto: hostPlayer, cardsOnly: !autoMode, game: { ...newGame(people, roleList), ...look }, seen: [], votes: {}, mafiaPicks: {} }));
   };
 
   return (
@@ -278,8 +283,9 @@ export const MafiaHost: React.FC<{ code: string; onQuit: () => void }> = ({ code
           {snap.bots.length ? '🧪 شيل اللاعبين التجريبيين' : '🧪 تيست: ضيف 5 لاعبين تجريبيين'}
         </button>
       </div>
-      {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} plain={plain} setPlain={setPlain} />}
-      <RankingView ranking={snap.ranking ?? loadRanking()} onReset={() => { saveRanking({}); setSnap((sn) => ({ ...sn, ranking: {} })); }} />
+      {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} look={look} setLook={setLook} />}
+      <GroupField group={group} setGroup={setGroup} />
+      <RankingView ranking={ranking} group={group.trim()} onReset={group.trim() ? undefined : () => { saveRanking({}); setRanking({}); }} />
     </Shell>
   );
 };
@@ -329,9 +335,9 @@ const PlayerView: React.FC<{
         </div>
       ));
     }
-    if (snap.cardsOnly && seen) return wrap('كرتك', <RoleCard me={mine} players={g.players} plain={g.plain} />,
+    if (snap.cardsOnly && seen) return wrap('كرتك', <RoleCard me={mine} players={g.players} plain={g.plain} noIcons={g.noIcons} />,
       <button onClick={() => setPeek(false)} className="w-full btn-primary-game text-lg">🙈 خبّي كرتي</button>);
-    return wrap('كرتك', <RoleCard me={mine} players={g.players} plain={g.plain} />,
+    return wrap('كرتك', <RoleCard me={mine} players={g.players} plain={g.plain} noIcons={g.noIcons} />,
       <button onClick={() => act('seen')} disabled={seen} className="w-full btn-primary-game text-lg disabled:opacity-60">{seen ? '✅ تمام، استنى الباقي' : '🙈 شفت كرتي'}</button>);
   }
 

@@ -276,6 +276,12 @@ export type Database = {
         }
         Relationships: []
       }
+      mafia_results: {
+        Row: { created_at: string; group_name: string; id: string; player_name: string; won: boolean }
+        Insert: { created_at?: string; group_name: string; id?: string; player_name: string; won: boolean }
+        Update: { created_at?: string; group_name?: string; id?: string; player_name?: string; won?: boolean }
+        Relationships: []
+      }
       guessing_players: {
         Row: {
           avatar: string

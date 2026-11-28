@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
 import {
   MafiaPlayer, MafiaRole, MafiaState, MafiaAction, Ranking, ROLE_INFO, STEP_INFO, isMafia, nightSteps, addResult, rankOrder, buildRoles, maxMafia, MAFIA_SPECIALS, TOWN_SPECIALS, NO_SHOT,
 } from '@/lib/mafia';
+import { fetchRanking, pushResult } from '@/services/mafiaRankingService';
 import { hasArabicVoice, unlockSpeech } from './autoNarrator';
 
 export const useTap = () => {
@@ -52,7 +53,21 @@ export const PlayerGrid: React.FC<{
   );
 };
 
-export const RoleEditor: React.FC<{ n: number; roles: MafiaRole[]; setRoles: (r: MafiaRole[]) => void; plain: boolean; setPlain: (v: boolean) => void }> = ({ n, roles, setRoles, plain, setPlain }) => {
+/** How private role cards look: colours and emoji can both be hidden so a neighbour can't read a role at a glance. */
+export interface CardLook { plain: boolean; noIcons: boolean }
+export const DEFAULT_LOOK: CardLook = { plain: false, noIcons: false };
+
+const Switch: React.FC<{ on: boolean; onToggle: () => void; title: string; onText: string; offText: string }> = ({ on, onToggle, title, onText, offText }) => (
+  <button onClick={onToggle} className="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-secondary/60 text-start">
+    <span>
+      <span className="block text-sm font-bold">{title}</span>
+      <span className="block text-xs text-muted-foreground">{on ? onText : offText}</span>
+    </span>
+    <span className={`shrink-0 w-11 h-6 rounded-full p-0.5 transition-colors ${on ? 'bg-primary' : 'bg-secondary'}`}><span className={`block w-5 h-5 rounded-full bg-white transition-transform ${on ? '-translate-x-5' : ''}`} /></span>
+  </button>
+);
+
+export const RoleEditor: React.FC<{ n: number; roles: MafiaRole[]; setRoles: (r: MafiaRole[]) => void; look: CardLook; setLook: (l: CardLook) => void }> = ({ n, roles, setRoles, look, setLook }) => {
   const tap = useTap();
   const mafiaN = roles.filter((r) => ROLE_INFO[r].team === 'mafia').length;
   const specials = roles.filter((r) => MAFIA_SPECIALS.includes(r) || TOWN_SPECIALS.includes(r));
@@ -90,13 +105,10 @@ export const RoleEditor: React.FC<{ n: number; roles: MafiaRole[]; setRoles: (r:
         <p className="text-xs font-bold text-emerald-500 mb-2">أدوار المواطنين</p>
         <div className="flex flex-wrap gap-2">{TOWN_SPECIALS.map((r) => <Chip key={r} r={r} />)}</div>
       </div>
-      <button onClick={() => { tap(); setPlain(!plain); }} className="w-full flex items-center justify-between gap-3 p-3 rounded-2xl bg-secondary/60 text-start">
-        <span>
-          <span className="block text-sm font-bold">🎨 لون أحمر لكروت المافيا</span>
-          <span className="block text-xs text-muted-foreground">{plain ? 'مطفي: كل الكروت بنفس اللون، الدور بينعرف من الكتابة بس' : 'شغّال: كرت المافيا أحمر وكرت المواطن أخضر'}</span>
-        </span>
-        <span className={`shrink-0 w-11 h-6 rounded-full p-0.5 transition-colors ${plain ? 'bg-secondary' : 'bg-primary'}`}><span className={`block w-5 h-5 rounded-full bg-white transition-transform ${plain ? '' : '-translate-x-5'}`} /></span>
-      </button>
+      <Switch on={!look.plain} onToggle={() => { tap(); setLook({ ...look, plain: !look.plain }); }} title="🎨 لون أحمر لكروت المافيا"
+        onText="شغّال: كرت المافيا أحمر وكرت المواطن أخضر" offText="مطفي: كل الكروت بنفس اللون، الدور بينعرف من الكتابة بس" />
+      <Switch on={!look.noIcons} onToggle={() => { tap(); setLook({ ...look, noIcons: !look.noIcons }); }} title="🔪 أشكال الأدوار على الكرت"
+        onText="شغّال: كل كرت عليه شكل دوره (🔪 🕵️ 👤…)" offText="مطفي: الكرت بدون شكل، بس اسم الدور" />
       <p className="text-xs text-muted-foreground leading-relaxed">
         الكروت: {Object.entries(counts).map(([r, c]) => `${ROLE_INFO[r as MafiaRole].icon} ${ROLE_INFO[r as MafiaRole].name}${c > 1 ? ` ×${c}` : ''}`).join(' · ')}
       </p>
@@ -104,13 +116,13 @@ export const RoleEditor: React.FC<{ n: number; roles: MafiaRole[]; setRoles: (r:
   );
 };
 
-export const RoleCard: React.FC<{ me: MafiaPlayer; players: MafiaPlayer[]; plain?: boolean }> = ({ me, players, plain }) => {
+export const RoleCard: React.FC<{ me: MafiaPlayer; players: MafiaPlayer[]; plain?: boolean; noIcons?: boolean }> = ({ me, players, plain, noIcons }) => {
   const info = ROLE_INFO[me.role];
   const tint = (red: string, green: string, neutral: string) => (plain ? neutral : info.team === 'mafia' ? red : green);
   const mates = isMafia(me) ? players.filter((q) => q !== me && isMafia(q)) : [];
   return (
     <div className={`card-game text-center border-2 ${tint('border-red-500/50', 'border-emerald-500/40', 'border-border')}`}>
-      <div className="text-7xl mb-3">{info.icon}</div>
+      {!noIcons && <div className="text-7xl mb-3">{info.icon}</div>}
       <h2 className={`text-3xl font-black mb-2 ${tint('text-red-500', 'text-emerald-500', 'text-foreground')}`}>{info.name}</h2>
       <p className="text-sm text-muted-foreground mb-2">{info.desc}</p>
       {mates.length > 0 && (
@@ -230,22 +242,54 @@ const RANK_KEY = 'mafia_ranking';
 export const loadRanking = (): Ranking => { try { return JSON.parse(localStorage.getItem(RANK_KEY) || '{}'); } catch { return {}; } };
 export const saveRanking = (r: Ranking) => { try { localStorage.setItem(RANK_KEY, JSON.stringify(r)); } catch { /* private mode */ } };
 
-/** Adds a finished game to the stored ranking (once) and returns the new ranking, or null if nothing to add. */
-export function recordResult(g: MafiaState | null): Ranking | null {
-  if (!g || g.phase.t !== 'end' || g.ranked) return null;
-  const r = addResult(loadRanking(), g.players.filter((p) => !p.id?.startsWith('bot-')), g.phase.win);
-  saveRanking(r);
-  return r;
+/** Your own name and face, filled in for you next time. */
+export const loadMe = (): { name: string; avatar: string } | null => { try { return JSON.parse(localStorage.getItem('mafia_me') || 'null'); } catch { return null; } };
+export const saveMe = (name: string, avatar: string) => { try { localStorage.setItem('mafia_me', JSON.stringify({ name, avatar })); } catch { /* private mode */ } };
+
+const GROUP_KEY = 'mafia_group';
+export const loadGroup = () => { try { return localStorage.getItem(GROUP_KEY) ?? ''; } catch { return ''; } };
+
+/** Adds a finished game: always to this phone's ranking, and to the group's shared ranking when a group is set. */
+export async function recordResult(g: MafiaState, group: string): Promise<Ranking> {
+  if (g.phase.t !== 'end') return loadRanking();
+  const players = g.players.filter((p) => !p.id?.startsWith('bot-'));
+  const local = addResult(loadRanking(), players, g.phase.win);
+  saveRanking(local);
+  if (!group) return local;
+  await pushResult(group, players, g.phase.win);
+  return (await fetchRanking(group)) ?? local;
 }
 
+/** The ranking to show: the group's shared one (from the database) if a group is set, otherwise this phone's. */
+export function useRanking(group: string) {
+  const [ranking, setRanking] = useState<Ranking>(loadRanking);
+  useEffect(() => {
+    try { localStorage.setItem(GROUP_KEY, group); } catch { /* private mode */ }
+    if (!group) { setRanking(loadRanking()); return; }
+    let live = true;
+    const t = setTimeout(() => { void fetchRanking(group).then((r) => { if (live) setRanking(r ?? loadRanking()); }); }, 500);
+    return () => { live = false; clearTimeout(t); };
+  }, [group]);
+  return [ranking, setRanking] as const;
+}
+
+export const GroupField: React.FC<{ group: string; setGroup: (g: string) => void }> = ({ group, setGroup }) => (
+  <div className="card-game space-y-2">
+    <h2 className="font-bold">👥 اسم الشلة</h2>
+    <input value={group} onChange={(e) => setGroup(e.target.value.slice(0, 40))} placeholder="مثلاً: شلة الخميس"
+      className="w-full text-sm font-bold py-2.5 px-3 rounded-xl bg-secondary border-2 border-transparent focus:border-primary focus:outline-none" />
+    <p className="text-xs text-muted-foreground">نفس الاسم = نفس الترتيب، مين ما فتح الغرفة. اتركه فاضي إذا بدك ترتيب على هالجوال بس</p>
+  </div>
+);
+
 const MEDALS = ['🥇', '🥈', '🥉'];
-export const RankingView: React.FC<{ ranking?: Ranking; onReset?: () => void }> = ({ ranking, onReset }) => {
+export const RankingView: React.FC<{ ranking?: Ranking; onReset?: () => void; group?: string }> = ({ ranking, onReset, group }) => {
   const rows = ranking ? rankOrder(ranking) : [];
   if (!rows.length) return null;
   return (
     <div className="card-game space-y-2">
       <div className="flex items-center justify-between">
-        <h2 className="font-bold">🏆 الترتيب</h2>
+        <h2 className="font-bold">🏆 الترتيب{group ? ` · ${group}` : ''}</h2>
         {onReset && <button onClick={() => { if (confirm('أكيد بدك تصفّر الترتيب؟')) onReset(); }} className="text-xs text-muted-foreground underline">صفّر</button>}
       </div>
       {rows.map(([name, { wins, games }], i) => (

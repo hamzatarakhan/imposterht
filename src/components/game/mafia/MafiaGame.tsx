@@ -3,7 +3,7 @@ import { useGame, AVATAR_OPTIONS } from '@/context/GameContext';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import MafiaLocal from './MafiaLocal';
 import { MafiaHost, MafiaPlayerScreen, newRoomCode } from './MafiaOnline';
-import { Shell, useTap } from './ui';
+import { Shell, loadMe, saveMe, useTap } from './ui';
 
 type Mode =
   | { t: 'menu' }
@@ -39,8 +39,8 @@ const MafiaGame: React.FC = () => {
   const tap = useTap();
   const { savedPlayers } = useSavedPlayers();
   const [mode, setModeRaw] = useState<Mode>(initialMode);
-  const [name, setName] = useState(savedPlayers[0]?.name ?? '');
-  const [avatar, setAvatar] = useState(savedPlayers[0]?.avatar ?? '👤');
+  const [name, setName] = useState(loadMe()?.name ?? savedPlayers[0]?.name ?? '');
+  const [avatar, setAvatar] = useState(loadMe()?.avatar ?? savedPlayers[0]?.avatar ?? '👤');
   const [code, setCode] = useState('');
 
   const setMode = (m: Mode) => {
@@ -58,7 +58,7 @@ const MafiaGame: React.FC = () => {
     const ok = c.length === 5 && name.trim();
     return (
       <Shell title="ادخل غرفة" onBack={toMenu}
-        footer={<button disabled={!ok} onClick={() => { tap(50); setMode({ t: 'player', code: c, name: name.trim(), avatar }); }} className="w-full btn-primary-game text-xl disabled:opacity-50">🚪 ادخل</button>}>
+        footer={<button disabled={!ok} onClick={() => { tap(50); saveMe(name.trim(), avatar); setMode({ t: 'player', code: c, name: name.trim(), avatar }); }} className="w-full btn-primary-game text-xl disabled:opacity-50">🚪 ادخل</button>}>
         <div className="card-game space-y-3">
           {!mode.code && (
             <input value={code} onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 5))} placeholder="كود الغرفة" dir="ltr"

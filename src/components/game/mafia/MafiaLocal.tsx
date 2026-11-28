@@ -4,7 +4,7 @@ import { Plus, X } from 'lucide-react';
 import { AVATAR_OPTIONS } from '@/context/GameContext';
 import { useSavedPlayers } from '@/hooks/useSavedPlayers';
 import { MafiaAction, MafiaRole, MafiaState, MIN_PLAYERS, mafiaReducer, newGame, suggestRoles } from '@/lib/mafia';
-import { CardsOnlyView, NarratorView, RankingView, RoleCard, RoleEditor, Shell, VoiceBanner, VoiceCheck, loadRanking, recordResult, saveRanking, useTap } from './ui';
+import { CardsOnlyView, NarratorView, RankingView, RoleCard, RoleEditor, Shell, VoiceBanner, VoiceCheck, DEFAULT_LOOK, GroupField, loadGroup, recordResult, saveRanking, useRanking, useTap } from './ui';
 
 /** One phone, held by the narrator; cards are revealed by passing the phone around. */
 const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
@@ -14,14 +14,16 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
   const [newName, setNewName] = useState('');
   const [roles, setRoles] = useState<MafiaRole[] | null>(null);
   const [game, setGame] = useState<MafiaState | null>(null);
-  const [plain, setPlain] = useState(false);
+  const [look, setLook] = useState(DEFAULT_LOOK);
   const [reveal, setReveal] = useState<{ i: number; shown: boolean } | null>(null);
   const [auto, setAuto] = useState(false);
-  const [ranking, setRanking] = useState(loadRanking);
+  const [group, setGroup] = useState(loadGroup);
+  const [ranking, setRanking] = useRanking(group.trim());
   useEffect(() => {
-    const r = recordResult(game);
-    if (r) { setRanking(r); setGame((g) => g && { ...g, ranked: true }); }
-  }, [game]);
+    if (!game || game.phase.t !== 'end' || game.ranked) return;
+    setGame((g) => g && { ...g, ranked: true });
+    void recordResult(game, group.trim()).then(setRanking);
+  }, [game]); // eslint-disable-line react-hooks/exhaustive-deps
   const dispatch = (a: MafiaAction) => setGame((g) => g && mafiaReducer(g, a));
   const snap = useMemo(() => ({ lobby: [], game, seen: [], votes: {}, mafiaPicks: {} }), [game]);
   const voice = useAutoNarrator(auto && !!game && !reveal, snap, dispatch, { samePhone: true });
@@ -32,7 +34,7 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
   const start = () => {
     tap(50);
     if (auto) unlockSpeech();
-    setGame({ ...newGame(names, roleList), plain });
+    setGame({ ...newGame(names, roleList), ...look });
     setReveal({ i: 0, shown: false });
   };
 
@@ -51,7 +53,7 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
             </div>
           ) : (
             <>
-              <RoleCard me={p} players={game.players} plain={game.plain} />
+              <RoleCard me={p} players={game.players} plain={game.plain} noIcons={game.noIcons} />
               <button onClick={next} className="w-full btn-secondary-game">🙈 خبّيت كرتي، التالي</button>
             </>
           )}
@@ -107,8 +109,9 @@ const MafiaLocal: React.FC<{ onQuit: () => void }> = ({ onQuit }) => {
           ))}
         </div>
       </div>
-      {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} plain={plain} setPlain={setPlain} />}
-      <RankingView ranking={ranking} onReset={() => { saveRanking({}); setRanking({}); }} />
+      {n >= MIN_PLAYERS && <RoleEditor n={n} roles={roleList} setRoles={setRoles} look={look} setLook={setLook} />}
+      <GroupField group={group} setGroup={setGroup} />
+      <RankingView ranking={ranking} group={group.trim()} onReset={group.trim() ? undefined : () => { saveRanking({}); setRanking({}); }} />
     </Shell>
   );
 };
