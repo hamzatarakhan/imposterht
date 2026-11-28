@@ -14,3 +14,6 @@ ALTER TABLE public.mafia_results ENABLE ROW LEVEL SECURITY;
 -- No accounts in the app: anyone with the group name can read and add results (party-game trust level).
 CREATE POLICY "Anyone can read mafia results" ON public.mafia_results FOR SELECT USING (true);
 CREATE POLICY "Anyone can add mafia results" ON public.mafia_results FOR INSERT WITH CHECK (true);
+
+GRANT SELECT, INSERT ON public.mafia_results TO anon, authenticated;
+GRANT ALL ON public.mafia_results TO service_role;
